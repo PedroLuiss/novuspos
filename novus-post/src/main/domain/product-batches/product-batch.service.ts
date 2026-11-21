@@ -123,19 +123,21 @@ export class ProductBatchService {
     return result
   }
 
-  /** Crea un lote inicial con el stock actual del producto (al activar control de lotes). */
-  ensureInitialBatch(productId: string): void {
+  /** Crea un lote inicial con la cantidad indicada (stock previo al activar el control). */
+  ensureInitialBatch(productId: string, quantity: number): void {
     const product = this.products.findById(productId)
     if (!product) throw new ValidationError('El producto no existe')
     const existing = this.batches.findByProductId(productId, false)
     if (existing.length > 0) return
+    const initialQuantity = Number.isFinite(quantity) ? Math.max(0, quantity) : 0
+    if (initialQuantity <= 0) return
 
     const now = new Date().toISOString()
     this.batches.create({
       id: `batch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       productId,
       batchNumber: `INICIAL-${now.slice(0, 10)}`,
-      quantity: product.stock,
+      quantity: initialQuantity,
       expirationDate: undefined,
       active: true,
       enteredAt: now,

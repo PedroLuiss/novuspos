@@ -16,6 +16,7 @@ import type { BrandRepository } from '../../ports/brand.repository'
 import type { SupplierRepository } from '../../ports/supplier.repository'
 import type { ProductTypeRepository } from '../../ports/product-type.repository'
 import type { ProductBatchRepository } from '../../ports/product-batch.repository'
+import type { TransactionRunner } from '../../ports/transaction'
 import type { AuthService } from '../auth/auth.service'
 import { NotFoundError, ValidationError } from '../shared/errors'
 import { normalizeProductInput, validateProductInput } from './product.entity'
@@ -29,7 +30,8 @@ export class ProductService {
     private readonly suppliers: SupplierRepository,
     private readonly productTypes: ProductTypeRepository,
     private readonly batches: ProductBatchRepository,
-    private readonly auth: AuthService
+    private readonly auth: AuthService,
+    private readonly tx: TransactionRunner
   ) {}
 
   list(filter?: ProductFilter): Product[] {
@@ -79,14 +81,19 @@ export class ProductService {
     }
 
     const now = new Date().toISOString()
-    const created = this.products.create({
-      ...normalized,
-      id: `prod-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      createdAt: now,
-      updatedAt: now
+    return this.tx.run(() => {
+      const created = this.products.create({
+        ...normalized,
+        id: `prod-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        createdAt: now,
+        updatedAt: now
+      })
+      // El stock inicial se copia al lote antes de releer el producto: para un
+      // producto con lotes, `created.stock` ya es el stock efectivo (suma de
+      // lotes) y valdría 0 porque todavía no existe ningún lote.
+      if (normalized.trackBatches) this.ensureInitialBatch(created.id, normalized.stock)
+      return this.products.findById(created.id) ?? created
     })
-    if (created.trackBatches) this.ensureInitialBatch(created)
-    return created
   }
 
   update(product: Product): Product {
@@ -134,20 +141,33 @@ export class ProductService {
       throw new ValidationError(`El código ${normalized.code} ya pertenece a otro producto`)
     }
 
-    const updated = this.products.update({ ...normalized, id: product.id })
-    if (updated.trackBatches && !existing.trackBatches) this.ensureInitialBatch(updated)
-    return updated
+    return this.tx.run(() => {
+      const updated = this.products.update({ ...normalized, id: product.id })
+      // Al activar el control de lotes, el lote inicial debe recibir el stock que
+      // el producto tenía antes de activarlo. No se puede usar `updated.stock`
+      // porque ya es el stock efectivo (suma de lotes) y valdría 0.
+      if (normalized.trackBatches && !existing.trackBatches) {
+        this.ensureInitialBatch(updated.id, normalized.stock)
+      }
+      return this.products.findById(product.id) ?? updated
+    })
   }
 
-  /** Crea un lote inicial con el stock actual del producto si aún no tiene lotes. */
-  private ensureInitialBatch(product: Product): void {
-    if (this.batches.findByProductId(product.id, false).length > 0) return
+  /**
+   * Crea el lote inicial con la cantidad indicada (el stock previo del producto).
+   * Se omite si ya hay lotes o si la cantidad es cero.
+   */
+  private ensureInitialBatch(productId: string, quantity: number): void {
+    if (this.batches.findByProductId(productId, false).length > 0) return
+    const initialQuantity = Number.isFinite(quantity) ? Math.max(0, quantity) : 0
+    if (initialQuantity <= 0) return
+
     const now = new Date().toISOString()
     this.batches.create({
       id: `batch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      productId: product.id,
+      productId,
       batchNumber: `INICIAL-${now.slice(0, 10)}`,
-      quantity: product.stock,
+      quantity: initialQuantity,
       active: true,
       enteredAt: now,
       createdAt: now,

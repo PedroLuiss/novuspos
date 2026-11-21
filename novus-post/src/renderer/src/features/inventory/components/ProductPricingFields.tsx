@@ -19,6 +19,8 @@ interface ProductPricingFieldsProps {
   canModifyPrice: boolean
   canAdjustStock: boolean
   canDeleteProduct: boolean
+  /** El stock de un producto con lotes se gestiona desde Lotes y Caducidad. */
+  stockManagedByBatches?: boolean
 }
 
 const PRESET_MARGINS = [10, 15, 20, 25, 30, 50]
@@ -33,7 +35,8 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
   isEditing,
   canModifyPrice,
   canAdjustStock,
-  canDeleteProduct
+  canDeleteProduct,
+  stockManagedByBatches = false
 }) => {
   const { config } = useBusinessConfig()
   const quantityStep = getProductQuantityStep(values.unit)
@@ -53,8 +56,8 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
           <label className="block text-xs font-medium text-slate-700 mb-1">
             Precio Costo ({config.currency}) <span className="text-red-500">*</span>
           </label>
-          <div className="relative">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+          <div className="flex rounded-[4px] border border-slate-300 bg-white overflow-hidden focus-within:border-[#0067C0] focus-within:ring-1 focus-within:ring-[#0067C0] transition-all">
+            <span className="inline-flex items-center justify-center px-2.5 bg-slate-50 border-r border-slate-300 text-slate-500 font-bold text-xs font-mono select-none shrink-0">
               {config.currency}
             </span>
             <CurrencyInput
@@ -63,7 +66,7 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
               value={values.costPrice}
               onValueChange={setCostPrice}
               disabled={pricingDisabled}
-              className="w-full pl-6 pr-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-[4px] focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0]"
+              className="w-full px-3 py-1.5 text-xs font-mono bg-white focus:outline-hidden disabled:bg-slate-100 disabled:text-slate-500"
             />
           </div>
           <span className="text-[10px] text-slate-400 mt-0.5 block">Costo de compra</span>
@@ -110,11 +113,10 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
                 type="button"
                 onClick={() => setProfitMarginPercent(pct)}
                 disabled={pricingDisabled}
-                className={`px-2.5 py-0.5 text-[11px] font-semibold rounded-[4px] border transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
-                  isSelected
-                    ? 'bg-[#107C41] text-white border-[#107C41] shadow-2xs'
-                    : 'bg-white hover:bg-emerald-50 text-slate-700 border-slate-300'
-                }`}
+                className={`px-2.5 py-0.5 text-[11px] font-semibold rounded-[4px] border transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${isSelected
+                  ? 'bg-[#107C41] text-white border-[#107C41] shadow-2xs'
+                  : 'bg-white hover:bg-emerald-50 text-slate-700 border-slate-300'
+                  }`}
               >
                 +{pct}%
               </button>
@@ -175,9 +177,15 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
             step={quantityStep}
             value={values.stock}
             onChange={(e) => update('stock', Number(e.target.value))}
-            disabled={!canAdjustStock}
-            className="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-[4px] focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0]"
+            disabled={!canAdjustStock || stockManagedByBatches}
+            title={stockManagedByBatches ? 'El stock se gestiona desde Lotes y Caducidad' : undefined}
+            className="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-[4px] focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0] disabled:bg-slate-100 disabled:text-slate-500"
           />
+          {stockManagedByBatches && (
+            <span className="block text-[10px] text-slate-500 mt-1">
+              Se gestiona desde Lotes y Caducidad.
+            </span>
+          )}
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-700 mb-1">Stock Mínimo</label>
@@ -211,14 +219,12 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
           type="button"
           onClick={() => update('active', !values.active)}
           disabled={!canDeleteProduct}
-          className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-50 ${
-            values.active ? 'bg-[#0067C0]' : 'bg-slate-300'
-          }`}
+          className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-50 ${values.active ? 'bg-[#0067C0]' : 'bg-slate-300'
+            }`}
         >
           <span
-            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-              values.active ? 'translate-x-5' : 'translate-x-0'
-            }`}
+            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${values.active ? 'translate-x-5' : 'translate-x-0'
+              }`}
           />
         </button>
       </div>

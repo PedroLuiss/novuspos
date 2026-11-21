@@ -125,7 +125,8 @@ export function registerIpcHandlers(): void {
     supplierRepository,
     productTypeRepository,
     productBatchRepository,
-    authService
+    authService,
+    transactionRunner
   )
   const productBarcodeService = new ProductBarcodeService(productBarcodeRepository, authService)
   const productPriceTierService = new ProductPriceTierService(

@@ -141,6 +141,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
                 canModifyPrice={canModifyPrice}
                 canAdjustStock={canAdjustStock}
                 canDeleteProduct={canDeleteProduct}
+                stockManagedByBatches={Boolean(product) && values.trackBatches}
               />
             </div>
 

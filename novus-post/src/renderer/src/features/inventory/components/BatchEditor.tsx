@@ -177,6 +177,13 @@ export const BatchEditor: React.FC<BatchEditorProps> = ({
         </div>
       )}
 
+      {trackBatches && (
+        <p className="text-[10px] text-slate-500">
+          Cada entrada de lote suma unidades al stock. Para asignar vencimiento a unidades que ya
+          tienes, reduce primero la cantidad del lote inicial y luego registra la entrada.
+        </p>
+      )}
+
       {trackBatches && batches.length === 0 && (
         <p className="text-[10px] text-slate-500">
           No hay lotes registrados para &quot;{productName}&quot;. Agregue una entrada de lote.
