@@ -95,6 +95,8 @@ export interface ProductPageQuery extends ProductFilter {
   stockFilter?: ProductStockFilter
   /** Omit aggregate catalog metrics for lightweight product selectors. */
   includeStats?: boolean
+  /** Excluye productos que agrupan variantes (el POS vende las variantes, no el padre). */
+  excludeVariantParents?: boolean
 }
 
 export interface ProductCatalogStats {

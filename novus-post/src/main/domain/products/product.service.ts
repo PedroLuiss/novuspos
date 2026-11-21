@@ -19,6 +19,11 @@ import type { ProductBatchRepository } from '../../ports/product-batch.repositor
 import type { ProductBarcodeRepository } from '../../ports/product-barcode.repository'
 import type { TransactionRunner } from '../../ports/transaction'
 import { detectBarcodeFormat } from '@shared/lib/product-barcode'
+import {
+  formatProductAttributes,
+  parseProductAttributes,
+  serializeVariantAttributeNames
+} from '@shared/lib/product-variants'
 import type { AuthService } from '../auth/auth.service'
 import { NotFoundError, ValidationError } from '../shared/errors'
 import { normalizeProductInput, validateProductInput } from './product.entity'
@@ -85,6 +90,7 @@ export class ProductService {
 
     const now = new Date().toISOString()
     return this.tx.run(() => {
+      if (normalized.parentId) this.validateVariant(normalized.parentId, normalized.attributes)
       const created = this.products.create({
         ...normalized,
         id: `prod-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -146,7 +152,19 @@ export class ProductService {
     }
 
     return this.tx.run(() => {
+      if (normalized.parentId) {
+        if (this.products.findByParentId(product.id).some((v) => !v.deleted)) {
+          throw new ValidationError(
+            'Un producto que ya tiene variantes no puede convertirse en variante de otro producto.'
+          )
+        }
+        this.validateVariant(normalized.parentId, normalized.attributes, product.id)
+      } else if (normalized.variantAttrs !== existing.variantAttrs) {
+        this.validateParentAttributes(normalized, product.id)
+      }
+
       const updated = this.products.update({ ...normalized, id: product.id })
+      this.propagateInheritedFields(existing, normalized)
       // Al activar el control de lotes, el lote inicial debe recibir el stock que
       // el producto tenía antes de activarlo. No se puede usar `updated.stock`
       // porque ya es el stock efectivo (suma de lotes) y valdría 0.
@@ -159,9 +177,6 @@ export class ProductService {
   }
 
   /**
-   * Crea el lote inicial con la cantidad indicada (el stock previo del producto).
-   * Se omite si ya hay lotes o si la cantidad es cero.
-   */
   /**
    * Sincroniza `products.code` con un código principal real en `product_barcodes`
    * si el producto todavía no tiene uno. Evita que el editor muestre 0 códigos
@@ -201,6 +216,10 @@ export class ProductService {
     this.barcodes.setPrimary(product.id, created.id)
   }
 
+  /**
+   * Crea el lote inicial con la cantidad indicada (el stock previo del producto).
+   * Se omite si ya hay lotes o si la cantidad es cero.
+   */
   private ensureInitialBatch(productId: string, quantity: number): void {
     if (this.batches.findByProductId(productId, false).length > 0) return
     const initialQuantity = Number.isFinite(quantity) ? Math.max(0, quantity) : 0
@@ -310,6 +329,106 @@ export class ProductService {
       throw new ValidationError(`El tipo de producto "${type.name}" está inactivo.`)
     }
     return type
+  }
+
+  /**
+   * Valida los atributos de una variante contra la definición del padre y evita
+   * combinaciones duplicadas entre hermanos. Si el padre aún no definió sus
+   * atributos, los toma de la primera variante.
+   */
+  private validateVariant(parentId: string, attributes?: string, currentId?: string): void {
+    const parent = this.products.findById(parentId)
+    if (!parent || parent.deleted) {
+      throw new ValidationError('El producto padre de la variante no existe')
+    }
+
+    const attrs = parseProductAttributes(attributes)
+    if (attrs.length === 0) {
+      throw new ValidationError('La variante debe tener al menos un atributo con valor.')
+    }
+    if (attrs.some((a) => !a.name.trim() || !a.value.trim())) {
+      throw new ValidationError('Todos los atributos de la variante deben tener nombre y valor.')
+    }
+
+    const same = (a: string, b: string): boolean =>
+      a.trim().toLowerCase() === b.trim().toLowerCase()
+    const defined = parseProductAttributes(parent.variantAttrs).map((a) => a.name.trim())
+
+    if (defined.length === 0) {
+      this.products.update({
+        ...parent,
+        variantAttrs: serializeVariantAttributeNames(attrs.map((a) => a.name))
+      })
+    } else {
+      const missing = defined.filter((name) => !attrs.some((a) => same(a.name, name)))
+      const extra = attrs.filter((a) => !defined.some((name) => same(name, a.name)))
+      if (missing.length > 0 || extra.length > 0) {
+        throw new ValidationError(
+          `Los atributos de la variante deben ser exactamente: ${defined.join(', ')}.`
+        )
+      }
+    }
+
+    const signature = (value?: string): string =>
+      parseProductAttributes(value)
+        .map((a) => `${a.name.trim().toLowerCase()}=${a.value.trim().toLowerCase()}`)
+        .sort()
+        .join('|')
+    const duplicate = this.products
+      .findByParentId(parentId)
+      .find(
+        (v) => v.id !== currentId && !v.deleted && signature(v.attributes) === signature(attributes)
+      )
+    if (duplicate) {
+      throw new ValidationError(`Ya existe una variante con ${formatProductAttributes(attrs)}.`)
+    }
+  }
+
+  /** Evita cambiar los atributos del padre dejando variantes incompatibles. */
+  private validateParentAttributes(product: ProductInput, productId: string): void {
+    const defined = parseProductAttributes(product.variantAttrs).map((a) => a.name.trim())
+    if (defined.length === 0) return
+
+    for (const variant of this.products.findByParentId(productId).filter((v) => !v.deleted)) {
+      const names = parseProductAttributes(variant.attributes).map((a) => a.name.trim())
+      if (names.length === 0) continue
+      const invalid = names.filter(
+        (name) => !defined.some((d) => d.toLowerCase() === name.toLowerCase())
+      )
+      if (invalid.length > 0) {
+        throw new ValidationError(
+          `La variante "${variant.name}" usa atributos que ya no están definidos (${invalid.join(', ')}).`
+        )
+      }
+    }
+  }
+
+  /**
+   * Propaga al hijo los campos heredados del padre solo cuando el hijo todavía
+   * conservaba el valor anterior; así se respetan las personalizaciones.
+   */
+  private propagateInheritedFields(existing: Product, next: ProductInput): void {
+    if (next.parentId) return
+    const keys: Array<'category' | 'unit' | 'taxId' | 'brandId' | 'supplierId' | 'hasTax'> = [
+      'category',
+      'unit',
+      'taxId',
+      'brandId',
+      'supplierId',
+      'hasTax'
+    ]
+    const changed = keys.filter((key) => next[key] !== existing[key])
+    if (changed.length === 0) return
+
+    for (const child of this.products.findByParentId(existing.id).filter((v) => !v.deleted)) {
+      const patch: Record<string, unknown> = {}
+      for (const key of changed) {
+        if (child[key] === existing[key]) patch[key] = next[key]
+      }
+      if (Object.keys(patch).length > 0) {
+        this.products.update({ ...child, ...patch } as Product)
+      }
+    }
   }
 
   /**

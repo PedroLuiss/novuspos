@@ -4,7 +4,8 @@ import { useProductVariants } from '../../../shared/hooks/useProductVariants'
 import {
   formatProductAttributes,
   parseProductAttributes,
-  serializeProductAttributes
+  serializeProductAttributes,
+  serializeVariantAttributeNames
 } from '@shared/lib/product-variants'
 import { Edit3, GitBranch, Plus, Trash2, AlertCircle } from '../../../shared/icons/Icons'
 import VariantForm, { type VariantDraft } from './VariantForm'
@@ -35,14 +36,16 @@ export const VariantEditor: React.FC<VariantEditorProps> = ({
   )
   const pagination = useTablePagination(variants)
   const confirmation = useConfirmDialog()
-  const [attrText, setAttrText] = useState(() =>
-    parseProductAttributes(variantAttrs)
-      .map((a) => a.name)
-      .join(', ')
-  )
+  const [attrTextDraft, setAttrTextDraft] = useState<string | null>(null)
   const [draft, setDraft] = useState<VariantDraft | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+
+  const attrText =
+    attrTextDraft ??
+    parseProductAttributes(variantAttrs)
+      .map((a) => a.name)
+      .join(', ')
 
   const attributeNames = attrText
     .split(',')
@@ -50,9 +53,7 @@ export const VariantEditor: React.FC<VariantEditorProps> = ({
     .filter(Boolean)
 
   const commitAttributeNames = (): void => {
-    onVariantAttrsChange(
-      serializeProductAttributes(attributeNames.map((name) => ({ name, value: '' })))
-    )
+    onVariantAttrsChange(serializeVariantAttributeNames(attributeNames))
   }
 
   const startCreate = (): void => {
@@ -86,6 +87,31 @@ export const VariantEditor: React.FC<VariantEditorProps> = ({
       salePrice: String(variant.salePrice),
       stock: String(variant.stock),
       values
+    })
+  }
+
+  /** Genera nombre y SKU a partir del padre y de los valores de atributos. */
+  const suggestDraft = (): void => {
+    if (!draft) return
+    const values = attributeNames
+      .map((name) => draft.values[name]?.trim())
+      .filter(Boolean) as string[]
+    if (values.length === 0) {
+      setFormError('Complete primero los valores de los atributos.')
+      return
+    }
+    const slug = (value: string): string =>
+      value
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') || 'VAR'
+    setFormError(null)
+    setDraft({
+      ...draft,
+      name: draft.name.trim() || `${parent.name} / ${values.join(' / ')}`,
+      code: draft.code.trim() || `${parent.code}-${values.map(slug).join('-')}`
     })
   }
 
@@ -188,7 +214,7 @@ export const VariantEditor: React.FC<VariantEditorProps> = ({
           <input
             type="text"
             value={attrText}
-            onChange={(e) => setAttrText(e.target.value)}
+            onChange={(e) => setAttrTextDraft(e.target.value)}
             onBlur={commitAttributeNames}
             placeholder="Ej. Talla, Color"
             className={inputClass}
@@ -202,7 +228,12 @@ export const VariantEditor: React.FC<VariantEditorProps> = ({
           </button>
         </div>
         <p className="mt-1 text-[9px] text-slate-400">
-          Ej: &quot;Talla, Color&quot; genera combinaciones como Talla M / Color Rojo.
+          Ej: &quot;Talla, Color&quot; genera combinaciones como Talla M / Color Rojo. Las variantes
+          deben usar exactamente estos atributos y no se puede repetir una combinación.
+        </p>
+        <p className="mt-1 text-[9px] text-slate-400">
+          Cuando un producto tiene variantes, el padre deja de venderse en el POS: se cobra la
+          variante elegida.
         </p>
       </div>
 
@@ -285,6 +316,7 @@ export const VariantEditor: React.FC<VariantEditorProps> = ({
           isSaving={isSaving}
           error={formError}
           onChange={setDraft}
+          onSuggest={suggestDraft}
           onSave={() => void handleSave()}
           onCancel={() => setDraft(null)}
         />

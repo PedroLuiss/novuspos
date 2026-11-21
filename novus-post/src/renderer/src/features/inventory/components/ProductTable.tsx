@@ -16,6 +16,7 @@ import { useBrands } from '../../../shared/hooks/useBrands'
 import { useSuppliers } from '../../../shared/hooks/useSuppliers'
 import { useProductTypes } from '../../../shared/hooks/useProductTypes'
 import { productsApi, toErrorMessage } from '../api/products.api'
+import { VARIANT_PARENT_REF_PREFIX } from '../lib/productCsv'
 import ProductToolbar from './ProductToolbar'
 import ProductFilters from './ProductFilters'
 import ProductRows from './ProductRows'
@@ -175,7 +176,20 @@ export const ProductTable: React.FC<{ user: User }> = ({ user }) => {
     const errors: string[] = []
     for (let index = 0; index < inputs.length; index += 1) {
       try {
-        createdProducts.push(await productsApi.create(inputs[index]))
+        const input = inputs[index]
+        let payload = input
+        if (input.parentId?.startsWith(VARIANT_PARENT_REF_PREFIX)) {
+          const parentSku = input.parentId
+            .slice(VARIANT_PARENT_REF_PREFIX.length)
+            .trim()
+            .toLowerCase()
+          const parent = createdProducts.find((p) => p.code.trim().toLowerCase() === parentSku)
+          if (!parent) {
+            throw new Error(`No se creó el producto padre con SKU "${parentSku}" en este lote.`)
+          }
+          payload = { ...input, parentId: parent.id }
+        }
+        createdProducts.push(await productsApi.create(payload))
       } catch (error) {
         errors.push(`Fila ${index + 2}: ${toErrorMessage(error)}`)
       }

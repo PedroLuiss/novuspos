@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Product } from '@shared/contracts'
-import { Check, X, AlertCircle } from '../../../shared/icons/Icons'
+import { Check, Sparkles, X, AlertCircle } from '../../../shared/icons/Icons'
 import { CurrencyInput } from '../../../shared/ui/CurrencyInput'
 
 const inputClass =
@@ -23,6 +23,7 @@ interface VariantFormProps {
   isSaving: boolean
   error: string | null
   onChange: (draft: VariantDraft) => void
+  onSuggest: () => void
   onSave: () => void
   onCancel: () => void
 }
@@ -35,6 +36,7 @@ export const VariantForm: React.FC<VariantFormProps> = ({
   isSaving,
   error,
   onChange,
+  onSuggest,
   onSave,
   onCancel
 }) => {
@@ -81,6 +83,16 @@ export const VariantForm: React.FC<VariantFormProps> = ({
             />
           </div>
         ))}
+        <div className="col-span-4 flex justify-end">
+          <button
+            type="button"
+            onClick={onSuggest}
+            className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-[#0067C0] bg-white border border-blue-200 rounded-[4px] hover:bg-blue-50 cursor-pointer"
+          >
+            <Sparkles size={11} />
+            Sugerir nombre y SKU desde los atributos
+          </button>
+        </div>
         <div>
           <label className="block text-[10px] font-semibold text-slate-700 mb-0.5">Costo</label>
           <CurrencyInput

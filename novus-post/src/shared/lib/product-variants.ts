@@ -21,9 +21,13 @@ export function parseProductAttributes(json?: string | null): ProductAttribute[]
   try {
     const parsed = JSON.parse(json)
     if (!Array.isArray(parsed)) return []
-    return parsed
-      .filter((a: any) => a && typeof a.name === 'string' && typeof a.value === 'string')
-      .map((a: any) => ({ name: a.name, value: a.value }))
+    return parsed.filter(
+      (a: unknown): a is ProductAttribute =>
+        typeof a === 'object' &&
+        a !== null &&
+        typeof (a as ProductAttribute).name === 'string' &&
+        typeof (a as ProductAttribute).value === 'string'
+    )
   } catch {
     return []
   }
@@ -37,6 +41,23 @@ export function serializeProductAttributes(attrs: ProductAttribute[]): string {
       .filter((a) => a.name.trim() && a.value.trim())
       .map((a) => ({ name: a.name.trim(), value: a.value.trim() }))
   )
+}
+
+/**
+ * Serializa solo los NOMBRES de los atributos que definen las variantes de un
+ * padre. A diferencia de `serializeProductAttributes`, conserva entradas con
+ * valor vacío: en `variantAttrs` el valor no existe todavía, solo el nombre.
+ */
+export function serializeVariantAttributeNames(names: string[]): string {
+  const unique = new Map<string, string>()
+  for (const name of names) {
+    const trimmed = name.trim()
+    if (trimmed && !unique.has(trimmed.toLowerCase())) {
+      unique.set(trimmed.toLowerCase(), trimmed)
+    }
+  }
+  if (unique.size === 0) return ''
+  return JSON.stringify([...unique.values()].map((name) => ({ name, value: '' })))
 }
 
 /** Etiqueta legible de los atributos: "Talla M · Color Rojo". */

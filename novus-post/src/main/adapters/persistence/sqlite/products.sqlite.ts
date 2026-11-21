@@ -181,6 +181,11 @@ function buildPageWhere(query: ProductPageQuery): {
     params.search = `%${escapeLikePattern(query.search.trim())}%`
     params.exactSearch = query.search.trim()
   }
+  if (query.excludeVariantParents) {
+    clauses.push(
+      'NOT EXISTS (SELECT 1 FROM products v WHERE v.parent_id = p.id AND v.deleted = 0 AND v.active = 1)'
+    )
+  }
   if (query.stockFilter === 'LOW') {
     clauses.push(`(${EFFECTIVE_STOCK}) > 0 AND (${EFFECTIVE_STOCK}) <= p.min_stock`)
   } else if (query.stockFilter === 'OUT') {

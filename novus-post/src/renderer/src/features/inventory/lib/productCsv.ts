@@ -1,4 +1,11 @@
-import type { Brand, Product, ProductInput, ProductType, Supplier, TaxRate } from '@shared/contracts'
+import type {
+  Brand,
+  Product,
+  ProductInput,
+  ProductType,
+  Supplier,
+  TaxRate
+} from '@shared/contracts'
 
 /** Columnas oficiales del CSV de catálogo (incluye impuesto, marca, proveedor y tipo). */
 export const PRODUCT_CSV_HEADERS = [
@@ -20,6 +27,12 @@ export const PRODUCT_CSV_HEADERS = [
   'PadreSKU',
   'ImagenURL'
 ]
+
+/**
+ * Referencia temporal usada cuando el padre de una variante se importa en el
+ * mismo archivo. `handleImportBatch` la sustituye por el ID real tras crear el padre.
+ */
+export const VARIANT_PARENT_REF_PREFIX = 'IMPORT_REF:'
 
 const quote = (value: string): string => `"${value.replace(/"/g, '""')}"`
 
@@ -67,10 +80,9 @@ export function buildProductCatalogCsv(
   const csvValue = (value: string | number): string =>
     typeof value === 'number' ? String(value) : quote(value)
 
-  return [
-    PRODUCT_CSV_HEADERS.join(','),
-    ...rows.map((row) => row.map(csvValue).join(','))
-  ].join('\r\n')
+  return [PRODUCT_CSV_HEADERS.join(','), ...rows.map((row) => row.map(csvValue).join(','))].join(
+    '\r\n'
+  )
 }
 
 export interface ProductCsvParseResult {
@@ -179,9 +191,7 @@ function parseNumber(value: string | undefined): number | undefined {
   const commaIndex = trimmed.lastIndexOf(',')
   const dotIndex = trimmed.lastIndexOf('.')
   const normalized =
-    commaIndex > dotIndex
-      ? trimmed.replace(/\./g, '').replace(',', '.')
-      : trimmed.replace(/,/g, '')
+    commaIndex > dotIndex ? trimmed.replace(/\./g, '').replace(',', '.') : trimmed.replace(/,/g, '')
   const parsed = Number(normalized)
   return Number.isFinite(parsed) ? parsed : undefined
 }
@@ -248,7 +258,9 @@ export function parseProductCatalogRows(
   const activeSuppliers = suppliers.filter((s) => s.active)
   const activeTypes = types.filter((t) => t.active)
   const exemptTax = activeTaxes.find((tax) => tax.rate === 0) ?? null
-  const existingCodes = new Set(existingProducts.map((product) => product.code.trim().toLowerCase()))
+  const existingCodes = new Set(
+    existingProducts.map((product) => product.code.trim().toLowerCase())
+  )
   const importedCodes = new Set<string>()
 
   const resolveRef = (
@@ -369,12 +381,21 @@ export function parseProductCatalogRows(
     const parentSku = cell('parentSku').trim()
     let parentId: string | undefined
     if (parentSku) {
-      const parent = existingProducts.find((p) => p.code.trim().toLowerCase() === parentSku.toLowerCase())
-      if (!parent) {
-        errors.push(`Línea ${i + 1}: no existe un producto padre con SKU "${parentSku}".`)
+      const parent = existingProducts.find(
+        (p) => p.code.trim().toLowerCase() === parentSku.toLowerCase()
+      )
+      if (parent) {
+        parentId = parent.id
+      } else if (importedCodes.has(parentSku.toLowerCase())) {
+        // El padre aparece antes en el mismo archivo; se resolverá al importar.
+        parentId = `${VARIANT_PARENT_REF_PREFIX}${parentSku}`
+      } else {
+        errors.push(
+          `Línea ${i + 1}: no existe un producto padre con SKU "${parentSku}". ` +
+            'Si se importa en el mismo archivo, coloque la fila del padre antes que la de la variante.'
+        )
         continue
       }
-      parentId = parent.id
     }
 
     rows.push({

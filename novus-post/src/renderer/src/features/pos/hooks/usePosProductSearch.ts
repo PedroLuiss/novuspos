@@ -44,7 +44,8 @@ export function usePosProductSearch(
           pageSize: PAGE_SIZE,
           search: search || undefined,
           onlyActive: true,
-          includeStats: false
+          includeStats: false,
+          excludeVariantParents: true
         })
 
         if (request !== requestId.current) return []
