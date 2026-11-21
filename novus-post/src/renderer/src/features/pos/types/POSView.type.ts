@@ -25,4 +25,6 @@ export interface POSViewProps {
   cashShiftOpen: boolean
   canOverrideNoStock: boolean
   canApplyDiscount: boolean
+  onLoadCart?: (items: CartItem[]) => void
+  onShowToast?: (message: string, type?: 'success' | 'error' | 'info') => void
 }

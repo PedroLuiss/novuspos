@@ -4,6 +4,7 @@ import SaleModal from './components/SaleModal'
 import SplitPaymentModal from './components/SplitPaymentModal'
 import SuspendedSalesModal from './components/SuspendedSalesModal'
 import TicketPreviewModal from './components/TicketPreviewModal'
+import ShiftSalesModal from './components/ShiftSalesModal'
 import ProductAvatar from '../../shared/ui/ProductAvatar'
 import POSProductSearch, { type POSProductSearchHandle } from './components/POSProductSearch'
 import { useBusinessConfig } from '../../shared/hooks/useBusinessConfig'
@@ -58,7 +59,9 @@ export const POSView: React.FC<POSViewProps> = ({
   cashierName,
   cashShiftOpen,
   canOverrideNoStock,
-  canApplyDiscount
+  canApplyDiscount,
+  onLoadCart,
+  onShowToast
 }) => {
   const { config: businessConfig } = useBusinessConfig()
   const { tiersByProduct } = useAllPriceTiers()
@@ -98,6 +101,7 @@ export const POSView: React.FC<POSViewProps> = ({
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false)
   const [isSplitModalOpen, setIsSplitModalOpen] = useState(false)
   const [isSuspendedModalOpen, setIsSuspendedModalOpen] = useState(false)
+  const [isShiftSalesModalOpen, setIsShiftSalesModalOpen] = useState(false)
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
   const [lastPaymentDetails, setLastPaymentDetails] = useState<PaymentDetails | undefined>(
     undefined
@@ -302,6 +306,32 @@ export const POSView: React.FC<POSViewProps> = ({
     setTicketNumber(createTicketNumber())
   }, [onClearCart])
 
+  const handleCloneSale = useCallback(
+    (items: typeof cart, customerId?: string): void => {
+      if (onLoadCart) {
+        onLoadCart(items)
+      } else {
+        onClearCart()
+        items.forEach((it) => onAddToCart(it.product, it.quantity))
+      }
+      setTicketNumber(createTicketNumber())
+      if (customerId && customers) {
+        const matched = customers.find((c) => c.id === customerId)
+        if (matched) {
+          setSelectedCustomer(matched)
+          setAssignCustomer(true)
+        } else {
+          setSelectedCustomer(null)
+          setAssignCustomer(false)
+        }
+      } else {
+        setSelectedCustomer(null)
+        setAssignCustomer(false)
+      }
+    },
+    [onLoadCart, onClearCart, onAddToCart, customers]
+  )
+
   // Global hotkeys listener for keyboard-first POS flow
   const handleGlobalKeyDown = useEffectEvent((e: KeyboardEvent): void => {
     if (e.repeat) return
@@ -328,6 +358,7 @@ export const POSView: React.FC<POSViewProps> = ({
       isSaleModalOpen ||
       isSplitModalOpen ||
       isSuspendedModalOpen ||
+      isShiftSalesModalOpen ||
       isPreviewModalOpen ||
       isCreateCustomerModalOpen
     ) {
@@ -418,6 +449,13 @@ export const POSView: React.FC<POSViewProps> = ({
       return
     }
 
+    // [ALT+V]: Open shift sales / Facturas de esta caja
+    if (hasOnlyAlt && e.key.toLowerCase() === 'v') {
+      e.preventDefault()
+      if (cashShiftOpen) setIsShiftSalesModalOpen(true)
+      return
+    }
+
     // [ALT+T]: View ticket receipt
     if (hasOnlyAlt && e.key.toLowerCase() === 't') {
       e.preventDefault()
@@ -499,9 +537,9 @@ export const POSView: React.FC<POSViewProps> = ({
             Abre tu caja desde el módulo Caja antes de cobrar o pausar ventas.
           </div>
         )}
-        {/* Top Command Bar & Search (Fluent Box) */}
-        <div className="relative bg-white border border-[#E5E5E5] rounded-[4px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-2.5">
-          <div className="flex items-center gap-2">
+        {/* Top Command Bar & Search (Fluent Box - Responsive) */}
+        <div className="relative bg-white border border-[#E5E5E5] rounded-[4px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-2 sm:p-2.5">
+          <div className="flex flex-col xl:flex-row xl:items-center gap-2">
             <POSProductSearch
               ref={productSearchRef}
               showResults={showSearchResults}
@@ -509,42 +547,65 @@ export const POSView: React.FC<POSViewProps> = ({
               onAddToCart={onAddToCart}
             />
 
-            {/* Buscar en Lista [ALT+L] */}
-            <button
-              onClick={() => productSearchRef.current?.toggleList()}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#1B1B1B] bg-white hover:bg-[#F9F9F9] border border-[#D1D1D1] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-colors cursor-pointer"
-            >
-              <List size={14} className="text-[#0067C0]" />
-              <span>Lista</span>
-              <span className="kbd-badge">ALT+L</span>
-            </button>
+            {/* Action buttons group: Responsive flow across any screen resolution */}
+            <div className="flex items-center justify-between xl:justify-end gap-1.5 sm:gap-2 shrink-0 flex-wrap sm:flex-nowrap">
+              {/* Buscar en Lista [ALT+L] */}
+              <button
+                type="button"
+                onClick={() => productSearchRef.current?.toggleList()}
+                title="Buscar en lista completa de productos [ALT+L]"
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-semibold text-[#1B1B1B] bg-white hover:bg-[#F9F9F9] border border-[#D1D1D1] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-colors cursor-pointer whitespace-nowrap min-h-[36px]"
+              >
+                <List size={14} className="text-[#0067C0] shrink-0" />
+                <span>Lista</span>
+                <span className="kbd-badge hidden 2xl:inline-block">ALT+L</span>
+              </button>
 
-            {/* Pausar Venta [ALT+P] */}
-            <button
-              onClick={() => void handleSuspendCurrentSale()}
-              disabled={cart.length === 0 || !cashShiftOpen}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#1B1B1B] bg-white hover:bg-amber-50 disabled:opacity-40 border border-[#D1D1D1] rounded-[4px] transition-colors cursor-pointer"
-            >
-              <Pause size={13} className="text-amber-600" />
-              <span>Pausar</span>
-              <span className="kbd-badge">ALT+P</span>
-            </button>
+              {/* Pausar Venta [ALT+P] */}
+              <button
+                type="button"
+                onClick={() => void handleSuspendCurrentSale()}
+                disabled={cart.length === 0 || !cashShiftOpen}
+                title="Pausar venta actual y poner en espera [ALT+P]"
+                className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-semibold text-[#1B1B1B] bg-white hover:bg-amber-50 disabled:opacity-40 border border-[#D1D1D1] rounded-[4px] transition-colors cursor-pointer whitespace-nowrap min-h-[36px]"
+              >
+                <Pause size={13} className="text-amber-600 shrink-0" />
+                <span>Pausar</span>
+                <span className="kbd-badge hidden 2xl:inline-block">ALT+P</span>
+              </button>
 
-            {/* Tickets en Espera [ALT+E] */}
-            <button
-              onClick={() => setIsSuspendedModalOpen(true)}
-              disabled={!cashShiftOpen}
-              className="relative flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#1B1B1B] bg-white hover:bg-[#F9F9F9] border border-[#D1D1D1] rounded-[4px] transition-colors cursor-pointer"
-            >
-              <Clock size={13} className="text-[#5C5C5C]" />
-              <span>Espera</span>
-              {suspendedSales.length > 0 && (
-                <span className="bg-amber-500 text-white font-bold text-[10px] px-1.5 py-0.2 rounded-full">
-                  {suspendedSales.length}
-                </span>
-              )}
-              <span className="kbd-badge">ALT+E</span>
-            </button>
+              {/* Tickets en Espera [ALT+E] */}
+              <button
+                type="button"
+                onClick={() => setIsSuspendedModalOpen(true)}
+                disabled={!cashShiftOpen}
+                title="Ver ventas pausadas en espera [ALT+E]"
+                className="relative flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-semibold text-[#1B1B1B] bg-white hover:bg-[#F9F9F9] border border-[#D1D1D1] rounded-[4px] transition-colors cursor-pointer whitespace-nowrap min-h-[36px]"
+              >
+                <Clock size={13} className="text-[#5C5C5C] shrink-0" />
+                <span>Espera</span>
+                {suspendedSales.length > 0 && (
+                  <span className="bg-amber-500 text-white font-bold text-[10px] px-1.5 py-0.2 rounded-full">
+                    {suspendedSales.length}
+                  </span>
+                )}
+                <span className="kbd-badge hidden 2xl:inline-block">ALT+E</span>
+              </button>
+
+              {/* Ventas de Caja [ALT+V] */}
+              <button
+                type="button"
+                onClick={() => setIsShiftSalesModalOpen(true)}
+                disabled={!cashShiftOpen}
+                title="Ventas realizadas en este turno de caja [ALT+V]"
+                className="relative flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 text-xs font-semibold text-[#1B1B1B] bg-white hover:bg-blue-50/60 disabled:opacity-40 border border-[#D1D1D1] rounded-[4px] shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-colors cursor-pointer whitespace-nowrap min-h-[36px]"
+              >
+                <Receipt size={13} className="text-[#0067C0] shrink-0" />
+                <span className="hidden sm:inline">Ventas de Caja</span>
+                <span className="sm:hidden">Ventas</span>
+                <span className="kbd-badge hidden 2xl:inline-block">ALT+V</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1206,6 +1267,19 @@ export const POSView: React.FC<POSViewProps> = ({
         onClose={() => setIsSuspendedModalOpen(false)}
         onResumeSale={handleResumeSuspendedSale}
         onDeleteSuspendedSale={onDeleteSuspendedSale}
+      />
+
+      {/* Modal de Ventas del Turno Activo (Facturas de esta Caja) */}
+      <ShiftSalesModal
+        isOpen={isShiftSalesModalOpen}
+        onClose={() => setIsShiftSalesModalOpen(false)}
+        cashShiftOpen={cashShiftOpen}
+        cashierName={cashierName}
+        currentCartCount={cart.length}
+        onCloneSale={handleCloneSale}
+        exchangeRate={exchangeRate}
+        canOverrideNoStock={canOverrideNoStock}
+        onShowToast={onShowToast}
       />
 
       {/* Comprobante / Ticket / Factura Carta Preview Modal */}

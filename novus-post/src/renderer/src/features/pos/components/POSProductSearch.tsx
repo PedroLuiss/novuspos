@@ -96,13 +96,13 @@ const POSProductSearch = forwardRef<POSProductSearchHandle, POSProductSearchProp
     }
 
     return (
-      <div className="relative flex-1">
+      <div className="relative flex-1 min-w-[200px]">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#717783]" />
         <input
           ref={searchInputRef}
           type="text"
           autoFocus
-          placeholder="Escanear código de barras o buscar producto [F2]..."
+          placeholder="Escanear código o buscar producto [F2]..."
           value={searchInput}
           onChange={(event) => {
             const value = event.target.value
@@ -110,9 +110,9 @@ const POSProductSearch = forwardRef<POSProductSearchHandle, POSProductSearchProp
             onResultsVisibilityChange(Boolean(value.trim()))
           }}
           onKeyDown={(event) => void handleSearchKeyDown(event)}
-          className="w-full pl-9 pr-24 py-2 text-xs bg-[#F9F9F9] border border-[#D1D1D1] rounded-[4px] focus:bg-white focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0] font-medium text-[#1B1B1B] placeholder:text-[#717783]"
+          className="w-full pl-9 pr-14 sm:pr-20 py-2 text-xs bg-[#F9F9F9] border border-[#D1D1D1] rounded-[4px] focus:bg-white focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0] font-medium text-[#1B1B1B] placeholder:text-[#717783] transition-colors"
         />
-        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 kbd-badge">ENTER</span>
+        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 kbd-badge hidden sm:inline-block">ENTER</span>
 
         {showResults && (
           <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-white border border-[#D1D1D1] rounded-[4px] shadow-lg max-h-80 overflow-y-auto divide-y divide-[#E5E5E5]">

@@ -282,6 +282,10 @@ function AppContent(): React.JSX.Element {
     showToast('Venta cancelada y ticket limpiado', 'info')
   }
 
+  const handleLoadCart = (items: CartItem[]): void => {
+    setCart(items)
+  }
+
   const handleCompleteSale = async (details: PaymentDetails): Promise<boolean> => {
     if (cart.length === 0) return false
     const unavailableItem = cart.find(
@@ -558,6 +562,8 @@ function AppContent(): React.JSX.Element {
           cashShiftOpen={Boolean(cashRegister.activeShiftId)}
           canOverrideNoStock={hasPermission(currentUser, 'CAN_OVERRIDE_NO_STOCK')}
           canApplyDiscount={hasPermission(currentUser, 'CAN_APPLY_DISCOUNT')}
+          onLoadCart={handleLoadCart}
+          onShowToast={showToast}
         />
       )}
 
