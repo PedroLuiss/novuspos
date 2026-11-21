@@ -1,10 +1,7 @@
 import type Database from 'better-sqlite3'
-import type {
-  ProductBarcode,
-  ProductBarcodeInput,
-  ProductBarcodeFilter
-} from '@shared/contracts'
+import type { ProductBarcode, ProductBarcodeInput, ProductBarcodeFilter } from '@shared/contracts'
 import type { ProductBarcodeRepository } from '../../../ports/product-barcode.repository'
+import { escapeLikePattern } from '@shared/lib/product-barcode'
 
 interface ProductBarcodeRow {
   id: string
@@ -49,8 +46,8 @@ export class SqliteProductBarcodeRepository implements ProductBarcodeRepository 
       params.productId = filter.productId
     }
     if (filter?.search) {
-      clauses.push('(barcode LIKE @search OR label LIKE @search)')
-      params.search = `%${filter.search}%`
+      clauses.push(`(barcode LIKE @search ESCAPE '\\' OR label LIKE @search ESCAPE '\\')`)
+      params.search = `%${escapeLikePattern(filter.search)}%`
     }
 
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''
@@ -62,15 +59,16 @@ export class SqliteProductBarcodeRepository implements ProductBarcodeRepository 
   }
 
   findById(id: string): ProductBarcode | null {
-    const row = this.db
-      .prepare('SELECT * FROM product_barcodes WHERE id = ?')
-      .get(id) as ProductBarcodeRow | undefined
+    const row = this.db.prepare('SELECT * FROM product_barcodes WHERE id = ?').get(id) as
+      ProductBarcodeRow | undefined
     return row ? mapRow(row) : null
   }
 
   findByBarcode(barcode: string): ProductBarcode | null {
     const row = this.db
-      .prepare('SELECT * FROM product_barcodes WHERE barcode = ?')
+      .prepare(
+        'SELECT * FROM product_barcodes WHERE UPPER(TRIM(barcode)) = UPPER(TRIM(?)) AND deleted = 0'
+      )
       .get(barcode.trim()) as ProductBarcodeRow | undefined
     return row ? mapRow(row) : null
   }
@@ -140,11 +138,26 @@ export class SqliteProductBarcodeRepository implements ProductBarcodeRepository 
     return this.findById(barcode.id) as ProductBarcode
   }
 
-  softDelete(id: string): void {
+  setPrimary(productId: string, barcodeId: string | null): void {
+    const now = new Date().toISOString()
+    // Dos sentencias para no violar el índice único mientras se conmuta el principal.
     this.db
       .prepare(
-        'UPDATE product_barcodes SET deleted = 1, active = 0, updated_at = ? WHERE id = ?'
+        'UPDATE product_barcodes SET is_primary = 0, updated_at = ? WHERE product_id = ? AND deleted = 0'
       )
+      .run(now, productId)
+    if (barcodeId) {
+      this.db
+        .prepare(
+          'UPDATE product_barcodes SET is_primary = 1, updated_at = ? WHERE id = ? AND product_id = ? AND deleted = 0'
+        )
+        .run(now, barcodeId, productId)
+    }
+  }
+
+  softDelete(id: string): void {
+    this.db
+      .prepare('UPDATE product_barcodes SET deleted = 1, active = 0, updated_at = ? WHERE id = ?')
       .run(new Date().toISOString(), id)
   }
 

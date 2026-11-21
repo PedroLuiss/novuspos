@@ -42,7 +42,39 @@ export function getProductBarcodeValidationError(
   const normalizedValue = value.trim()
   if (!normalizedValue) return 'El código de barras es obligatorio'
   if (!isValidFormatValue(normalizedValue, format)) {
-    return `El código no es válido para el formato ${format}`
+    const detail = isGs1Format(format) ? ' (revise la longitud y el dígito verificador)' : ''
+    return `El código no es válido para el formato ${format}${detail}`
   }
   return null
+}
+
+function isGs1Format(format: BarcodeFormat): boolean {
+  return format === 'EAN-13' || format === 'EAN-8' || format === 'UPC-A' || format === 'ITF-14'
+}
+
+/**
+ * Infiere el formato más probable de un código leído por un escáner.
+ *
+ * Los formatos GS1 se distinguen por su longitud (y se validan después con el
+ * dígito verificador). Para códigos internos se prefiere Code39 cuando el valor
+ * usa su alfabeto restringido y Code128 cuando contiene caracteres de texto.
+ * Devuelve `null` si no hay contenido.
+ */
+export function detectBarcodeFormat(value: string): BarcodeFormat | null {
+  const code = value.trim()
+  if (!code) return null
+
+  if (/^\d{13}$/.test(code)) return 'EAN-13'
+  if (/^\d{8}$/.test(code)) return 'EAN-8'
+  if (/^\d{12}$/.test(code)) return 'UPC-A'
+  if (/^\d{14}$/.test(code)) return 'ITF-14'
+
+  if (/^[0-9A-Z.$/+% -]+$/.test(code) && /[A-Z.$/+%-]/.test(code)) return 'Code39'
+  if (/^[\x20-\x7E]+$/.test(code)) return 'Code128'
+  return 'OTRO'
+}
+
+/** Escapa los comodines de `LIKE` para buscar códigos de barras literalmente. */
+export function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, '\\$&')
 }

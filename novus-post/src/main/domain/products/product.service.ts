@@ -16,7 +16,9 @@ import type { BrandRepository } from '../../ports/brand.repository'
 import type { SupplierRepository } from '../../ports/supplier.repository'
 import type { ProductTypeRepository } from '../../ports/product-type.repository'
 import type { ProductBatchRepository } from '../../ports/product-batch.repository'
+import type { ProductBarcodeRepository } from '../../ports/product-barcode.repository'
 import type { TransactionRunner } from '../../ports/transaction'
+import { detectBarcodeFormat } from '@shared/lib/product-barcode'
 import type { AuthService } from '../auth/auth.service'
 import { NotFoundError, ValidationError } from '../shared/errors'
 import { normalizeProductInput, validateProductInput } from './product.entity'
@@ -30,6 +32,7 @@ export class ProductService {
     private readonly suppliers: SupplierRepository,
     private readonly productTypes: ProductTypeRepository,
     private readonly batches: ProductBatchRepository,
+    private readonly barcodes: ProductBarcodeRepository,
     private readonly auth: AuthService,
     private readonly tx: TransactionRunner
   ) {}
@@ -92,6 +95,7 @@ export class ProductService {
       // producto con lotes, `created.stock` ya es el stock efectivo (suma de
       // lotes) y valdría 0 porque todavía no existe ningún lote.
       if (normalized.trackBatches) this.ensureInitialBatch(created.id, normalized.stock)
+      this.ensurePrimaryBarcode(created)
       return this.products.findById(created.id) ?? created
     })
   }
@@ -149,6 +153,7 @@ export class ProductService {
       if (normalized.trackBatches && !existing.trackBatches) {
         this.ensureInitialBatch(updated.id, normalized.stock)
       }
+      this.ensurePrimaryBarcode(updated)
       return this.products.findById(product.id) ?? updated
     })
   }
@@ -157,6 +162,45 @@ export class ProductService {
    * Crea el lote inicial con la cantidad indicada (el stock previo del producto).
    * Se omite si ya hay lotes o si la cantidad es cero.
    */
+  /**
+   * Sincroniza `products.code` con un código principal real en `product_barcodes`
+   * si el producto todavía no tiene uno. Evita que el editor muestre 0 códigos
+   * y que las etiquetas dependan del valor legacy.
+   */
+  private ensurePrimaryBarcode(product: Product): void {
+    const existing = this.barcodes.findByProductId(product.id).filter((b) => !b.deleted)
+    if (existing.some((b) => b.isPrimary)) return
+
+    const code = product.code?.trim()
+    if (!code) return
+
+    const matching = existing.find((b) => b.barcode.trim().toLowerCase() === code.toLowerCase())
+    if (matching) {
+      this.barcodes.setPrimary(product.id, matching.id)
+      return
+    }
+
+    const byCode = this.barcodes.findByBarcode(code)
+    if (byCode && !byCode.deleted) {
+      if (byCode.productId === product.id) this.barcodes.setPrimary(product.id, byCode.id)
+      return
+    }
+
+    const now = new Date().toISOString()
+    const created = this.barcodes.create({
+      id: `bc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      productId: product.id,
+      barcode: code,
+      format: detectBarcodeFormat(code) ?? 'OTRO',
+      label: 'Código principal',
+      isPrimary: false,
+      active: true,
+      createdAt: now,
+      updatedAt: now
+    })
+    this.barcodes.setPrimary(product.id, created.id)
+  }
+
   private ensureInitialBatch(productId: string, quantity: number): void {
     if (this.batches.findByProductId(productId, false).length > 0) return
     const initialQuantity = Number.isFinite(quantity) ? Math.max(0, quantity) : 0

@@ -1,8 +1,4 @@
-import type {
-  ProductBarcode,
-  ProductBarcodeInput,
-  ProductBarcodeFilter
-} from '@shared/contracts'
+import type { ProductBarcode, ProductBarcodeInput, ProductBarcodeFilter } from '@shared/contracts'
 
 /**
  * Puerto de persistencia de códigos de barras de producto.
@@ -17,6 +13,8 @@ export interface ProductBarcodeRepository {
     input: ProductBarcodeInput & { id: string; createdAt: string; updatedAt: string }
   ): ProductBarcode
   update(barcode: ProductBarcode): ProductBarcode
+  /** Deja un solo código principal del producto (o ninguno si `barcodeId` es null). */
+  setPrimary(productId: string, barcodeId: string | null): void
   softDelete(id: string): void
   toggleStatus(id: string): ProductBarcode
 }

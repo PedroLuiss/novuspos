@@ -9,6 +9,7 @@ import type {
   ProductCatalogStatsDelta
 } from '@shared/contracts'
 import type { ProductRepository } from '../../../ports/product.repository'
+import { escapeLikePattern } from '@shared/lib/product-barcode'
 
 interface ProductRow {
   id: string
@@ -170,14 +171,14 @@ function buildPageWhere(query: ProductPageQuery): {
   }
   if (query.search?.trim()) {
     clauses.push(`(
-      p.code LIKE @search OR p.name LIKE @search OR p.category LIKE @search OR
+      p.code LIKE @search ESCAPE '\\' OR p.name LIKE @search ESCAPE '\\' OR p.category LIKE @search ESCAPE '\\' OR
       EXISTS (
         SELECT 1 FROM product_barcodes pb
         WHERE pb.product_id = p.id AND pb.deleted = 0 AND pb.active = 1
-          AND pb.barcode LIKE @search
+          AND pb.barcode LIKE @search ESCAPE '\\'
       )
     )`)
-    params.search = `%${query.search.trim()}%`
+    params.search = `%${escapeLikePattern(query.search.trim())}%`
     params.exactSearch = query.search.trim()
   }
   if (query.stockFilter === 'LOW') {
@@ -259,8 +260,10 @@ export class SqliteProductRepository implements ProductRepository {
       params.typeId = filter.typeId
     }
     if (filter?.search) {
-      clauses.push('(p.code LIKE @search OR p.name LIKE @search OR p.category LIKE @search)')
-      params.search = `%${filter.search}%`
+      clauses.push(
+        `(p.code LIKE @search ESCAPE '\\' OR p.name LIKE @search ESCAPE '\\' OR p.category LIKE @search ESCAPE '\\')`
+      )
+      params.search = `%${escapeLikePattern(filter.search)}%`
     }
 
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : ''

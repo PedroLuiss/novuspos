@@ -3,6 +3,7 @@ import type { Product } from '@shared/contracts'
 import ProductAvatar from '../../../shared/ui/ProductAvatar'
 import { Search } from '../../../shared/icons/Icons'
 import { usePosProductSearch } from '../hooks/usePosProductSearch'
+import { useAllBarcodes } from '../../../shared/hooks/useAllBarcodes'
 import { useBusinessConfig } from '../../../shared/hooks/useBusinessConfig'
 import { formatCurrency } from '../../../shared/lib/currency'
 
@@ -40,7 +41,9 @@ const SearchSkeletons: React.FC<{ count: number }> = ({ count }) => (
 const POSProductSearch = forwardRef<POSProductSearchHandle, POSProductSearchProps>(
   function POSProductSearch({ showResults, onResultsVisibilityChange, onAddToCart }, ref) {
     const [searchInput, setSearchInput] = useState('')
+    const [scanError, setScanError] = useState<string | null>(null)
     const { config } = useBusinessConfig()
+    const { barcodeToProduct } = useAllBarcodes()
     const searchInputRef = useRef<HTMLInputElement>(null)
     const {
       products,
@@ -74,21 +77,35 @@ const POSProductSearch = forwardRef<POSProductSearchHandle, POSProductSearchProp
       if (isOutOfStock(product)) return
       onAddToCart(product, 1)
       setSearchInput('')
+      setScanError(null)
       onResultsVisibilityChange(false)
     }
 
     const handleSearchKeyDown = async (
       event: React.KeyboardEvent<HTMLInputElement>
     ): Promise<void> => {
-      if (event.key !== 'Enter') return
-      event.preventDefault()
+      if (event.key !== 'Enter' && event.key !== 'Tab') return
       const query = searchInput.trim()
       if (!query) return
+      event.preventDefault()
+      setScanError(null)
 
       const matches = await searchNow(query)
+      const normalized = query.toLowerCase()
+      const barcodeProductId = barcodeToProduct.get(query)
+      // Solo se agrega automáticamente si el código coincide exactamente con
+      // un código de barras activo o con el SKU. Nunca se toma un resultado
+      // difuso: eso cobraría el producto equivocado en un mal escaneo.
       const product =
-        matches.find((item) => item.code.trim().toLowerCase() === query.toLowerCase()) ?? matches[0]
-      if (!product || isOutOfStock(product)) {
+        matches.find((item) => item.id === barcodeProductId) ??
+        matches.find((item) => item.code.trim().toLowerCase() === normalized)
+
+      if (!product) {
+        setScanError(`Código "${query}" no encontrado. Revise la lista de productos.`)
+        onResultsVisibilityChange(true)
+        return
+      }
+      if (isOutOfStock(product)) {
         onResultsVisibilityChange(true)
         return
       }
@@ -107,15 +124,23 @@ const POSProductSearch = forwardRef<POSProductSearchHandle, POSProductSearchProp
           onChange={(event) => {
             const value = event.target.value
             setSearchInput(value)
+            setScanError(null)
             onResultsVisibilityChange(Boolean(value.trim()))
           }}
           onKeyDown={(event) => void handleSearchKeyDown(event)}
           className="w-full pl-9 pr-14 sm:pr-20 py-2 text-xs bg-[#F9F9F9] border border-[#D1D1D1] rounded-[4px] focus:bg-white focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0] font-medium text-[#1B1B1B] placeholder:text-[#717783] transition-colors"
         />
-        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 kbd-badge hidden sm:inline-block">ENTER</span>
+        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 kbd-badge hidden sm:inline-block">
+          ENTER
+        </span>
 
         {showResults && (
           <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-white border border-[#D1D1D1] rounded-[4px] shadow-lg max-h-80 overflow-y-auto divide-y divide-[#E5E5E5]">
+            {scanError && (
+              <div role="alert" className="p-2.5 text-xs font-semibold text-[#C42B1C] bg-red-50">
+                {scanError}
+              </div>
+            )}
             {isLoading ? (
               <SearchSkeletons count={5} />
             ) : error ? (
