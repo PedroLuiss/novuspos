@@ -307,8 +307,8 @@ export const SaleModal: React.FC<SaleModalProps> = ({
                   <label className="block text-xs font-semibold text-[#1B1B1B] mb-1">
                     Monto Recibido en Efectivo
                   </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#717783] font-bold text-sm">
+                  <div className="flex rounded-[4px] border border-[#D1D1D1] bg-white overflow-hidden shadow-2xs focus-within:border-[#0067C0] focus-within:ring-1 focus-within:ring-[#0067C0] transition-all">
+                    <span className="inline-flex items-center justify-center px-3.5 bg-[#F3F3F3] border-r border-[#D1D1D1] text-[#5C5C5C] font-bold text-sm font-mono select-none shrink-0">
                       {businessConfig.currency}
                     </span>
                     <CurrencyInput
@@ -316,7 +316,7 @@ export const SaleModal: React.FC<SaleModalProps> = ({
                       autoFocus
                       value={cashTendered}
                       onValueChange={setCashTendered}
-                      className="w-full pl-8 pr-3 py-2 text-lg font-bold font-mono text-[#1B1B1B] bg-white border border-[#D1D1D1] rounded-[4px] focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0]"
+                      className="w-full px-3 py-2 text-lg font-bold font-mono text-[#1B1B1B] bg-white focus:outline-hidden"
                     />
                   </div>
                 </div>
