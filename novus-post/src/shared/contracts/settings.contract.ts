@@ -49,6 +49,11 @@ export interface BusinessConfig {
   taxId: string
   /** Régimen tributario declarado (texto libre). */
   taxRegime: string
+  /**
+   * Logo del negocio en data URL (PNG o JPEG).
+   * Vacío = los documentos usan el logo predeterminado de NovusPOS.
+   */
+  logoDataUrl: string
   // ── Propietario / Representante legal ──────────────────────────────
   ownerName: string
   ownerTaxId: string

@@ -16,6 +16,7 @@ interface BusinessSettingsRow {
   tax_id_type: string
   tax_id: string
   tax_regime: string
+  logo_data?: string
   owner_name: string
   owner_tax_id: string
   email: string
@@ -65,6 +66,7 @@ const FALLBACK_CONFIG: BusinessConfig = {
   taxIdType: 'RIF',
   taxId: '',
   taxRegime: '',
+  logoDataUrl: '',
   ownerName: '',
   ownerTaxId: '',
   email: '',
@@ -132,6 +134,10 @@ const EXPECTED_COLUMNS: { name: string; ddl: string }[] = [
   {
     name: 'tax_regime',
     ddl: "ALTER TABLE business_settings ADD COLUMN tax_regime TEXT NOT NULL DEFAULT ''"
+  },
+  {
+    name: 'logo_data',
+    ddl: "ALTER TABLE business_settings ADD COLUMN logo_data TEXT NOT NULL DEFAULT ''"
   },
   {
     name: 'owner_tax_id',
@@ -282,6 +288,7 @@ function mapRow(row: BusinessSettingsRow): BusinessConfig {
     taxIdType: row.tax_id_type as TaxIdType,
     taxId: row.tax_id,
     taxRegime: row.tax_regime,
+    logoDataUrl: row.logo_data ?? '',
     ownerName: row.owner_name,
     ownerTaxId: row.owner_tax_id,
     email: row.email,
@@ -386,7 +393,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
     const result = this.db
       .prepare(
         `UPDATE business_settings SET
-          legal_name = ?, trade_name = ?, tax_id_type = ?, tax_id = ?, tax_regime = ?,
+          legal_name = ?, trade_name = ?, tax_id_type = ?, tax_id = ?, tax_regime = ?, logo_data = ?,
           owner_name = ?, owner_tax_id = ?, email = ?, phone = ?, mobile = ?, website = ?,
           address = ?, district = ?, city = ?, state = ?, municipality = ?, parish = ?,
           country = ?, postal_code = ?,
@@ -406,6 +413,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
         input.taxIdType,
         input.taxId,
         input.taxRegime,
+        input.logoDataUrl,
         input.ownerName,
         input.ownerTaxId,
         input.email,
@@ -462,7 +470,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
     this.db
       .prepare(
         `INSERT OR IGNORE INTO business_settings (
-          id, legal_name, trade_name, tax_id_type, tax_id, tax_regime,
+          id, legal_name, trade_name, tax_id_type, tax_id, tax_regime, logo_data,
           owner_name, owner_tax_id, email, phone, mobile, website,
           address, district, city, state, municipality, parish, country, postal_code, currency,
           ticket_header, ticket_footer, ticket_legal_note,
@@ -474,7 +482,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
           tax_enabled, tax_name, tax_rate, prices_include_tax,
           created_at, updated_at
         ) VALUES (
-          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?,
           ?, ?, ?, ?, ?, ?, ?, ?, ?,
           ?, ?, ?,
@@ -494,6 +502,7 @@ export class SqliteSettingsRepository implements SettingsRepository {
         base.taxIdType,
         base.taxId,
         base.taxRegime,
+        base.logoDataUrl,
         base.ownerName,
         base.ownerTaxId,
         base.email,

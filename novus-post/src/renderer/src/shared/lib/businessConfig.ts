@@ -12,6 +12,7 @@ export const DEFAULT_BUSINESS_CONFIG: BusinessConfig = {
   taxIdType: 'RIF',
   taxId: 'J-00000000-0',
   taxRegime: 'Régimen General - Persona Jurídica',
+  logoDataUrl: '',
   ownerName: 'Carlos Morales',
   ownerTaxId: 'V-12345678',
   email: 'contacto@novusmarket.com.ve',

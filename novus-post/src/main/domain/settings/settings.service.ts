@@ -18,6 +18,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const MAX_TAX_RATE = 100
 const TAX_ID_TYPES = TAX_ID_TYPE_OPTIONS.map((t) => t.value)
 const CURRENCIES = CURRENCY_OPTIONS.map((c) => c.code)
+/** Logo en data URL: solo PNG o JPEG, que son los formatos soportados por ExcelJS y jsPDF. */
+const LOGO_DATA_URL_RE = /^data:image\/(png|jpe?g);base64,[a-z0-9+/]+={0,2}$/i
+const MAX_LOGO_BYTES = 2 * 1024 * 1024
 
 function clean(value: unknown, maxLength = 200): string {
   if (typeof value !== 'string') return ''
@@ -73,6 +76,7 @@ export class SettingsService {
     const taxIdType = input.taxIdType
     const taxId = clean(input.taxId, 40).toUpperCase()
     const taxRegime = clean(input.taxRegime, 120)
+    const logoDataUrl = typeof input.logoDataUrl === 'string' ? input.logoDataUrl.trim() : ''
     const ownerName = clean(input.ownerName, 120)
     const ownerTaxId = clean(input.ownerTaxId, 40).toUpperCase()
     const email = clean(input.email, 120).toLowerCase()
@@ -106,6 +110,16 @@ export class SettingsService {
     if (taxIdType !== 'NONE' && !taxId) {
       throw new Error('El número de identificación fiscal (RIF) es obligatorio.')
     }
+    if (logoDataUrl) {
+      if (!LOGO_DATA_URL_RE.test(logoDataUrl)) {
+        throw new Error('El logo del negocio debe ser una imagen PNG o JPG válida.')
+      }
+      const base64 = logoDataUrl.slice(logoDataUrl.indexOf(',') + 1)
+      const estimatedBytes = Math.ceil((base64.length * 3) / 4)
+      if (estimatedBytes > MAX_LOGO_BYTES) {
+        throw new Error('El logo del negocio supera el tamaño máximo de 2 MB.')
+      }
+    }
     if (email && !EMAIL_RE.test(email)) {
       throw new Error('El correo electrónico del negocio no tiene un formato válido.')
     }
@@ -125,6 +139,7 @@ export class SettingsService {
       taxIdType: taxIdType as TaxIdType,
       taxId,
       taxRegime,
+      logoDataUrl,
       ownerName,
       ownerTaxId,
       email,

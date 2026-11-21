@@ -10,6 +10,7 @@ import {
   MapPin
 } from '../../../shared/icons/Icons'
 import BusinessIdentityForm from './BusinessIdentityForm'
+import BusinessLogoField from './BusinessLogoField'
 import TicketTemplateForm from './TicketTemplateForm'
 
 interface BusinessInfoModalProps {
@@ -150,7 +151,14 @@ export const BusinessInfoModal: React.FC<BusinessInfoModalProps> = ({
           className="flex-1 overflow-y-auto p-5 text-xs"
         >
           {tab === 'identity' ? (
-            <BusinessIdentityForm values={form} onChange={patch} disabled={!canEdit} />
+            <div className="space-y-4">
+              <BusinessLogoField
+                value={form.logoDataUrl}
+                onChange={(logoDataUrl) => patch({ logoDataUrl })}
+                disabled={!canEdit}
+              />
+              <BusinessIdentityForm values={form} onChange={patch} disabled={!canEdit} />
+            </div>
           ) : (
             <TicketTemplateForm values={form} onChange={patch} disabled={!canEdit} />
           )}

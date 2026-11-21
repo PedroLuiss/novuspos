@@ -73,6 +73,58 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;')
 }
 
+interface BusinessLogo {
+  extension: 'png' | 'jpeg'
+  dataUrl: string
+}
+
+const LOGO_DATA_URL_RE = /^data:image\/(png|jpe?g);base64,([a-z0-9+/]+={0,2})$/i
+const MAX_LOGO_BYTES = 2 * 1024 * 1024
+
+/**
+ * Convierte el logo guardado en SQLite en un data URL validado.
+ * Si no existe, está corrupto o supera el límite, devuelve `null` para
+ * que la exportación use el logo predeterminado de NovusPOS.
+ */
+function parseLogoDataUrl(dataUrl: string | undefined): BusinessLogo | null {
+  if (!dataUrl) return null
+  const trimmed = dataUrl.trim()
+  const match = LOGO_DATA_URL_RE.exec(trimmed)
+  if (!match) return null
+
+  const extension: BusinessLogo['extension'] = match[1].toLowerCase() === 'png' ? 'png' : 'jpeg'
+  const buffer = Buffer.from(match[2], 'base64')
+  if (buffer.length === 0 || buffer.length > MAX_LOGO_BYTES) return null
+
+  const isPng =
+    buffer.length >= 8 &&
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47 &&
+    buffer[4] === 0x0d &&
+    buffer[5] === 0x0a &&
+    buffer[6] === 0x1a &&
+    buffer[7] === 0x0a
+  const isJpeg =
+    buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff
+
+  if (extension === 'png' ? !isPng : !isJpeg) return null
+  return { extension, dataUrl: trimmed }
+}
+
+/** Lee el logo del proyecto incluido en los recursos de la aplicación. */
+async function loadDefaultLogo(): Promise<BusinessLogo> {
+  const logoPath = app.isPackaged
+    ? join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'logobanner.png')
+    : join(app.getAppPath(), 'resources', 'logobanner.png')
+  const logoBuffer = await readFile(logoPath)
+  return {
+    extension: 'png',
+    dataUrl: `data:image/png;base64,${logoBuffer.toString('base64')}`
+  }
+}
+
 function businessHeaderLines(business: BusinessConfig): [string, string, string, string] {
   const legalName = business.legalName.trim()
   const tradeName = business.tradeName.trim()
@@ -152,15 +204,15 @@ function createWorkbook(
   movements: KardexMovement[],
   query: KardexMovementQuery,
   business: BusinessConfig,
-  logoBuffer: Buffer
+  logo: BusinessLogo
 ): ExcelJS.Workbook {
   const workbook = new ExcelJS.Workbook()
   workbook.creator = 'NovusPOS'
   workbook.subject = 'Kardex de movimientos de inventario'
   workbook.created = new Date()
   const logoId = workbook.addImage({
-    base64: `data:image/png;base64,${logoBuffer.toString('base64')}`,
-    extension: 'png'
+    base64: logo.dataUrl,
+    extension: logo.extension
   })
 
   const sheet = workbook.addWorksheet('Kardex', {
@@ -290,10 +342,10 @@ function createPdfHtml(
   movements: KardexMovement[],
   query: KardexMovementQuery,
   business: BusinessConfig,
-  logoBuffer: Buffer
+  logo: BusinessLogo
 ): string {
   const [companyName, fiscalDetails, address, contact] = businessHeaderLines(business)
-  const logoDataUrl = `data:image/png;base64,${logoBuffer.toString('base64')}`
+  const logoDataUrl = logo.dataUrl
   const rows = movements
     .map(
       (movement) => `<tr>
@@ -347,7 +399,7 @@ function createPdfHtml(
       footer { color: #717783; font-size: 7pt; margin-top: 4mm; text-align: right; }
     </style></head><body>
       <header class="business-header">
-        <img src="${logoDataUrl}" alt="Logo NovusPOS">
+        <img src="${logoDataUrl}" alt="Logo del negocio">
         <div class="business-info">
           <div class="business-name">${escapeHtml(companyName)}</div>
           <div class="business-detail">${escapeHtml(fiscalDetails)}</div>
@@ -417,13 +469,10 @@ export class KardexExporter {
     const filePath = result.filePath.toLowerCase().endsWith(`.${extension}`)
       ? result.filePath
       : `${result.filePath}.${extension}`
-    const logoPath = app.isPackaged
-      ? join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'logobanner.png')
-      : join(app.getAppPath(), 'resources', 'logobanner.png')
-    const logoBuffer = await readFile(logoPath)
+    const logo = parseLogoDataUrl(business.logoDataUrl) ?? (await loadDefaultLogo())
 
     if (format === 'XLSX') {
-      const workbook = createWorkbook(movements, query, business, logoBuffer)
+      const workbook = createWorkbook(movements, query, business, logo)
       const buffer = await workbook.xlsx.writeBuffer()
       await writeFile(filePath, new Uint8Array(buffer))
       return true
@@ -435,7 +484,7 @@ export class KardexExporter {
       pdfWindow = createPdfWindow()
       await writeFile(
         join(temporaryDirectory, 'report.html'),
-        createPdfHtml(movements, query, business, logoBuffer),
+        createPdfHtml(movements, query, business, logo),
         'utf8'
       )
       await pdfWindow.loadFile(join(temporaryDirectory, 'report.html'))

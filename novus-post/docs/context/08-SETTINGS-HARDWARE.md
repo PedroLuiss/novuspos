@@ -34,6 +34,10 @@ El módulo de Ajustes centraliza los parámetros críticos del sistema y la comu
   - Contacto: correo, teléfono fijo (+58), celular / WhatsApp y sitio web.
   - Domicilio fiscal: dirección, distrito / urbanización, ciudad, estado, municipio, parroquia, país (Venezuela) y código postal.
   - Operación: moneda (`VES` Bolívar Soberano, `USD` Dólar, `EUR` Euro — catálogo extensible para agregar más monedas).
+  - Logo del negocio (`logoDataUrl`, columna `logo_data` de la migración `030_business_logo.ts`):
+    - Se carga desde Ajustes › Datos del Negocio como PNG o JPG; el renderer lo redimensiona a 512 px y lo guarda como data URL en SQLite (máximo 2 MB).
+    - La exportación de Kardex en XLSX y PDF usa el logo del negocio cuando existe; si está vacío, la exportación conserva el logo predeterminado de NovusPOS.
+    - Las facturas PDF y la cabecera de la aplicación no consumen este logo.
   - Plantilla de ticket y comprobantes de venta:
     - Textos: encabezado, pie, leyenda legal obligatoria y toggles para RIF, domicilio y cajero.
     - Formato de papel / tamaño de documento (`invoicePaperSize`):
@@ -215,7 +219,8 @@ novus-post/src/
 │   │       ├── 019_combo_items.ts           # Tabla `combo_items` (bundles con desglose a Kardex)
 │   │       ├── 020_product_variants.ts      # products.parent_id / attributes / variant_attrs
 │   │       ├── 021_product_batches.ts       # product_batches + products.track_batches (FEFO)
-│   │       └── 022_sale_item_traceability.ts  # sale_items.is_combo / combo_id / batches_json
+│   │       ├── 022_sale_item_traceability.ts  # sale_items.is_combo / combo_id / batches_json
+│   │       └── 030_business_logo.ts         # Columna `logo_data` en business_settings
 │   ├── adapters/hardware/
 │   │   ├── scale.serial.ts                  # Puerto serial para báscula (SerialPort)
 │   │   └── scale.sqlite.ts                  # Persistencia de configuración
@@ -261,6 +266,7 @@ novus-post/src/
             ├── UserFormModal.tsx            # Alta/edición de credenciales, rol y permisos
             ├── UserPermissionsPicker.tsx    # Matriz de módulos y acciones críticas
             ├── BusinessInfoModal.tsx        # Contenedor 2 tabs (negocio/propietario + ticket)
+            ├── BusinessLogoField.tsx        # Carga, vista previa y eliminación del logo del negocio
             ├── BusinessIdentityForm.tsx     # Identidad fiscal, propietario, contacto y domicilio
             ├── TicketTemplateForm.tsx       # Encabezado, pie, leyenda legal y toggles
             ├── TaxSettingsModal.tsx         # Interruptor global + IVA incluido + simulación
