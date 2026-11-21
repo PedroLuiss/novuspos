@@ -107,7 +107,7 @@ export const ProductToolbar: React.FC<ProductToolbarProps> = ({
           </button>
         )}
 
-        {canCreateProduct && onSeedDemoProducts && (
+        {/* {canCreateProduct && onSeedDemoProducts && (
           <button
             onClick={onSeedDemoProducts}
             className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-[4px] transition-colors cursor-pointer"
@@ -116,7 +116,7 @@ export const ProductToolbar: React.FC<ProductToolbarProps> = ({
             <Sparkles size={13} className="text-purple-600" />
             <span>50 Demos</span>
           </button>
-        )}
+        )} */}
       </div>
 
       <div>
