@@ -14,6 +14,8 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 > ⚠️ **Excepción 2 (veracidad del copy):** `KeyFeatures` y `KeyboardCheatSheet` fueron auditados contra `novus-post/docs/context/`; donde Stitch afirmaba algo falso sobre el sistema, prevalece la documentación real. Ver §10.
 >
 > ⚠️ **Excepción 3 (tabla y FAQ):** `ComparisonTable` y `HardwareFaq` también se auditaron; se eliminaron las métricas inventadas y el claim de impresión ESC/POS. Ver §11.
+>
+> ⚠️ **Excepción 4 (precios):** `Pricing` conserva el precio comercial, pero su checklist técnico y la línea de Windows se auditaron; se eliminaron ESC/POS, backups automáticos y soporte por WhatsApp. Ver §12.
 
 ---
 
@@ -147,7 +149,7 @@ Espaciado: `space-xl` 2.5rem · `space-lg` 1.5rem · `space-md` 1rem · `space-s
 3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas con copy verificado contra los contextos 02–06 y 08 (ver §10).
 4. `KeyboardCheatSheet` — 7 atajos reales (`ALT+1`…`ALT+7`, `F12`, `ALT+Q`).
 5. `ComparisonTable` — 5 filas con copy verificado contra contextos 01, 02, 05 y 08 (ver §11).
-6. `Pricing` (`#precios`)
+6. `Pricing` (`#precios`) — plan único $4.99; checklist técnico verificado (ver §12).
 7. `HardwareFaq` — 3 preguntas; periféricos y requisitos corregidos según docs (ver §11).
 8. `FinalCta` (`#descargar`)
 9. `Footer`
@@ -247,3 +249,21 @@ Con una sola imagen el efecto no se aprecia (no hay relevo), pero el componente 
 La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión comercial documentada en `09-LANDING-WEB.md`, no una afirmación técnica del sistema.
 
 > Regla futura: todo copy que mencione hardware o rendimiento debe verificarse en `08-SETTINGS-HARDWARE.md` y `02-POS-SALES.md` antes de copiarlo de Stitch.
+
+---
+
+## 12. Pricing verificado (excepción 4 a Stitch)
+
+`Pricing.tsx` conserva el precio comercial (`$4.99 USD / mes`, `PRIMER MES $0`, `30 días gratis`, sin tarjeta) y el dato del instalador (`v2.4.0 (.exe) • ~85 MB`), que no son afirmaciones técnicas del sistema. El checklist y la línea de Windows sí se auditaron contra los contextos **00, 01, 02, 04, 05 y 08**:
+
+| Antes (Stitch) | Ahora (sistema real) | Fuente |
+| :--- | :--- | :--- |
+| "Para Windows 11 / 10 x64" | "Para Windows 11 (64 bits) Desktop" (Windows 10 no está documentado; alineado con la FAQ corregida) | 00 §1/§3.7 |
+| "SQLite integrada de ultra-alto rendimiento" | "SQLite integrada y operación offline-first" | 00 §1 |
+| "Productos y transacciones ilimitadas sin ralentización" | "Catálogo y transacciones sin costos por volumen ni comisiones" | — (claims de precio, no de rendimiento) |
+| "Impresoras térmicas ESC/POS de 58/80mm y cajón de dinero" | "Básculas RS-232 (Torrey, Rhino, Dibal) y tickets PDF 80/58mm; ESC/POS y gaveta aún no integrados" | 08 §1/§6, 02 §4 |
+| "Corte Z, control de caja y Kardex inmutable" | Sin cambios | 04, 05 |
+| "Actualizaciones continuas v2.x y soporte prioritario por WhatsApp y Ticket" | "Soporte por ticket desde la app (requiere internet)" | 00 §3.7, 08 §1 |
+| "Copias de seguridad automáticas a memorias USB o carpetas compartidas" | "Respaldo verificado con SHA-256 en la carpeta de datos de la app, con restauración y copia preventiva" | 08 §1/§6 |
+
+> No restaurar estos textos en una futura sincronización con Stitch: las excepciones deliberadas son hero (§9), tarjetas/atajos (§10), tabla/FAQ (§11) y precios (§12).

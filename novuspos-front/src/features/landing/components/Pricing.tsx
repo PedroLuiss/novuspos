@@ -28,7 +28,7 @@ export function Pricing() {
                 Licencia Profesional NovusPOS
               </span>
               <span className="font-body-sm text-body-sm text-on-surface-variant">
-                Para Windows 11 / 10 x64 Desktop
+                Para Windows 11 (64 bits) Desktop
               </span>
             </div>
             <div className="mt-space-sm sm:mt-0 text-left sm:text-right">
@@ -42,15 +42,18 @@ export function Pricing() {
             </div>
           </div>
 
-          {/* Checklist */}
+          {/* Checklist — copy verificado contra contextos 00, 01, 02, 04, 05 y 08.
+           * Se eliminaron los claims falsos de Stitch: ESC/POS y gaveta
+           * conectados, backups automáticos a USB/red, soporte por WhatsApp y
+           * la garantía de rendimiento sin respaldo documental. */}
           <div className="flex flex-col gap-space-sm mb-space-xl">
             {[
-              { strong: 'Instalación local completa', rest: ' con base de datos SQLite integrada de ultra-alto rendimiento.' },
-              { strong: 'Productos y transacciones ilimitadas', rest: ' sin ralentización ni costos por volumen.' },
-              { strong: 'Conectividad total de periféricos:', rest: ' básculas RS-232, impresoras térmicas ESC/POS de 58/80mm y cajón de dinero.' },
+              { strong: 'Instalación local completa', rest: ' con base de datos SQLite integrada y operación offline-first.' },
+              { strong: 'Catálogo y transacciones', rest: ' sin costos por volumen ni comisiones sobre tus ventas.' },
+              { strong: 'Periféricos conectados:', rest: ' básculas RS-232 (Torrey, Rhino y Dibal) y tickets PDF 80/58mm; impresión ESC/POS y pulso de gaveta aún no integrados.' },
               { strong: 'Corte Z, control de caja y Kardex inmutable', rest: ' con auditoría exhaustiva.' },
-              { strong: 'Actualizaciones continuas v2.x', rest: ' y soporte técnico prioritario por WhatsApp y Ticket.' },
-              { strong: 'Copias de seguridad automáticas', rest: ' locales en un click a memorias USB o carpetas compartidas.' },
+              { strong: 'Soporte por ticket', rest: ' desde la propia aplicación (requiere conexión a internet).' },
+              { strong: 'Respaldo verificado con SHA-256', rest: ' en la carpeta de datos de la app, con restauración y copia preventiva.' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-space-sm">
                 <MS name="check_circle" className="text-secondary text-[20px] shrink-0 mt-0.5" />

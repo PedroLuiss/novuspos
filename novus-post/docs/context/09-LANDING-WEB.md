@@ -67,7 +67,7 @@ src/
 3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas: terminal POS, inventario, Kardex, Corte Z, básculas RS-232, créditos. Copy verificado contra los contextos 02–06 y 08 (ver §5.3).
 4. `KeyboardCheatSheet` — 7 atajos reales: `ALT+1`…`ALT+7`, `F12` y `ALT+Q`.
 5. `ComparisonTable` — 5 filas comparativas con copy verificado contra contextos 01, 02, 05 y 08 (ver §5.4).
-6. `Pricing` (`#precios`) — licencia profesional $4.99, badge "PRIMER MES $0".
+6. `Pricing` (`#precios`) — licencia profesional $4.99, badge "PRIMER MES $0"; checklist técnico verificado (ver §5.5).
 7. `HardwareFaq` — 3 preguntas (SQLite WAL, periféricos, requisitos Windows); periféricos y requisitos verificados contra docs (ver §5.4).
 8. `FinalCta` (`#descargar`) — gradiente primary→on-primary-fixed-variant.
 9. `Footer` — producto, desarrolladores & soporte, seguridad & legal, línea legal.
@@ -139,11 +139,13 @@ src/
 
 4. **Tabla comparativa y FAQ verificadas (pedido explícito):** `comparisonRows` y `faqs` (en `landing-data.tsx`) se auditaron contra los contextos 00, 01, 02, 05 y 08. Se eliminó "100% Ininterrumpido", la latencia inventada (0.5–1.2 ms / 300–2500 ms) y el claim "ESC/POS directo al puerto RAW" (08 §1/§6: impresión física no integrada; 02 §4: la previsualización no imprime). La fila de básculas ahora habla de puerto COM y baudios con Torrey/Rhino/Dibal, y la de documentos de venta de PDF vectorial 80/58mm/Carta. El FAQ de periféricos se alineó con lo anterior (sin "cualquier impresora ESC/POS", sin CAS/BAR-9) y el de requisitos se limitó a lo documentado (Electron 64 bits, ventana mínima 960×600, sin cifras oficiales de CPU/RAM). El precio de $4.99 se conserva por ser decisión comercial (ver §3, ítem 6).
 
+5. **Pricing verificado (pedido explícito):** el checklist de `Pricing.tsx` y su línea "Para Windows 11 / 10 x64" se auditaron contra los contextos 00, 01, 02, 04, 05 y 08. Se eliminó "ultra-alto rendimiento", "sin ralentización", "impresoras térmicas ESC/POS de 58/80mm y cajón de dinero" (08 §1/§6: no integrados; 02 §4: previsualizar no imprime), "actualizaciones continuas v2.x y soporte por WhatsApp y Ticket" (00 §3.7: ticket requiere internet; WhatsApp no es canal de soporte documentado) y "copias de seguridad automáticas a memorias USB o carpetas compartidas" (08 §1: respaldo manual en `userData/backups` con SHA-256 y copia preventiva). Windows 10 se retiró para alinear con la FAQ corregida. El precio ($4.99, primer mes $0), los 30 días gratis, "sin tarjeta" y el dato del instalador (`v2.4.0 (.exe) • ~85 MB`) se conservan por ser decisiones comerciales, no claims técnicos (ver §3, ítem 6).
+
 ---
 
 ## 6. Estado y verificación
 
-- ✅ Réplica exacta de Stitch validada sección por sección con capturas headless de Chrome a 1280px contra el HTML renderizado y el screenshot oficial, **excepto** hero y copy de `KeyFeatures`/`KeyboardCheatSheet` (ver §5).
+- ✅ Réplica exacta de Stitch validada sección por sección con capturas headless de Chrome a 1280px contra el HTML renderizado y el screenshot oficial, **excepto** hero y el copy verificado de `KeyFeatures`/`KeyboardCheatSheet`, tabla/FAQ y `Pricing` (ver §5).
 - ✅ Copy de `KeyFeatures` y `KeyboardCheatSheet` auditado contra los contextos 00, 02, 03, 04, 05, 06 y 08; eliminados los claims falsos de Stitch (ver §5.3).
 - ✅ Altura final ≈4780px con el hero de dos columnas (antes, 5523px con el carrusel apilado abajo; oficial 5350px). Posición del carrusel a 1280px: `x≈660, y≈230, w≈596, h≈477`.
 - ✅ Tipografías, iconos y logo autoalojados (funciona offline, sin CDN).
