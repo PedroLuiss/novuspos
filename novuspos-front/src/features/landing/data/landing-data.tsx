@@ -276,3 +276,21 @@ export const mockCartRows: MockCartRow[] = [
   },
   { name: 'Pan Blanco Bimbo Gde', qty: '1 unids', unit: '$46.00', total: '$46.00', variant: 'bg-surface-container-low' },
 ]
+
+/** Captura del sistema mostrada en el carrusel del hero. */
+export interface ScreenshotSlide {
+  src: string
+  alt: string
+}
+
+/**
+ * Capturas del sistema NovusPOS (carpeta `public/imagen/`).
+ * Agrega aquí más entradas con el mismo formato para activar el relevo entre
+ * la imagen de arriba y la de abajo; el carrusel las alterna automáticamente.
+ */
+export const screenshots: ScreenshotSlide[] = [
+  {
+    src: '/imagen/novusposventa.png',
+    alt: 'Terminal de ventas NovusPOS Desktop: catálogo, carrito, báscula RS-232 y cobro rápido',
+  },
+]

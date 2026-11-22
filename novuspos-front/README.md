@@ -20,8 +20,10 @@ src/
 ├── features/landing/
 │   ├── components/               # SiteHeader, Hero, HeroHeader, HeroMockup, KeyFeatures,
 │   │   │                         # KeyboardCheatSheet, ComparisonTable, Pricing,
-│   │   │                         # HardwareFaq, FinalCta, Footer, Kbd, product/ProductCard
-│   │   └── product/ProductCard.tsx  # ProductCard + CartRow del mockup
+│   │   │                         # HardwareFaq, FinalCta, Footer, Kbd,
+│   │   │                         # ScreenshotCarousel (carrusel del hero)
+│   │   ├── HeroMockup.tsx           # wrapper que renderiza el carrusel
+│   │   └── product/ProductCard.tsx  # ProductCard + CartRow (sin uso tras el carrusel)
 │   └── data/landing-data.tsx     # Contenido tipado extraído de Stitch (JSX inline, mocks, tonos)
 └── index.css                     # @font-face Material Symbols + @theme MD3 + shimmer
 ```
@@ -40,6 +42,7 @@ public/
 │   └── jetbrains-mono-latin-ext.woff2
 ├── MaterialSymbolsOutlined.ttf                # iconos Material Symbols
 ├── novuspos-logo.png                          # logo del header y footer
+├── imagen/novusposventa.png                   # captura del sistema en el carrusel del hero
 └── favicon.svg
 ```
 
@@ -73,6 +76,12 @@ npm run dev -- --host 127.0.0.1 --port 5173
   --hide-scrollbars --window-size=1280,7000 --screenshot="captura.png" "http://127.0.0.1:5173/"
 ```
 
-Viewport de referencia: 1280px. Altura esperada ≈5300px (oficial 5350px).
+Viewport de referencia: 1280px. Altura actual ≈5520px (el carrusel de capturas sustituye al mockup HTML de Stitch).
+
+## Carrusel de capturas del hero
+
+`HeroMockup.tsx` ya no renderiza el terminal en JSX; muestra `ScreenshotCarousel`, que apila las imágenes de `public/imagen/` con el efecto de `nexusposgobal.com`: cada 4s la de arriba baja a `opacity-30` y se desplaza en 3D mientras la siguiente pasa al frente (transición de 1s). Se respeta `prefers-reduced-motion`.
+
+Para activar el relevo, agrega más PNG en `public/imagen/` y una entrada `{ src, alt }` al array `screenshots` en `src/features/landing/data/landing-data.tsx`.
 
 > Antes de modificar, lee `.agents/skills/novuspos-web-landing/SKILL.md` y `novus-post/docs/context/09-LANDING-WEB.md`.

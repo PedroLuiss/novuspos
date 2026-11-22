@@ -13,6 +13,8 @@
   - HTML: `files/10532653372921472128` · Screenshot: `files/14233028886615310537` (1280×5351).
 - **Sistema visual:** **Material Design 3** (azul `#003ec7`/`#0052ff`, verde `#006c49`), **NO** Fluent. No mezclar con el escritorio.
 
+> ⚠️ **Excepción actual (pedido explícito):** el hero ya no usa el mockup HTML de Stitch; muestra capturas reales del sistema en un carrusel apilado con el efecto de `nexusposgobal.com`. Ver §5.
+
 > 🛑 **El screenshot de Stitch NO sirve como referencia tipográfica.** Su renderizador no cargó Google Fonts: todo el texto sale en **Times New Roman** (verificado ampliando el bitmap 4×). Por eso los saltos de línea y algunas alturas del screenshot no coinciden con el diseño real. La verdad son el **HTML + `tailwind.config` embebido**.
 
 ---
@@ -26,8 +28,9 @@ src/
 │   ├── components/
 │   │   ├── SiteHeader.tsx             # header fixed h-20 (logo local)
 │   │   ├── HeroHeader.tsx             # helper MS + ReleasePill + cabecera hero
-│   │   ├── HeroMockup.tsx             # mockup terminal POS (title bar, hotkeys, catálogo, carrito)
-│   │   ├── product/ProductCard.tsx    # ProductCard + CartRow
+│   │   ├── HeroMockup.tsx             # wrapper del carrusel (antes: mockup HTML del POS)
+│   │   ├── ScreenshotCarousel.tsx     # carrusel 3D apilado, relevo suave estilo NexusPOS
+│   │   ├── product/ProductCard.tsx    # ProductCard + CartRow (sin uso tras el carrusel)
 │   │   ├── Kbd.tsx                    # atajo inline <strong class="font-mono">
 │   │   ├── Hero.tsx                   # glow + HeroHeader + HeroMockup
 │   │   ├── KeyFeatures.tsx            # 6 tarjetas (#caracteristicas)
@@ -38,7 +41,7 @@ src/
 │   │   ├── FinalCta.tsx               # CTA gradiente (#descargar)
 │   │   └── Footer.tsx                 # 3 columnas + legal (logo local)
 │   └── data/landing-data.tsx          # contenido tipado (ReactNode para negritas/mono inline,
-│                                      # mockProducts, mockCartRows, tonos de celda)
+│                                      # mockProducts, mockCartRows, screenshots, tonos de celda)
 └── index.css                          # @font-face Material Symbols + @theme MD3 + shimmer
 ```
 
@@ -51,6 +54,7 @@ src/
 | `public/fonts/fonts.css` | 4 `@font-face` con `unicode-range` por subset |
 | `public/MaterialSymbolsOutlined.ttf` | Iconos (`.material-symbols-outlined`) |
 | `public/novuspos-logo.png` | Logo del header y footer (512×141) |
+| `public/imagen/novusposventa.png` | Captura del sistema mostrada en el carrusel del hero (1600×1280) |
 
 > ❌ No enlaces a `fonts.googleapis.com` ni a `lh3.googleusercontent.com`: si falla la red el diseño se degrada y los assets de Stitch caducan (en el screenshot oficial los logos salen rotos). `index.html` precarga solo los dos woff2 latin.
 
@@ -59,7 +63,7 @@ src/
 ## 3. Orden de secciones (idéntico a Stitch)
 
 1. `SiteHeader` — fijo, logo + Características/Precios/Documentación + Iniciar Sesión.
-2. `Hero` — glow, píldora "⚡ NUEVA VERSIÓN 2.4.0…", headline, slogan, CTAs, trust badges, mockup.
+2. `Hero` — glow, píldora "⚡ NUEVA VERSIÓN 2.4.0…", headline, slogan, CTAs, trust badges, carrusel de capturas (`#interfaz-en-vivo`).
 3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas: terminal POS, inventario, Kardex, Corte Z, básculas RS-232, créditos.
 4. `KeyboardCheatSheet` — 7 atajos.
 5. `ComparisonTable` — 5 filas comparativas.
@@ -106,16 +110,27 @@ src/
 
 ---
 
-## 5. Desviación deliberada conocida
+## 5. Desviaciones deliberadas conocidas
 
-El CTA principal del hero usa `px-space-lg` en lugar del `px-space-xl` del HTML de Stitch. La geometría del botón es idéntica, pero evita que la etiqueta se parta en 3 líneas con Plus Jakarta Sans (fuente real del diseño, más ancha que el fallback Times del screenshot); con este ajuste se parte en 2 líneas, igual que en Stitch.
+1. **CTA del hero:** usa `px-space-lg` en lugar del `px-space-xl` del HTML de Stitch. La geometría del botón es idéntica, pero evita que la etiqueta se parta en 3 líneas con Plus Jakarta Sans (fuente real del diseño, más ancha que el fallback Times del screenshot); con este ajuste se parte en 2 líneas, igual que en Stitch.
+
+2. **Carrusel de capturas en el hero (pedido explícito):** `HeroMockup.tsx` ya no contiene el mockup HTML del terminal; delega en `ScreenshotCarousel.tsx`, que apila las capturas reales de `public/imagen/` y reproduce el efecto de **nexusposgobal.com**:
+   - `setInterval` de **4s** alternating `setActive((i) => (i + 1) % screenshots.length)`.
+   - Activa: `z-20 opacity-100` + `rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateZ(0)`.
+   - Inactiva: `z-10 opacity-30` + `translateZ(-180px) translateY(-90px) translateX(110px)`.
+   - Transición `duration-1000 ease-in-out`: la imagen de arriba se oculta suavemente mientras la de abajo pasa al frente.
+   - Contenedor `[transform-style:preserve-3d] [perspective:1200px]`, `max-w-5xl aspect-[5/4]`.
+   - Respeta `prefers-reduced-motion`.
+   - El ancla `#interfaz-en-vivo` se conserva.
+
+   Para agregar capturas: copiar el PNG a `public/imagen/` y añadir un objeto `{ src, alt }` al array `screenshots` en `landing-data.tsx`. Con una sola imagen no hay relevo visible, pero el componente ya está preparado. `ProductCard.tsx` y los mocks del carrito quedaron sin uso (no eliminados por si se requieren después).
 
 ---
 
 ## 6. Estado y verificación
 
 - ✅ Réplica exacta de Stitch validada sección por sección con capturas headless de Chrome a 1280px contra el HTML renderizado y el screenshot oficial.
-- ✅ Altura final ≈5292px (oficial 5350px; la diferencia se debe a los saltos de línea de la fuente correcta).
+- ✅ Altura final ≈5520px con el carrusel de capturas (antes del cambio, 5292px; oficial 5350px).
 - ✅ Tipografías, iconos y logo autoalojados (funciona offline, sin CDN).
 - ✅ `npm run build` y `npm run lint` limpios.
 - ✅ Autenticación del MCP Stitch configurada vía API key en `~/.config/opencode/secrets/stitch-api-key`.
