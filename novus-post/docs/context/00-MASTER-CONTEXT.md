@@ -135,6 +135,7 @@ Para trabajar de manera eficiente sin saturar la ventana de contexto de la IA, c
 | **06** | [`06-CUSTOMERS-CREDIT.md`](./06-CUSTOMERS-CREDIT.md)     | Cuentas por cobrar, estados de deuda, abonos automáticos a gaveta                   | `[ALT+5]` / `[ALT+C]` |
 | **07** | [`07-REPORTS-ANALYTICS.md`](./07-REPORTS-ANALYTICS.md)   | Métricas gerenciales, KPIs de rentabilidad, ranking top ventas, gráficos SVG        | `[ALT+6]` |
 | **08** | [`08-SETTINGS-HARDWARE.md`](./08-SETTINGS-HARDWARE.md)   | Básculas RS-232, hardware ESC/POS, impresión de etiquetas, backup SQLite y permisos | `[ALT+7]` / `[ALT+U]` |
+| **09** | [`09-LANDING-WEB.md`](./09-LANDING-WEB.md)               | Landing page oficial en `novuspos-front`: React 19, Tailwind v4, componentes desde Stitch | sitio web |
 
 En el dashboard autenticado, `ALT+1` a `ALT+7` navegan a las pestañas en el orden de la tabla y solo funcionan para módulos autorizados. Se ignoran al escribir en campos o mientras haya un modal abierto. Los atajos propios de cada módulo se describen en su contexto.
 

@@ -32,6 +32,7 @@ NovusPOS utiliza una **Matriz de Contextos Modulares** ubicada en:
 | **Cartera de clientes, límites de crédito, cuentas por cobrar, abonos a caja** | [`06-CUSTOMERS-CREDIT.md`](file:///c:/laragon/www/novuspos/novus-post/docs/context/06-CUSTOMERS-CREDIT.md) |
 | **KPIs de venta, ganancias netas, gráficos SVG interactivos, top 5** | [`07-REPORTS-ANALYTICS.md`](file:///c:/laragon/www/novuspos/novus-post/docs/context/07-REPORTS-ANALYTICS.md) |
 | **Báscula RS-232, impresora térmica ESC/POS, respaldos SQLite, matriz RBAC** | [`08-SETTINGS-HARDWARE.md`](file:///c:/laragon/www/novuspos/novus-post/docs/context/08-SETTINGS-HARDWARE.md) |
+| **Sitio web / landing oficial (`novuspos-front`), Tailwind, componentes desde Stitch** | [`novuspos-web-landing`](file:///c:/laragon/www/novuspos/.agents/skills/novuspos-web-landing/SKILL.md) |
 
 ---
 

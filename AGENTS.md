@@ -26,6 +26,9 @@ Para optimizar el uso de tokens y permitir que cualquier IA comprenda el proyect
 7. **[06-CUSTOMERS-CREDIT.md](file:///c:/laragon/www/novuspos/novus-post/docs/context/06-CUSTOMERS-CREDIT.md)**: Directorio de clientes [F5], cuentas corrientes, cartera vencida y abonos a caja.
 8. **[07-REPORTS-ANALYTICS.md](file:///c:/laragon/www/novuspos/novus-post/docs/context/07-REPORTS-ANALYTICS.md)**: KPIs [F6], gráfico SVG interactivo de ventas y top 5 de productos.
 9. **[08-SETTINGS-HARDWARE.md](file:///c:/laragon/www/novuspos/novus-post/docs/context/08-SETTINGS-HARDWARE.md)**: Ajustes [F7], báscula RS-232, impresoras térmicas, backup SQLite y matriz RBAC [ALT+U].
+10. **[09-LANDING-WEB.md](file:///c:/laragon/www/novuspos/novus-post/docs/context/09-LANDING-WEB.md)**: Landing page oficial (`novuspos-front`), React 19 + Tailwind v4, componentización desde Stitch.
+
+> **Skill asociado:** Para cambios en el sitio web, carga también `.agents/skills/novuspos-web-landing/SKILL.md`.
 
 > **Protocolo de Actualización:** Por cada cambio significativo realizado en un módulo, se debe actualizar su archivo de contexto respectivo.
 
