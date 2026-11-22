@@ -1,5 +1,8 @@
-appId: com.electron.app
+appId: com.novuspos.desktop
+# Se mantiene "novus-post" como nombre interno para no cambiar la carpeta
+# %APPDATA%\novus-post donde vive novuspos.sqlite. La marca visible es NovusPOS.
 productName: novus-post
+copyright: Copyright © 2026 NovusPOS
 directories:
   buildResources: build
 files:
@@ -13,12 +16,28 @@ asarUnpack:
   - resources/**
   - '**/*.node'
 win:
-  executableName: novus-post
+  executableName: NovusPOS
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
+  artifactName: NovusPOS-Setup-${version}-x64.${ext}
+  shortcutName: NovusPOS
+  uninstallDisplayName: NovusPOS
+  menuCategory: NovusPOS
   createDesktopShortcut: always
+  createStartMenuShortcut: true
+  runAfterFinish: true
+  # Asistente real (no instalador de un clic) e instalación por usuario:
+  # no pide permisos de administrador y permite elegir la carpeta.
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  # NUNCA borrar los datos: la base SQLite está en %APPDATA%\novus-post.
+  deleteAppDataOnUninstall: false
+  language: 3082
+  installerLanguages:
+    - es_ES
+  multiLanguageInstaller: false
+  installerSidebar: installerSidebar.bmp
+  uninstallerSidebar: uninstallerSidebar.bmp
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -28,17 +47,14 @@ mac:
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: NovusPOS-${version}.${ext}
 linux:
   target:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: novuspos
   category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: NovusPOS-${version}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates

@@ -277,6 +277,15 @@ Para compilar la aplicación empaquetada lista para distribución:
 npm run build:win
 ```
 
+El instalador se genera en `dist/NovusPOS-Setup-<version>-x64.exe`.
+
+- **Marca:** el icono del exe y del instalador se genera desde `build/icon.png` (512×512, basado en `resources/icon.png`). El asistente NSIS usa `build/installerSidebar.bmp` y `build/uninstallerSidebar.bmp` (164×314) con el logo y el tagline. Los iconos genéricos de Electron (`build/icon.ico` / `build/icon.icns`) se eliminaron para que electron-builder los regenere con la marca NovusPOS.
+- **Comportamiento:** asistente completo, instalación por usuario (sin permisos de administrador), carpeta configurable, accesos directos en escritorio y menú de inicio. El desinstalador **no borra** los datos: la base `novuspos.sqlite` permanece en `%APPDATA%\novus-post` para conservar el inventario entre reinstalaciones.
+- **Identidad:** `appId: com.novuspos.desktop`, ejecutable y accesos llamados `NovusPOS`. El nombre interno del producto sigue siendo `novus-post` para no cambiar la ruta de `userData`.
+- **Recursos:** `asarUnpack: resources/**` mantiene `logobanner.png` accesible para el Kardex en la app empaquetada; `**/*.node` conserva los módulos nativos (`better-sqlite3`, `serialport`).
+- **Firma:** sin certificado de código, Windows SmartScreen mostrará una advertencia la primera vez. Para distribución masiva se requiere firma con certificado Code Signing.
+- Si la app empaquetada no abre la base por un módulo nativo, ejecutar `npx electron-builder install-app-deps` y volver a compilar.
+
 ---
 
 © 2026 NovusPOS Desktop — Todos los derechos reservados.
