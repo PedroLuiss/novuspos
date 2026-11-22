@@ -63,7 +63,7 @@ src/
 ## 3. Orden de secciones (idéntico a Stitch)
 
 1. `SiteHeader` — fijo, logo + Características/Precios/Documentación + Iniciar Sesión.
-2. `Hero` — glow, píldora "⚡ NUEVA VERSIÓN 2.4.0…", headline, slogan, CTAs, trust badges, carrusel de capturas (`#interfaz-en-vivo`).
+2. `Hero` — glow; grid de 2 columnas en desktop: texto a la izquierda (píldora, headline, slogan, CTAs, trust badges) y carrusel de capturas (`#interfaz-en-vivo`) arriba a la derecha. En móvil se apila.
 3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas: terminal POS, inventario, Kardex, Corte Z, básculas RS-232, créditos.
 4. `KeyboardCheatSheet` — 7 atajos.
 5. `ComparisonTable` — 5 filas comparativas.
@@ -121,7 +121,7 @@ src/
    - Transición `duration-1000 ease-in-out`: la imagen de arriba se oculta suavemente mientras la de abajo pasa al frente.
    - Contenedor `[transform-style:preserve-3d] [perspective:1200px]`, `max-w-5xl aspect-[5/4]`.
    - Respeta `prefers-reduced-motion`.
-   - El ancla `#interfaz-en-vivo` se conserva.
+   - El ancla `#interfaz-en-vivo` se conserva, ahora en la **columna derecha del hero**: `HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`, con el copy alineado a la izquierda en desktop y el carrusel subido desde el fondo. En móvil se apila con `mt-space-lg`.
 
    Para agregar capturas: copiar el PNG a `public/imagen/` y añadir un objeto `{ src, alt }` al array `screenshots` en `landing-data.tsx`. Con una sola imagen no hay relevo visible, pero el componente ya está preparado. `ProductCard.tsx` y los mocks del carrito quedaron sin uso (no eliminados por si se requieren después).
 
@@ -130,7 +130,7 @@ src/
 ## 6. Estado y verificación
 
 - ✅ Réplica exacta de Stitch validada sección por sección con capturas headless de Chrome a 1280px contra el HTML renderizado y el screenshot oficial.
-- ✅ Altura final ≈5520px con el carrusel de capturas (antes del cambio, 5292px; oficial 5350px).
+- ✅ Altura final ≈4780px con el hero de dos columnas (antes, 5523px con el carrusel apilado abajo; oficial 5350px). Posición del carrusel a 1280px: `x≈660, y≈230, w≈596, h≈477`.
 - ✅ Tipografías, iconos y logo autoalojados (funciona offline, sin CDN).
 - ✅ `npm run build` y `npm run lint` limpios.
 - ✅ Autenticación del MCP Stitch configurada vía API key en `~/.config/opencode/secrets/stitch-api-key`.

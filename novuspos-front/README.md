@@ -76,11 +76,13 @@ npm run dev -- --host 127.0.0.1 --port 5173
   --hide-scrollbars --window-size=1280,7000 --screenshot="captura.png" "http://127.0.0.1:5173/"
 ```
 
-Viewport de referencia: 1280px. Altura actual ≈5520px (el carrusel de capturas sustituye al mockup HTML de Stitch).
+Viewport de referencia: 1280px. Altura actual ≈4780px (hero de dos columnas; antes, 5523px con el carrusel apilado abajo).
 
 ## Carrusel de capturas del hero
 
 `HeroMockup.tsx` ya no renderiza el terminal en JSX; muestra `ScreenshotCarousel`, que apila las imágenes de `public/imagen/` con el efecto de `nexusposgobal.com`: cada 4s la de arriba baja a `opacity-30` y se desplaza en 3D mientras la siguiente pasa al frente (transición de 1s). Se respeta `prefers-reduced-motion`.
+
+El carrusel se muestra en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`): el texto queda a la izquierda y las capturas se suben desde el fondo hasta la parte superior derecha. En móvil se apilan (texto arriba, capturas abajo).
 
 Para activar el relevo, agrega más PNG en `public/imagen/` y una entrada `{ src, alt }` al array `screenshots` en `src/features/landing/data/landing-data.tsx`.
 

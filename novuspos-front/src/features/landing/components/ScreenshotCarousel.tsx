@@ -40,7 +40,7 @@ export function ScreenshotCarousel() {
       id="interfaz-en-vivo"
       role="group"
       aria-label="Capturas del sistema NovusPOS"
-      className="relative mx-auto mt-space-xl flex w-full max-w-5xl aspect-[5/4] items-center justify-center [transform-style:preserve-3d] [perspective:1200px]"
+      className="relative mx-auto mt-space-lg flex w-full max-w-5xl aspect-[5/4] items-center justify-center lg:mt-0 [transform-style:preserve-3d] [perspective:1200px]"
     >
       {screenshots.map((slide, index) => (
         <div

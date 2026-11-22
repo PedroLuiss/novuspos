@@ -139,7 +139,7 @@ Espaciado: `space-xl` 2.5rem · `space-lg` 1.5rem · `space-md` 1rem · `space-s
 ## 6. Orden de secciones
 
 1. `SiteHeader` (fixed, h-20) → `<main class="pt-20">`
-2. `Hero` — glow, píldora "⚡ NUEVA VERSIÓN 2.4.0 • …", headline, "Lema oficial", subtítulo, CTAs, 4 trust badges, carrusel de capturas (#interfaz-en-vivo)
+2. `Hero` — glow; **grid de 2 columnas en desktop**: izquierda = píldora "⚡ NUEVA VERSIÓN 2.4.0 • …", headline, "Lema oficial", subtítulo, CTAs y 4 trust badges (alineados a la izquierda); derecha = carrusel de capturas (#interfaz-en-vivo), movido de abajo hacia arriba. En móvil se apila (texto arriba, capturas abajo).
 3. `KeyFeatures` (`#caracteristicas`)
 4. `KeyboardCheatSheet`
 5. `ComparisonTable`
@@ -170,7 +170,9 @@ npm run dev -- --host 127.0.0.1 --port 5173
   --hide-scrollbars --window-size=1280,7000 --screenshot="captura.png" "http://127.0.0.1:5173/"
 ```
 
-El viewport de referencia es **1280px** (ahí `max-w-7xl` = 1280 y el diseño ocupa todo el ancho). El screenshot oficial mide 1280×5351; la implementación actual ronda los **5520px** de alto (el carrusel de capturas es más alto que el mockup original de Stitch).
+El viewport de referencia es **1280px** (ahí `max-w-7xl` = 1280 y el diseño ocupa todo el ancho). El screenshot oficial mide 1280×5351; la implementación actual ronda los **4780px** de alto (el hero de dos columnas comparte altura entre texto y capturas).
+
+Verificación rápida del layout del hero a 1280px: `#interfaz-en-vivo` debe quedar en `x≈660, y≈230, w≈596, h≈477` y el `<h1>` en `x≈24, y≈166, w≈596`.
 
 > El diseño usa MD3 (azul `#003ec7`/`#0052ff`), **no** el Fluent POS Engine del escritorio. No mezclar sistemas.
 
@@ -196,4 +198,4 @@ export const screenshots: ScreenshotSlide[] = [
 ]
 ```
 
-Con una sola imagen el efe­cto no se aprecia (no hay relevo), pero el componente ya está listo. El ancla `#interfaz-en-vivo` se conserva en el contenedor del carrusel.
+Con una sola imagen el efecto no se aprecia (no hay relevo), pero el componente ya está listo. El ancla `#interfaz-en-vivo` se conserva en el contenedor del carrusel, ahora ubicado en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`; en móvil el carrusel baja con `mt-space-lg`).
