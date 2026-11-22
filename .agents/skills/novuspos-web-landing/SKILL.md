@@ -10,6 +10,10 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 > 🛑 **Regla de oro:** la landing es una **réplica exacta** del diseño de Stitch **"NovusPOS - Landing Page Oficial"**. Textos, colores, iconos, clases y orden de secciones deben coincidir con el HTML de Stitch. **No improvises ni rediseñes.**
 >
 > ⚠️ **Excepción actual (pedido explícito):** el hero ya no usa el mockup HTML de Stitch. Muestra capturas reales del sistema en un carrusel apilado con el efecto de `nexusposgobal.com`. Ver §9.
+>
+> ⚠️ **Excepción 2 (veracidad del copy):** `KeyFeatures` y `KeyboardCheatSheet` fueron auditados contra `novus-post/docs/context/`; donde Stitch afirmaba algo falso sobre el sistema, prevalece la documentación real. Ver §10.
+>
+> ⚠️ **Excepción 3 (tabla y FAQ):** `ComparisonTable` y `HardwareFaq` también se auditaron; se eliminaron las métricas inventadas y el claim de impresión ESC/POS. Ver §11.
 
 ---
 
@@ -140,11 +144,11 @@ Espaciado: `space-xl` 2.5rem · `space-lg` 1.5rem · `space-md` 1rem · `space-s
 
 1. `SiteHeader` (fixed, h-20) → `<main class="pt-20">`
 2. `Hero` — glow; **grid de 2 columnas en desktop**: izquierda = píldora "⚡ NUEVA VERSIÓN 2.4.0 • …", headline, "Lema oficial", subtítulo, CTAs y 4 trust badges (alineados a la izquierda); derecha = carrusel de capturas (#interfaz-en-vivo), movido de abajo hacia arriba. En móvil se apila (texto arriba, capturas abajo).
-3. `KeyFeatures` (`#caracteristicas`)
-4. `KeyboardCheatSheet`
-5. `ComparisonTable`
+3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas con copy verificado contra los contextos 02–06 y 08 (ver §10).
+4. `KeyboardCheatSheet` — 7 atajos reales (`ALT+1`…`ALT+7`, `F12`, `ALT+Q`).
+5. `ComparisonTable` — 5 filas con copy verificado contra contextos 01, 02, 05 y 08 (ver §11).
 6. `Pricing` (`#precios`)
-7. `HardwareFaq`
+7. `HardwareFaq` — 3 preguntas; periféricos y requisitos corregidos según docs (ver §11).
 8. `FinalCta` (`#descargar`)
 9. `Footer`
 
@@ -157,6 +161,7 @@ Espaciado: `space-xl` 2.5rem · `space-lg` 1.5rem · `space-md` 1rem · `space-s
 - [ ] ¿Los assets nuevos son locales (no CDN)?
 - [ ] ¿Usé `MS` para iconos y `Kbd` para atajos inline?
 - [ ] ¿Se mantienen ids de ancla y orden de secciones?
+- [ ] ¿El copy de características/atajos coincide con `novus-post/docs/context/` (no con Stitch cuando contradiga al sistema)?
 - [ ] `npm run build` + `npm run lint` limpios.
 - [ ] ¿Actualicé `novus-post/docs/context/09-LANDING-WEB.md`?
 
@@ -199,3 +204,46 @@ export const screenshots: ScreenshotSlide[] = [
 ```
 
 Con una sola imagen el efecto no se aprecia (no hay relevo), pero el componente ya está listo. El ancla `#interfaz-en-vivo` se conserva en el contenedor del carrusel, ahora ubicado en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`; en móvil el carrusel baja con `mt-space-lg`).
+
+---
+
+## 10. Copy verificado contra el sistema (excepción 2 a Stitch)
+
+`KeyFeatures.tsx` es solo el renderizador; las 6 tarjetas viven en `features` (`landing-data.tsx`). Ese array y `shortcuts` se auditaron contra `novus-post/docs/context/00-MASTER-CONTEXT.md` y los contextos **02 (POS), 03 (Inventario), 04 (Kardex), 05 (Caja), 06 (Clientes) y 08 (Ajustes/Hardware)**. Donde el HTML de Stitch contradecía al sistema, prevalece la documentación:
+
+| Antes (Stitch) | Ahora (sistema real) | Fuente |
+| :--- | :--- | :--- |
+| Atajos `F1-F7` | `ALT+1`…`ALT+7` para navegar; `F2`, `F6`, `F7`, `F8`, `F12`, `ALT+Q`, `ALT+P`, `ALT+E` en POS | 00 §5, 02 §3 |
+| Cobro mixto = "efectivo, tarjeta, crédito" | Cuatro medios: efectivo, tarjeta, **mixto (`F8`, efectivo+tarjeta)** y crédito | 02 §1, §4 |
+| "Latencia por escaneo < 0.8ms" | "Búsqueda paginada y cobro transaccional SQLite" (sin métrica inventada) | — |
+| "Papelera de reciclaje" | Baja lógica (`deleted=1, active=0`) que preserva Kardex | 03 §4.1, 00 §3.4 |
+| `ALT+E` = "entradas directas" | `ALT+E` = entradas masivas; `ALT+S` = salidas por merma | 03 §3 |
+| EAN-13/Code128, etiquetas DPI | 7 simbologías (EAN-13/8, UPC-A, ITF-14, Code128, Code39, OTRO) y mm | 03 §1, §4.8 |
+| "Segundo a segundo", exportación Excel | Fecha/hora exacta, append-only, XLSX y PDF de todos los filtrados | 04 §1, §5 |
+| `Fondo + Ventas + Abonos - Gastos`, "cierre ciego" | `Fondo + Ventas + Abonos + Ingresos manuales - Gastos - Devoluciones en efectivo`; sobrante/faltante en vivo; tarjeta y crédito excluidos | 05 § "Reglas operativas" |
+| "Probada con CAS", "COM1-COM8", "COM/USB" | Torrey, Rhino y Dibal; puerto COM + baudios persistidos; validación física pendiente | 08 §1 |
+| "compras fadas", recibo de abono impreso | "compras fiadas"; abono a deudas más antiguas con impacto en gaveta (ESC/POS no conectado) | 06 §1/§6, 08 §1 |
+| "hasta 500,000 transacciones mensuales" | "alto volumen transaccional" | — |
+
+`KeyboardCheatSheet.tsx` también mostraba `F1`–`F5` como navegación; ahora usa `ALT+1`…`ALT+7`, `F12` → "Cobro Estándar" y `ALT+Q`. `KeyCap` aplica `px-2 text-[13px]` cuando la tecla tiene más de 3 caracteres para que `ALT+1` quepa sin desbordar, conservando el color del variante.
+
+> Si en el futuro se vuelve a sincronizar con Stitch, **no restaurar estos textos**: la fidelidad visual se sacrificó deliberadamente por veracidad funcional en el hero (§9), las tarjetas y atajos (§10) y la tabla y FAQ (§11).
+
+---
+
+## 11. Tabla comparativa y FAQ verificadas (excepción 3 a Stitch)
+
+`ComparisonTable.tsx` renderiza `comparisonRows` y `HardwareFaq.tsx` renderiza `faqs`; ambos arrays viven en `landing-data.tsx`. Se auditaron contra los contextos **00, 01, 02, 05 y 08**:
+
+| Antes (Stitch) | Ahora (sistema real) | Fuente |
+| :--- | :--- | :--- |
+| "✓ 100% Ininterrumpido (SQLite Local Nativo)" | "✓ Núcleo POS offline-first con SQLite local en modo WAL" (bootstrap/OTP, reportes y tasas BCV sí requieren red) | 00 §1/§3.7, 01 §1/§4, 02 §4 |
+| "~0.5 a 1.2 ms" / "300–2500 ms" | "✓ Búsqueda local paginada en SQLite (50 por página), sin viaje de red" | 02 §1, §5.14 |
+| "Conexión directa a puertos COM nativos" | "✓ Lectura serial con puerto COM y baudios configurables (Torrey, Rhino, Dibal)" | 08 §1 |
+| "✓ ESC/POS directo al puerto RAW sin diálogo de Windows" | "✓ PDF vectorial nativo 80mm/58mm/Carta con descarga directa" | 02 §1, 08 §1/§6 |
+| FAQ: "cualquier impresora ESC/POS vía USB/Serial/Red", CAS, BAR-9 | PDF vectorial + diálogo nativo para etiquetas (no ESC/POS/ZPL); Torrey/Rhino/Dibal por RS-232, validación física pendiente | 08 §1/§6 |
+| FAQ: Windows 10/11, i3, 4 GB RAM, 250 MB, VFD | Electron 64 bits, Fluent/WinUI 3, SQLite local y ventana mínima 960×600; sin cifras oficiales de CPU/RAM/disco | 00 §1/§3.7 |
+
+La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión comercial documentada en `09-LANDING-WEB.md`, no una afirmación técnica del sistema.
+
+> Regla futura: todo copy que mencione hardware o rendimiento debe verificarse en `08-SETTINGS-HARDWARE.md` y `02-POS-SALES.md` antes de copiarlo de Stitch.

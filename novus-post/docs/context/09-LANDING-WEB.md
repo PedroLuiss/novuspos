@@ -64,11 +64,11 @@ src/
 
 1. `SiteHeader` — fijo, logo + Características/Precios/Documentación + Iniciar Sesión.
 2. `Hero` — glow; grid de 2 columnas en desktop: texto a la izquierda (píldora, headline, slogan, CTAs, trust badges) y carrusel de capturas (`#interfaz-en-vivo`) arriba a la derecha. En móvil se apila.
-3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas: terminal POS, inventario, Kardex, Corte Z, básculas RS-232, créditos.
-4. `KeyboardCheatSheet` — 7 atajos.
-5. `ComparisonTable` — 5 filas comparativas.
+3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas: terminal POS, inventario, Kardex, Corte Z, básculas RS-232, créditos. Copy verificado contra los contextos 02–06 y 08 (ver §5.3).
+4. `KeyboardCheatSheet` — 7 atajos reales: `ALT+1`…`ALT+7`, `F12` y `ALT+Q`.
+5. `ComparisonTable` — 5 filas comparativas con copy verificado contra contextos 01, 02, 05 y 08 (ver §5.4).
 6. `Pricing` (`#precios`) — licencia profesional $4.99, badge "PRIMER MES $0".
-7. `HardwareFaq` — 3 preguntas (SQLite WAL, periféricos, requisitos Windows).
+7. `HardwareFaq` — 3 preguntas (SQLite WAL, periféricos, requisitos Windows); periféricos y requisitos verificados contra docs (ver §5.4).
 8. `FinalCta` (`#descargar`) — gradiente primary→on-primary-fixed-variant.
 9. `Footer` — producto, desarrolladores & soporte, seguridad & legal, línea legal.
 
@@ -125,11 +125,26 @@ src/
 
    Para agregar capturas: copiar el PNG a `public/imagen/` y añadir un objeto `{ src, alt }` al array `screenshots` en `landing-data.tsx`. Con una sola imagen no hay relevo visible, pero el componente ya está preparado. `ProductCard.tsx` y los mocks del carrito quedaron sin uso (no eliminados por si se requieren después).
 
+3. **Copy verificado contra el sistema real (pedido explícito):** el HTML de Stitch contenía afirmaciones falsas o no verificables. Prevalece `novus-post/docs/context/`:
+   - Atajos `F1-F7` → navegación real `ALT+1`…`ALT+7`; `F12` es Cobro Estándar (no "Cobro Mixto", que es `F8`).
+   - Eliminado el claim "latencia por escaneo < 0.8ms" (sin respaldo documental).
+   - "Papelera de reciclaje" → baja lógica (soft delete) que preserva Kardex.
+   - Etiquetas: 7 simbologías y medidas en **mm** (no DPI); exportación `.xlsx` + CSV con BOM UTF-8.
+   - Kardex: libro append-only con fecha/hora, usuario, motivo, lote y ticket; exportación XLSX/PDF.
+   - Caja: `efectivo esperado = fondo inicial + ventas + abonos + ingresos manuales - gastos - devoluciones en efectivo`; se eliminó "cierre ciego" y se añadió el cálculo de sobrante/faltante en vivo.
+   - Básculas: Torrey/Rhino/Dibal con puerto COM y baudios; se eliminaron CAS, "probada y comprobada" y "COM1-COM8" (la validación con hardware sigue pendiente).
+   - Créditos: corregido "fadas" → "fiadas"; eliminada la impresión de recibos de abono (ESC/POS no conectado), reemplazada por el impacto inmediato en la gaveta.
+   - Titular de `KeyFeatures`: "hasta 500,000 transacciones mensuales" → "alto volumen transaccional" (claim sin respaldo).
+   - `KeyCap` de `KeyboardCheatSheet` usa tamaño compacto para teclas con modificador (`ALT+1`…`ALT+5`).
+
+4. **Tabla comparativa y FAQ verificadas (pedido explícito):** `comparisonRows` y `faqs` (en `landing-data.tsx`) se auditaron contra los contextos 00, 01, 02, 05 y 08. Se eliminó "100% Ininterrumpido", la latencia inventada (0.5–1.2 ms / 300–2500 ms) y el claim "ESC/POS directo al puerto RAW" (08 §1/§6: impresión física no integrada; 02 §4: la previsualización no imprime). La fila de básculas ahora habla de puerto COM y baudios con Torrey/Rhino/Dibal, y la de documentos de venta de PDF vectorial 80/58mm/Carta. El FAQ de periféricos se alineó con lo anterior (sin "cualquier impresora ESC/POS", sin CAS/BAR-9) y el de requisitos se limitó a lo documentado (Electron 64 bits, ventana mínima 960×600, sin cifras oficiales de CPU/RAM). El precio de $4.99 se conserva por ser decisión comercial (ver §3, ítem 6).
+
 ---
 
 ## 6. Estado y verificación
 
-- ✅ Réplica exacta de Stitch validada sección por sección con capturas headless de Chrome a 1280px contra el HTML renderizado y el screenshot oficial.
+- ✅ Réplica exacta de Stitch validada sección por sección con capturas headless de Chrome a 1280px contra el HTML renderizado y el screenshot oficial, **excepto** hero y copy de `KeyFeatures`/`KeyboardCheatSheet` (ver §5).
+- ✅ Copy de `KeyFeatures` y `KeyboardCheatSheet` auditado contra los contextos 00, 02, 03, 04, 05, 06 y 08; eliminados los claims falsos de Stitch (ver §5.3).
 - ✅ Altura final ≈4780px con el hero de dos columnas (antes, 5523px con el carrusel apilado abajo; oficial 5350px). Posición del carrusel a 1280px: `x≈660, y≈230, w≈596, h≈477`.
 - ✅ Tipografías, iconos y logo autoalojados (funciona offline, sin CDN).
 - ✅ `npm run build` y `npm run lint` limpios.

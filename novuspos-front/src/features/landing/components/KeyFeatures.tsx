@@ -22,7 +22,7 @@ export function KeyFeatures() {
           ARQUITECTURA DE ESCRITORIO EXTREMA
         </span>
         <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight mb-space-sm">
-          Potencia nativa diseñada para soportar hasta 500,000 transacciones mensuales
+          Potencia nativa diseñada para operar con alto volumen transaccional
         </h2>
         <p className="font-body-lg text-body-lg text-on-surface-variant">
           Despídete de los navegadores lentos, pestañas congeladas y cuelgues repentinos cuando se corta la señal de

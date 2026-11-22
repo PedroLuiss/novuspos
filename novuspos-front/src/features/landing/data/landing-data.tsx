@@ -42,6 +42,12 @@ export interface Faq {
 
 /* Marcado inline idéntico a Stitch: los atajos usan `Kbd`. */
 
+/**
+ * Copy verificado contra `novus-post/docs/context/` (contextos 00, 02, 03, 04,
+ * 05, 06 y 08). Se eliminaron claims de Stitch sin respaldo en el sistema real:
+ * atajos F1-F7, latencia < 0.8ms, papelera de reciclaje, etiquetas DPI, CAS y
+ * impresión de recibos de abono.
+ */
 export const features: Feature[] = [
   {
     id: 'terminal-ventas',
@@ -50,11 +56,12 @@ export const features: Feature[] = [
     title: 'Terminal de Ventas Ultra Rápida',
     description: (
       <>
-        Búsqueda reactiva de productos por código o descripción, atajos de función F1-F7, cobro mixto (efectivo,
-        tarjeta, crédito de tienda) y función de venta en espera con un toque vía <Kbd>[ALT+P]</Kbd>.
+        Búsqueda reactiva y paginada por nombre, código o código de barras, navegación de módulos con{' '}
+        <Kbd>[ALT+1]</Kbd> a <Kbd>[ALT+7]</Kbd>, cobro en efectivo, tarjeta, mixto <Kbd>[F8]</Kbd> o crédito, y ventas
+        en espera persistentes con <Kbd>[ALT+P]</Kbd> que se recuperan con <Kbd>[ALT+E]</Kbd>.
       </>
     ),
-    badge: '⚡ Latencia por escaneo: < 0.8ms',
+    badge: '⚡ Búsqueda paginada y cobro transaccional SQLite',
     badgeTone: 'primary',
   },
   {
@@ -64,12 +71,11 @@ export const features: Feature[] = [
     title: 'Inventario Denso Estilo Excel',
     description: (
       <>
-        Control de stock en grilla editable rápida, papelera de reciclaje y soft delete, entradas directas{' '}
-        <Kbd>[ALT+E]</Kbd>, salidas masivas <Kbd>[ALT+S]</Kbd> y generador de códigos de barras EAN-13/Code128 con
-        etiquetas DPI configurables.
+        Grilla densa de 40px con paginación en SQLite, baja lógica (soft delete) que preserva el Kardex, entradas
+        masivas <Kbd>[ALT+E]</Kbd>, salidas por merma <Kbd>[ALT+S]</Kbd> y etiquetas con 7 simbologías y medidas en mm.
       </>
     ),
-    badge: '📦 Importación / Exportación .xlsx instantánea',
+    badge: '📦 Importación / Exportación .xlsx y CSV con BOM UTF-8',
     badgeTone: 'secondary',
   },
   {
@@ -79,9 +85,9 @@ export const features: Feature[] = [
     title: 'Kardex de Auditoría Inmutable',
     description: (
       <>
-        Rastro histórico segundo a segundo de cada unidad que entra, sale o se ajusta por merma. Nada se borra a
-        espaldas del administrador: registro riguroso de usuario responsable, motivo de ajuste y exportación forense a
-        Excel.
+        Libro mayor append-only con fecha/hora exacta, usuario responsable, motivo, lote y ticket de referencia.
+        Ventas, combos, mermas y devoluciones quedan trazados sin borrar ni reescribir el historial; exportación a XLSX
+        y PDF de todos los resultados filtrados.
       </>
     ),
     badge: '🛡 Cero manipulación o descuadre no autorizado',
@@ -94,9 +100,9 @@ export const features: Feature[] = [
     title: 'Corte Z & Ecuación de Caja',
     description: (
       <>
-        Supervisión continua de la gaveta de dinero. La fórmula matemática es indiscutible:{' '}
-        <em>Fondo Inicial + Ventas + Abonos - Gastos = Total Esperado</em>. Cierre ciego por cajero y alerta inmediata
-        de faltantes o sobrantes.
+        Supervisión continua de la gaveta. El efectivo esperado es{' '}
+        <em>Fondo Inicial + Ventas + Abonos + Ingresos manuales - Gastos - Devoluciones en efectivo</em>; tarjeta y
+        crédito se excluyen del conteo. El cierre calcula sobrante o faltante en vivo al registrar el efectivo contado.
       </>
     ),
     badge: '💰 Cuadratura al céntimo en cada turno',
@@ -109,11 +115,11 @@ export const features: Feature[] = [
     title: 'Básculas Comerciales RS-232',
     description: (
       <>
-        Driver universal nativo para protocolos seriales COM/USB. Compatibilidad probada y comprobada con básculas
-        líderes: Torrey (L-EQ/PCR), Rhino (BAR-8), Dibal y CAS. Pesaje automático sin digitar manualmente los gramos.
+        Lectura en vivo desde básculas Torrey, Rhino y Dibal por puerto serial, con puerto COM y baudios configurables
+        y persistidos. El pesaje se captura sin digitar manualmente los gramos.
       </>
     ),
-    badge: '⚖ Lectura continua en puerto serial COM1-COM8',
+    badge: '⚖ Configuración de puerto COM y baudios persistida',
     badgeTone: 'primary',
   },
   {
@@ -123,29 +129,30 @@ export const features: Feature[] = [
     title: 'Cuentas por Cobrar & Créditos',
     description: (
       <>
-        Cartera integrada de clientes con límites de crédito estrictos, indicadores automáticos de{' '}
+        Cartera integrada con límites de crédito validados al cobrar, indicadores automáticos de{' '}
         <strong className="text-error font-mono">DEUDOR</strong> o{' '}
-        <strong className="text-secondary font-mono">AL DÍA</strong>, historial de compras fadas y recepción de abonos
-        directos a la caja abierta.
+        <strong className="text-secondary font-mono">AL DÍA</strong>, historial de compras fiadas y abonos que se
+        aplican a las deudas más antiguas e impactan la caja del turno activo.
       </>
     ),
-    badge: '💳 Impresión de recibo de abono con saldo restante',
+    badge: '💳 Abono con efecto inmediato en la gaveta del turno',
     badgeTone: 'secondary',
   },
 ]
 
+/** Atajos reales del dashboard (00-MASTER §5): ALT+1…ALT+7 por módulo. */
 export const shortcuts: Shortcut[] = [
-  { key: 'F1', keyVariant: 'primary', title: 'Punto de Venta', subtitle: 'Regresar a la terminal' },
-  { key: 'F2', keyVariant: 'surface', title: 'Inventario', subtitle: 'Catálogo y existencia' },
-  { key: 'F3', keyVariant: 'surface', title: 'Kardex', subtitle: 'Historial y auditoría' },
-  { key: 'F4', keyVariant: 'surface', title: 'Corte Z', subtitle: 'Arqueo de efectivo' },
-  { key: 'F5', keyVariant: 'surface', title: 'Clientes', subtitle: 'Abonos y deudas' },
+  { key: 'ALT+1', keyVariant: 'primary', title: 'Punto de Venta', subtitle: 'Ir a la terminal' },
+  { key: 'ALT+2', keyVariant: 'surface', title: 'Inventario', subtitle: 'Catálogo y existencia' },
+  { key: 'ALT+3', keyVariant: 'surface', title: 'Kardex', subtitle: 'Historial y auditoría' },
+  { key: 'ALT+4', keyVariant: 'surface', title: 'Caja', subtitle: 'Arqueo de efectivo' },
+  { key: 'ALT+5', keyVariant: 'surface', title: 'Clientes', subtitle: 'Abonos y deudas' },
   {
     key: 'F12',
     keyVariant: 'primary',
     ring: 'primary',
-    title: 'Cobro Mixto',
-    subtitle: 'Modal de cobro',
+    title: 'Cobro Estándar',
+    subtitle: 'Modal de pago',
     titleTone: 'primary',
   },
   {
@@ -158,32 +165,35 @@ export const shortcuts: Shortcut[] = [
   },
 ]
 
+/**
+ * Copy verificado contra `novus-post/docs/context/` (00, 01, 02, 05 y 08).
+ * Se eliminaron los claims sin respaldo: latencia en milisegundos y
+ * "ESC/POS directo al puerto RAW" (la impresión física aún no está integrada).
+ */
 export const comparisonRows: ComparisonRow[] = [
   {
     capacity: 'Operatividad sin Internet',
-    novuspos: '✓ 100% Ininterrumpido (SQLite Local Nativo)',
+    novuspos: '✓ Núcleo POS offline-first con SQLite local en modo WAL',
     novusposTone: 'secondary',
     novusposWrap: true,
     web: '× Se congela, no cobra o pierde el carrito',
   },
   {
-    capacity: 'Tiempo de respuesta por escaneo',
-    novuspos: '~ 0.5 a 1.2 milisegundos',
+    capacity: 'Respuesta del catálogo',
+    novuspos: '✓ Búsqueda local paginada en SQLite (50 por página), sin viaje de red',
     novusposTone: 'primary',
-    novusposMono: true,
-    web: '300ms a 2,500ms (depende de latencia de red)',
-    webMono: true,
+    web: '× Depende de la latencia del servidor',
   },
   {
     capacity: 'Compatibilidad Báscula RS-232',
-    novuspos: '✓ Conexión directa a puertos seriales COM nativos',
+    novuspos: '✓ Lectura serial con puerto COM y baudios configurables (Torrey, Rhino, Dibal)',
     novusposTone: 'on-surface',
     novusposWrap: true,
     web: '× Requiere servidores puente locales o no es compatible',
   },
   {
-    capacity: 'Impresión Térmica de Tickets',
-    novuspos: '✓ ESC/POS directo al puerto RAW sin diálogo de Windows',
+    capacity: 'Documentos de venta (ticket/factura)',
+    novuspos: '✓ PDF vectorial nativo 80mm/58mm/Carta con descarga directa',
     novusposTone: 'on-surface',
     novusposWrap: true,
     web: 'Abre molesta ventana flotante del navegador "Imprimir..."',
@@ -209,14 +219,14 @@ export const faqs: Faq[] = [
     iconTone: 'secondary',
     question: '¿Qué marcas de básculas comerciales e impresoras son compatibles?',
     answer:
-      'NovusPOS Desktop es compatible con cualquier impresora térmica ESC/POS de 58mm u 80mm vía USB, Serial o Red (Epson, Bixolon, Xprinter, EC Line). En básculas comerciales, soporta comunicación continua y bajo demanda para Torrey (L-EQ, PCR), Rhino (BAR-8, BAR-9), Dibal, CAS y básculas genéricas con salida RS-232 o convertidor RS-232 a USB (CH340 / FTDI).',
+      'Las ventas generan documentos PDF vectoriales nativos en formato ticket 80mm, ticket 58mm o carta, con descarga directa; la impresión térmica ESC/POS y el pulso de gaveta aún no están integrados. Las etiquetas se imprimen con el diálogo nativo de Windows (no ESC/POS ni ZPL). En básculas, la lectura en vivo por puerto RS-232 (COM y baudios configurables) está conectada para Torrey, Rhino y Dibal; la validación con hardware físico sigue pendiente.',
   },
   {
     icon: 'computer',
     iconTone: 'neutral',
     question: '¿Cuáles son los requisitos mínimos de sistema en Windows?',
     answer:
-      'Cualquier computadora con Windows 10 u 11 (64 bits), procesador Intel Core i3 o AMD equivalente (o posterior), 4 GB de memoria RAM y 250 MB de almacenamiento libre en disco. Funciona con pantallas táctiles, monitores convencionales y displays de cliente de 2 líneas VFD.',
+      'NovusPOS es una aplicación nativa para Windows (Electron de 64 bits) con interfaz Fluent/WinUI 3 y base de datos SQLite local, sin dependencia de un servidor en la fase monopuesto actual. La ventana principal se inicia maximizada y conserva un mínimo de 960 × 600 px para no perder la disposición del POS. No hay cifras oficiales documentadas de CPU, RAM o espacio en disco: el consumo de SQLite crece con el catálogo y los respaldos locales.',
   },
 ]
 

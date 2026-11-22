@@ -12,26 +12,20 @@ const titleToneClass: Record<string, string> = {
   secondary: 'text-secondary',
 }
 
-/** Bloque de tecla del atajo. */
+/** Bloque de tecla del atajo (compacto cuando incluye modificador, p. ej. ALT+1). */
 function KeyCap({ shortcut }: { shortcut: Shortcut }) {
-  if (shortcut.keyVariant === 'primary') {
-    return (
-      <div className="w-12 h-10 rounded bg-primary text-on-primary font-mono font-bold text-center flex items-center justify-center text-[18px] shadow-sm mb-space-sm">
-        {shortcut.key}
-      </div>
-    )
-  }
-
-  if (shortcut.keyVariant === 'secondary') {
-    return (
-      <div className="px-2 h-10 rounded bg-secondary text-on-secondary font-mono font-bold text-center flex items-center justify-center text-[13px] shadow-sm mb-space-sm">
-        {shortcut.key}
-      </div>
-    )
-  }
+  const sizing = shortcut.key.length > 3 ? 'px-2 text-[13px]' : 'w-12 text-[18px]'
+  const tone =
+    shortcut.keyVariant === 'primary'
+      ? 'bg-primary text-on-primary'
+      : shortcut.keyVariant === 'secondary'
+        ? 'bg-secondary text-on-secondary'
+        : 'bg-surface-container text-on-surface'
 
   return (
-    <div className="w-12 h-10 rounded bg-surface-container text-on-surface font-mono font-bold text-center flex items-center justify-center text-[18px] shadow-sm mb-space-sm">
+    <div
+      className={`h-10 rounded ${tone} ${sizing} font-mono font-bold text-center flex items-center justify-center shadow-sm mb-space-sm`}
+    >
       {shortcut.key}
     </div>
   )
