@@ -18,10 +18,10 @@ export function FinalCta() {
         <div className="flex flex-col sm:flex-row items-center gap-space-md">
           <button className="px-space-xl py-space-md rounded-lg bg-surface-container-lowest text-primary font-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95 inline-flex items-center gap-space-sm">
             <MS name="download" className="text-[26px] cta-download-icon transition-transform" />
-            <span>Descargar Instalador Windows (.exe)</span>
+            <span>Descargar instalador de Windows</span>
           </button>
           <span className="font-label-sm text-label-sm text-primary-fixed font-mono">
-            Versión 2.4.0 • 30 días gratis • 85 MB
+            30 días gratis • sin tarjeta
           </span>
         </div>
       </div>

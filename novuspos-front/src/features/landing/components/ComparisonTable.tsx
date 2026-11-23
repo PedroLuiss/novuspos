@@ -25,7 +25,7 @@ export function ComparisonTable() {
             <tr className="bg-surface-container">
               <th className="p-space-md font-label-md text-label-md text-on-surface font-bold">Capacidad Operativa</th>
               <th className="p-space-md font-label-md text-label-md text-primary font-bold bg-primary-fixed/40">
-                NovusPOS Desktop v2.4.0
+                NovusPOS Desktop
               </th>
               <th className="p-space-md font-label-md text-label-md text-on-surface-variant">
                 Sistemas POS en Navegador Web

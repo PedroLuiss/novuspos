@@ -70,7 +70,7 @@ export function Pricing() {
             <span className="flex flex-col text-left">
               <span>Descargar para Windows</span>
               <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">
-                v2.4.0 (.exe) • ~85 MB • 30 Días Gratis
+                30 días gratis • sin tarjeta
               </span>
             </span>
           </a>

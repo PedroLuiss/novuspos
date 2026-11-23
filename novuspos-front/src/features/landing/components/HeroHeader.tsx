@@ -9,13 +9,13 @@ export function MS({ name, className }: { name: string; className?: string }) {
   )
 }
 
-/** Píldora de versión de release. */
-export function ReleasePill() {
+/** Píldora con el beneficio principal del hero (sin número de versión). */
+export function HighlightPill() {
   return (
     <div className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-high shadow-sm mb-space-lg">
       <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
       <span className="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">
-        ⚡ NUEVA VERSIÓN 2.4.0 • TRABAJA SIN DEPENDER DE INTERNET
+        ⚡ TRABAJA SIN DEPENDER DE INTERNET
       </span>
     </div>
   )
@@ -40,7 +40,7 @@ export function HeroHeader({ children }: { children: ReactNode }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-space-xl">
         {/* Columna izquierda: copy, CTAs y sellos de confianza */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-          <ReleasePill />
+          <HighlightPill />
 
           <h1 className="font-display text-display text-on-surface max-w-4xl tracking-tight leading-none mb-space-md">
             El punto de venta para Windows que tu negocio necesita:{' '}
@@ -69,7 +69,7 @@ export function HeroHeader({ children }: { children: ReactNode }) {
               <span className="flex flex-col text-left">
                 <span>Descargar para Windows</span>
                 <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">
-                  v2.4.0 (.exe) • ~85 MB • 30 Días Gratis
+                  30 días gratis • sin tarjeta
                 </span>
               </span>
             </a>

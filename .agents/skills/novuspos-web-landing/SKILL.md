@@ -107,7 +107,7 @@ src/
 ├── features/landing/
 │   ├── components/
 │   │   ├── SiteHeader.tsx              # header fixed h-20
-│   │   ├── HeroHeader.tsx              # MS + ReleasePill + cabecera del hero
+│   │   ├── HeroHeader.tsx              # MS + HighlightPill + cabecera del hero
 │   │   ├── HeroMockup.tsx              # wrapper del carrusel (antes: mockup HTML del POS)
 │   │   ├── ScreenshotCarousel.tsx      # carrusel 3D apilado, relevo suave estilo NexusPOS
 │   │   ├── product/ProductCard.tsx     # ProductCard + CartRow (sin uso tras el carrusel)
@@ -151,7 +151,7 @@ Espaciado: `space-xl` 2.5rem · `space-lg` 1.5rem · `space-md` 1rem · `space-s
 ## 6. Orden de secciones
 
 1. `SiteHeader` (fixed, h-20) → `<main class="pt-20">`
-2. `Hero` — glow; **grid de 2 columnas en desktop**: izquierda = píldora "⚡ NUEVA VERSIÓN 2.4.0 • …", headline, "Lema oficial", subtítulo, CTAs y 4 trust badges (alineados a la izquierda); derecha = carrusel de capturas (#interfaz-en-vivo), movido de abajo hacia arriba. En móvil se apila (texto arriba, capturas abajo).
+2. `Hero` — glow; **grid de 2 columnas en desktop**: izquierda = píldora "⚡ TRABAJA SIN DEPENDER DE INTERNET" (sin número de versión), headline, "Lema oficial", subtítulo, CTAs y 4 trust badges (alineados a la izquierda); derecha = carrusel de capturas (#interfaz-en-vivo), movido de abajo hacia arriba. En móvil se apila (texto arriba, capturas abajo).
 3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas con copy verificado contra los contextos 02–06 y 08 (ver §10).
 4. `KeyboardCheatSheet` — 7 atajos reales (`ALT+1`…`ALT+7`, `F12`, `ALT+Q`).
 5. `ComparisonTable` — 5 filas con copy verificado contra contextos 01, 02, 05 y 08 (ver §11).
@@ -269,7 +269,7 @@ La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión c
 
 ## 12. Pricing verificado (excepción 4 a Stitch)
 
-`Pricing.tsx` conserva el precio comercial (`$4.99 USD / mes`, `PRIMER MES $0`, `30 días gratis`, sin tarjeta) y el dato del instalador (`v2.4.0 (.exe) • ~85 MB`), que no son afirmaciones técnicas del sistema. El checklist y la línea de Windows sí se auditaron contra los contextos **00, 01, 02, 04, 05 y 08**:
+`Pricing.tsx` conserva el precio comercial (`$4.99 USD / mes`, `PRIMER MES $0`, `30 días gratis`, sin tarjeta). El número de versión y el tamaño del instalador se retiraron del copy (ver §14.2). El checklist y la línea de Windows sí se auditaron contra los contextos **00, 01, 02, 04, 05 y 08**:
 
 | Antes (Stitch) | Ahora (sistema real) | Fuente |
 | :--- | :--- | :--- |
@@ -300,7 +300,7 @@ La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión c
 | CTA "Ver Demostración" | "Ver capturas del sistema" (el ancla es un carrusel de capturas, no una demo) | §9 |
 | Footer: "offline-first de ultra-alto rendimiento" | "offline-first con SQLite local" | 00 §1 |
 
-El precio, la versión `2.4.0` y el tamaño del instalador (`~85 MB`) se conservan por ser decisiones comerciales.
+El precio y los beneficios de la prueba (`30 días gratis`, sin tarjeta) se conservan por ser decisiones comerciales; la versión y el tamaño del instalador ya no se muestran (§14.2).
 
 ---
 
@@ -330,4 +330,8 @@ El FAQ `¿Qué necesito para empezar?` y la línea de `Pricing` indican **Window
 - No hay ningún chequeo en el código que exija Windows 11; "Windows 11 Fluent Design / WinUI 3" en los contextos 00 y AGENTS.md es **estilo visual**, no requisito de sistema operativo.
 
 Por eso el texto dice que no hace falta la versión más reciente, pero **no menciona Windows 7/8/8.1** (no son compatibles). Si cambia la versión de Electron o el target del instalador, revisar este apartado antes de tocar el copy.
+
+### 14.2 Sin número de versión en la landing (pedido explícito)
+
+Se retiró `2.4.0` de **todo** el copy visible porque se veía mal. `ReleasePill` pasó a llamarse `HighlightPill` y ahora dice `⚡ TRABAJA SIN DEPENDER DE INTERNET`. Los subtítulos de los botones de descarga (hero y `Pricing`) y la línea del CTA final pasaron a `30 días gratis • sin tarjeta`. La columna de la comparativa dice solo `NovusPOS Desktop` y el enlace del footer dice `Novedades`. No reintroducir `v2.4.0`, `Versión 2.4.0`, `~85 MB` ni `(.exe)` en la landing: la versión real sigue viviendo en `novus-post/package.json` y en el nombre del artefacto de `electron-builder.yml`, no en el sitio web.
 

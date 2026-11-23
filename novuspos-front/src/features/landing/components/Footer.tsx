@@ -9,7 +9,7 @@ export function Footer() {
     },
     {
       title: 'Ayuda',
-      links: ['Guía de uso', 'Centro de ayuda', 'Novedades 2.4.0', 'Preguntas frecuentes'],
+      links: ['Guía de uso', 'Centro de ayuda', 'Novedades', 'Preguntas frecuentes'],
     },
     {
       title: 'Legal',
