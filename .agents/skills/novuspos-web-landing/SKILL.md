@@ -16,6 +16,8 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 > ⚠️ **Excepción 3 (tabla y FAQ):** `ComparisonTable` y `HardwareFaq` también se auditaron; se eliminaron las métricas inventadas y el claim de impresión ESC/POS. Ver §11.
 >
 > ⚠️ **Excepción 4 (precios):** `Pricing` conserva el precio comercial, pero su checklist técnico y la línea de Windows se auditaron; se eliminaron ESC/POS, backups automáticos y soporte por WhatsApp. Ver §12.
+>
+> ⚠️ **Excepción 5 (hero y footer):** `HeroHeader` y `Footer` también se auditaron; se eliminaron "100% sin internet", ESC/POS, la latencia en milisegundos y "ultra-alto rendimiento". Ver §13.
 
 ---
 
@@ -244,7 +246,9 @@ Con una sola imagen el efecto no se aprecia (no hay relevo), pero el componente 
 | "Conexión directa a puertos COM nativos" | "✓ Lectura serial con puerto COM y baudios configurables (Torrey, Rhino, Dibal)" | 08 §1 |
 | "✓ ESC/POS directo al puerto RAW sin diálogo de Windows" | "✓ PDF vectorial nativo 80mm/58mm/Carta con descarga directa" | 02 §1, 08 §1/§6 |
 | FAQ: "cualquier impresora ESC/POS vía USB/Serial/Red", CAS, BAR-9 | PDF vectorial + diálogo nativo para etiquetas (no ESC/POS/ZPL); Torrey/Rhino/Dibal por RS-232, validación física pendiente | 08 §1/§6 |
-| FAQ: Windows 10/11, i3, 4 GB RAM, 250 MB, VFD | Electron 64 bits, Fluent/WinUI 3, SQLite local y ventana mínima 960×600; sin cifras oficiales de CPU/RAM/disco | 00 §1/§3.7 |
+| FAQ: Windows 10/11, i3, 4 GB RAM, 250 MB, VFD | Electron, Fluent/WinUI 3, SQLite local y ventana mínima 960×600; sin cifras oficiales de CPU/RAM/disco | 00 §1/§3.7 |
+| FAQ: "escribe de manera atómica e **instantánea** ... si se corta la energía ningún registro queda a medias" | "se confirma en una transacción atómica y queda persistido en el disco local"; sin garantía de durabilidad ante corte de luz | 00 §1, 02 §113 |
+| FAQ: "**sin dependencia de un servidor** en la fase monopuesto" | "cobro, inventario y caja operan sin servidor; primer ingreso, OTP, reportes y tasas BCV sí requieren conexión" | 01 §1/§4, 00 §3.7, 02 §4 |
 
 La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión comercial documentada en `09-LANDING-WEB.md`, no una afirmación técnica del sistema.
 
@@ -266,4 +270,23 @@ La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión c
 | "Actualizaciones continuas v2.x y soporte prioritario por WhatsApp y Ticket" | "Soporte por ticket desde la app (requiere internet)" | 00 §3.7, 08 §1 |
 | "Copias de seguridad automáticas a memorias USB o carpetas compartidas" | "Respaldo verificado con SHA-256 en la carpeta de datos de la app, con restauración y copia preventiva" | 08 §1/§6 |
 
-> No restaurar estos textos en una futura sincronización con Stitch: las excepciones deliberadas son hero (§9), tarjetas/atajos (§10), tabla/FAQ (§11) y precios (§12).
+> No restaurar estos textos en una futura sincronización con Stitch: las excepciones deliberadas son hero (§9 y §13), tarjetas/atajos (§10), tabla/FAQ (§11), precios (§12) y footer (§13).
+
+---
+
+## 13. Hero y footer verificados (excepción 5 a Stitch)
+
+`HeroHeader.tsx` (además del carrusel de §9) y `Footer.tsx` se auditaron contra los contextos **00, 01, 02, 08 y 09**:
+
+| Antes (Stitch) | Ahora (sistema real) | Fuente |
+| :--- | :--- | :--- |
+| Badge "Instalador Nativo x64" | "Instalador nativo para Windows" (x64 no documentado) | 00 §1 |
+| Badge "Sin caídas por internet" | "Núcleo offline-first" (bootstrap/OTP, reportes y BCV sí requieren red) | 00 §3.7, 01 §1/§4, 02 §4 |
+| H1 "más rápido ... sin ataduras a la nube" | "rápido, confiable y con núcleo offline-first" (sin superlativo ni absoluto) | — |
+| "Procesa transacciones en milisegundos ... Opera 100% sin conexión" | "Cobro, inventario y caja sobre SQLite local con transacciones atómicas. El núcleo opera sin internet; el primer ingreso, la recuperación OTP, los reportes y las tasas BCV sí lo requieren" | 00 §1, 01 §1/§4, 02 §4 |
+| "Imprime tickets térmicos ESC/POS de 80mm" | "Tickets PDF 80/58mm" (ESC/POS no integrado) | 08 §1/§6, 02 §4 |
+| "Básculas RS-232" (sin matiz) | "Torrey, Rhino y Dibal, pendiente de validación física" | 08 §1/§6 |
+| CTA "Ver Demostración" | "Ver capturas del sistema" (el ancla es un carrusel de capturas, no una demo) | §9 |
+| Footer: "offline-first de ultra-alto rendimiento" | "offline-first con SQLite local" | 00 §1 |
+
+El precio, la versión `2.4.0` y el tamaño del instalador (`~85 MB`) se conservan por ser decisiones comerciales.

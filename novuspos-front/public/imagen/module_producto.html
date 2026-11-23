@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NovusPOS - Módulo de Productos</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            win: {
+              bg: '#f3f4f6',
+              surface: '#ffffff',
+              border: '#e2e8f0',
+              accent: '#0067c0',
+              accentHover: '#005ba4',
+              accentLight: '#eef5fc',
+              headerNavy: '#0f3e6d',
+              statusbar: '#02588f',
+              textMain: '#1e293b',
+              textMuted: '#64748b'
+            }
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Segoe UI Variable', '-apple-system', 'BlinkMacSystemFont', 'Roboto', 'sans-serif'],
+            mono: ['Consolas', 'Cascadia Mono', 'Courier New', 'monospace']
+          },
+          fontSize: {
+            'xxs': '0.6875rem'
+          }
+        }
+      }
+    }
+  </script>
+<!-- Typography & Global styles -->
+<style data-purpose="typography">
+    body {
+      font-family: 'Segoe UI Variable', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+    .font-numeric {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+<!-- Table and Scrollbar styles -->
+<style data-purpose="layout">
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    tr.product-row:hover {
+      background-color: #f8fafc;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col bg-[#edf2f7] text-win-textMain overflow-hidden antialiased text-xs">
+<!-- BEGIN: TitleBar -->
+<header class="bg-white border-b border-slate-200 px-3 py-1.5 flex items-center justify-between shadow-sm select-none shrink-0" data-purpose="app-title-bar">
+<!-- Brand / Logo -->
+<div class="flex items-center space-x-3">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-md bg-[#0067c0] flex items-center justify-center shadow-sm">
+<svg class="w-5 h-5 text-white" fill="currentColor" viewbox="0 0 24 24">
+<path d="M4 4h4.5l7 10.5V4H20v16h-4.5L8.5 9.5V20H4V4z"></path>
+</svg>
+</div>
+<div>
+<div class="flex items-center">
+<span class="text-base font-black tracking-tight text-[#0f3b6c]">Novus</span>
+<span class="text-base font-black tracking-tight text-[#0067c0]">POS</span>
+</div>
+<p class="text-[9px] text-slate-400 font-medium leading-none -mt-0.5">Diseñado para crecer contigo</p>
+</div>
+</div>
+</div>
+<!-- Central status & Exchange Rate widgets -->
+<div class="flex items-center space-x-3">
+<!-- Turno / Caja badge -->
+<div class="flex items-center px-2.5 py-1 rounded bg-slate-50 border border-slate-200 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+<span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+<span class="font-bold text-slate-700 tracking-tight text-xxs uppercase">CAJA ADMIN</span>
+<span class="mx-1.5 text-slate-300">•</span>
+<span class="text-slate-500 text-xxs font-medium uppercase">TURNO ACTIVO</span>
+</div>
+<!-- Tasa BCV widget -->
+<div class="flex items-center bg-slate-50 border border-slate-200 rounded px-2.5 py-1">
+<div class="mr-2">
+<div class="flex items-center space-x-1">
+<span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">TASA BCV</span>
+<span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>
+</div>
+<div class="flex items-center space-x-1.5">
+<span class="text-xs font-black text-slate-800 font-numeric">Bs. 918,77</span>
+<span class="text-[9px] text-rose-500 font-medium">Desactualizada</span>
+</div>
+</div>
+<button class="p-1 rounded text-slate-400 hover:text-win-accent hover:bg-slate-200 transition-colors" title="Sincronizar tasa">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</button>
+</div>
+<!-- User & Session profile -->
+<div class="flex items-center pl-2 space-x-2">
+<div class="flex items-center space-x-1.5 text-slate-600 bg-slate-100/80 px-2.5 py-1 rounded border border-slate-200">
+<span class="text-slate-400 font-medium">Admin:</span>
+<span class="font-bold text-win-accent">Admin Sistema</span>
+<button class="flex items-center ml-1 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 transition-colors" title="Bloquear Terminal">
+<svg class="w-2.5 h-2.5 mr-1 text-slate-500" fill="currentColor" viewbox="0 0 20 20">
+<path clip-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" fill-rule="evenodd"></path>
+</svg>
+            LOCK
+          </button>
+</div>
+<!-- Logout button -->
+<button class="flex items-center px-2.5 py-1 rounded text-red-600 hover:bg-red-50 border border-red-200 font-semibold transition-colors">
+<svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+          Salir
+        </button>
+</div>
+<!-- Native Windows Window Controls -->
+<div class="flex items-center pl-2 border-l border-slate-200 space-x-1">
+<button class="w-7 h-6 flex items-center justify-center rounded text-slate-500 hover:bg-slate-100 hover:text-black">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 12H4" stroke-width="2"></path></svg>
+</button>
+<button class="w-7 h-6 flex items-center justify-center rounded text-slate-500 hover:bg-slate-100 hover:text-black">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="14" rx="1" stroke-width="2" width="14" x="5" y="5"></rect></svg>
+</button>
+<button class="w-7 h-6 flex items-center justify-center rounded text-slate-500 hover:bg-red-600 hover:text-white">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</header>
+<!-- END: TitleBar -->
+<!-- BEGIN: NavigationTabs -->
+<nav class="bg-white border-b border-slate-200 px-4 pt-1 flex items-center space-x-1 shrink-0" data-purpose="main-module-tabs">
+<button class="px-3.5 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-t-md transition-all flex items-center space-x-1">
+<span>Venta (POS)</span>
+<span class="text-[10px] text-slate-400 font-mono bg-slate-200/60 px-1 py-0.5 rounded">ALT+1</span>
+</button>
+<!-- Active Tab: Productos -->
+<button class="px-3.5 py-2 text-win-accent font-bold bg-[#f1f6fb] border-b-2 border-win-accent rounded-t-md transition-all flex items-center space-x-1">
+<span>Productos</span>
+<span class="text-[10px] text-win-accent/80 font-mono bg-blue-100 px-1 py-0.5 rounded">ALT+2</span>
+</button>
+<button class="px-3.5 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-t-md transition-all flex items-center space-x-1">
+<span>Kardex</span>
+<span class="text-[10px] text-slate-400 font-mono bg-slate-200/60 px-1 py-0.5 rounded">ALT+3</span>
+</button>
+<button class="px-3.5 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-t-md transition-all flex items-center space-x-1">
+<span>Caja</span>
+<span class="text-[10px] text-slate-400 font-mono bg-slate-200/60 px-1 py-0.5 rounded">ALT+4</span>
+</button>
+<button class="px-3.5 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-t-md transition-all flex items-center space-x-1">
+<span>Clientes</span>
+<span class="text-[10px] text-slate-400 font-mono bg-slate-200/60 px-1 py-0.5 rounded">ALT+5</span>
+</button>
+<button class="px-3.5 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-t-md transition-all flex items-center space-x-1">
+<span>Reportes</span>
+<span class="text-[10px] text-slate-400 font-mono bg-slate-200/60 px-1 py-0.5 rounded">ALT+6</span>
+</button>
+<button class="px-3.5 py-2 text-slate-600 font-semibold hover:bg-slate-100 rounded-t-md transition-all flex items-center space-x-1">
+<span>Ajustes</span>
+<span class="text-[10px] text-slate-400 font-mono bg-slate-200/60 px-1 py-0.5 rounded">ALT+7</span>
+</button>
+</nav>
+<!-- END: NavigationTabs -->
+<!-- BEGIN: MainContentArea -->
+<main class="flex-1 flex flex-col p-3.5 space-y-2.5 overflow-hidden" data-purpose="inventory-manager">
+<!-- Action Toolbar (Fluent WinUI style) -->
+<section class="bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm flex items-center justify-between shrink-0" data-purpose="product-actions-bar">
+<!-- Left action shortcuts -->
+<div class="flex items-center space-x-2 flex-wrap">
+<!-- Entradas Masivas -->
+<button class="flex items-center px-2.5 py-1.5 rounded-md border border-emerald-300 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-100/70 font-semibold transition-all">
+<svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2.5"></path></svg>
+<span>Entradas Masivas</span>
+<span class="ml-1 text-[10px] opacity-75 font-mono">[ALT+E]</span>
+</button>
+<!-- Salidas Masivas -->
+<button class="flex items-center px-2.5 py-1.5 rounded-md border border-rose-300 text-rose-700 bg-rose-50/50 hover:bg-rose-100/70 font-semibold transition-all">
+<svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 12H4" stroke-width="2.5"></path></svg>
+<span>Salidas Masivas</span>
+<span class="ml-1 text-[10px] opacity-75 font-mono">[ALT+S]</span>
+</button>
+<div class="h-5 w-px bg-slate-200 mx-1"></div>
+<!-- Importar Excel -->
+<button class="flex items-center px-2.5 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition-all">
+<svg class="w-3.5 h-3.5 mr-1.5 text-emerald-600" fill="currentColor" viewbox="0 0 24 24">
+<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zM6 20V4h7v5h5v11H6z"></path>
+<path d="M8 12l2.5 4L8 20h2l1.5-2.5L13 20h2l-2.5-4L15 12h-2l-1.5 2.5L10 12H8z"></path>
+</svg>
+<span>Importar Excel</span>
+</button>
+<!-- Exportar Excel -->
+<button class="flex items-center px-2.5 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition-all">
+<svg class="w-3.5 h-3.5 mr-1.5 text-teal-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Exportar Excel</span>
+</button>
+<!-- Imprimir Códigos de Barra -->
+<button class="flex items-center px-2.5 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition-all">
+<svg class="w-3.5 h-3.5 mr-1.5 text-indigo-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 4v16m-4-16v16m-4-16v16m12-16v16m4-16v16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Imprimir Cód. Barras</span>
+<span class="ml-1 text-[10px] text-slate-400 font-mono">ALT+B</span>
+</button>
+<!-- Categorías -->
+<button class="flex items-center px-2.5 py-1.5 rounded-md border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold transition-all">
+<svg class="w-3.5 h-3.5 mr-1.5 text-amber-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Categorías</span>
+</button>
+</div>
+<!-- Right: Primary CTA (+ Nuevo Producto) -->
+<div>
+<button class="flex items-center px-4 py-1.5 bg-[#0067c0] hover:bg-[#005ba4] text-white rounded-md font-bold shadow-sm shadow-blue-500/20 active:translate-y-px transition-all">
+<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+<span class="tracking-wide">Nuevo Producto</span>
+<span class="ml-1.5 text-[10px] font-mono opacity-80">[ALT+N]</span>
+</button>
+</div>
+</section>
+<!-- Search & Filter Controls -->
+<section class="bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm flex items-center justify-between gap-3 shrink-0" data-purpose="filtering-bar">
+<!-- Search Input & Dropdowns -->
+<div class="flex items-center space-x-2 flex-1">
+<!-- Search bar with F2 indicator -->
+<div class="relative w-72">
+<span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</span>
+<input class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:border-win-accent focus:ring-1 focus:ring-win-accent outline-none text-slate-700 placeholder-slate-400 transition-colors" placeholder="Buscar por código, descripción o categoría [F2]..." type="text"/>
+</div>
+<button class="p-1.5 border border-slate-200 rounded-md text-slate-500 hover:bg-slate-50">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Dropdowns -->
+<select class="py-1.5 pl-2.5 pr-7 text-xs border border-slate-200 rounded-md bg-white text-slate-700 focus:border-win-accent focus:ring-1 focus:ring-win-accent">
+<option>Todas las Categorías</option>
+<option>Abarrotes y Despensa</option>
+<option>Bebidas y Refrescos</option>
+<option>Frutas y Verduras</option>
+<option>Snacks y Golosinas</option>
+<option>Limpieza del Hogar</option>
+</select>
+<select class="py-1.5 pl-2.5 pr-7 text-xs border border-slate-200 rounded-md bg-white text-slate-700 focus:border-win-accent">
+<option>Todos los impuestos</option>
+<option>IVA 16%</option>
+<option>Exento 0%</option>
+</select>
+<select class="py-1.5 pl-2.5 pr-7 text-xs border border-slate-200 rounded-md bg-white text-slate-700 focus:border-win-accent">
+<option>Todas las marcas</option>
+</select>
+<select class="py-1.5 pl-2.5 pr-7 text-xs border border-slate-200 rounded-md bg-white text-slate-700 focus:border-win-accent">
+<option>Todos los proveedores</option>
+</select>
+<select class="py-1.5 pl-2.5 pr-7 text-xs border border-slate-200 rounded-md bg-white text-slate-700 focus:border-win-accent">
+<option>Todos los tipos</option>
+<option>Estándar</option>
+<option>Con Lotes</option>
+<option>Servicio</option>
+</select>
+</div>
+<!-- Right state pills (Todos, Bajo Stock, Agotados) -->
+<div class="flex items-center space-x-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-white text-win-accent shadow-sm border border-slate-200/80">
+          Todos (53)
+        </button>
+<button class="px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 rounded">
+          Bajo Stock (0)
+        </button>
+<button class="px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 rounded">
+          Agotados (0)
+        </button>
+</div>
+</section>
+<!-- Products DataGrid / Table Container -->
+<section class="bg-white border border-slate-200 rounded-lg shadow-sm flex-1 flex flex-col overflow-hidden" data-purpose="product-datatable-container">
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse" id="products-table">
+<thead class="bg-slate-50 text-slate-600 text-xxs font-bold uppercase tracking-wider sticky top-0 border-b border-slate-200 select-none z-10 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+<tr>
+<th class="py-2.5 px-3 w-36" scope="col">Código / SKU</th>
+<th class="py-2.5 px-3 min-w-[280px]" scope="col">Producto</th>
+<th class="py-2.5 px-3 text-right w-24" scope="col">Costo</th>
+<th class="py-2.5 px-3 text-right w-24" scope="col">Venta</th>
+<th class="py-2.5 px-3 text-center w-28" scope="col">Stock</th>
+<th class="py-2.5 px-3 text-center w-16" scope="col">Mín.</th>
+<th class="py-2.5 px-3 text-center w-20" scope="col">Impuesto</th>
+<th class="py-2.5 px-3 text-center w-40" scope="col">Categoría</th>
+<th class="py-2.5 px-3 text-center w-28" scope="col">Estado</th>
+<th class="py-2.5 px-3 text-center w-24" scope="col">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 text-xs">
+<!-- Row 1: Nutrioli -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501039120101</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-amber-50 rounded border border-amber-200 flex items-center justify-center shrink-0 text-amber-700 font-bold text-[10px]">
+                    🍶
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Aceite Vegetal Nutrioli Puro de Soya 850ml</div>
+<div class="text-[11px] text-slate-400">Aceite comestible puro de soya rico en omegas</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 38,00</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 41,80</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">34</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">10</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Abarrotes y Despensa</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100" title="Desactivar">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg>
+</button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100" title="Editar">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100" title="Eliminar">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Peñafiel (With Lotes Tag) -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501071110030</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-blue-50 rounded border border-blue-200 flex items-center justify-center shrink-0 text-blue-700 font-bold text-[10px]">
+                    🥤
+                  </div>
+<div>
+<div class="flex items-center space-x-1.5">
+<span class="font-bold text-slate-800">Agua Mineral Peñafiel 600ml</span>
+<span class="bg-purple-100 text-purple-700 font-bold px-1 rounded text-[9px] border border-purple-200">Lotes</span>
+</div>
+<div class="text-[11px] text-slate-400">Agua mineral de manantial con gas</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 12,00</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 18,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">50</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">10</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Bebidas y Refrescos</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Bonafont -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501020510101</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-orange-50 rounded border border-orange-200 flex items-center justify-center shrink-0 text-orange-600 font-bold text-[10px]">
+                    💧
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Agua Purificada Bonafont 1L</div>
+<div class="text-[11px] text-slate-400">Agua ligera 100% purificada</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 11,00</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 16,50</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">43</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">15</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Bebidas y Refrescos</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Aguacate Hass -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">2000000000046</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-emerald-50 rounded border border-emerald-200 flex items-center justify-center shrink-0 text-emerald-700 font-bold text-[10px]">
+                    🥑
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Aguacate Hass Extra</div>
+<div class="text-[11px] text-slate-400">Aguacate Hass cremoso seleccionado por kilo</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 48,00</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 69,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">16</span> <span class="text-slate-500 text-xxs">Kilogramo</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">5</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Frutas y Verduras</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Arroz Valle Verde -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501018310012</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-lime-50 rounded border border-lime-200 flex items-center justify-center shrink-0 text-lime-700 font-bold text-[10px]">
+                    🍚
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Arroz Grano Largo Valle Verde 1kg</div>
+<div class="text-[11px] text-slate-400">Arroz súper extra blanco de primera calidad</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 19,50</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 28,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">49</span> <span class="text-slate-500 text-xxs">Kilogramo</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">15</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Abarrotes y Despensa</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 6: Atún Dolores -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501045401010</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-cyan-50 rounded border border-cyan-200 flex items-center justify-center shrink-0 text-cyan-700 font-bold text-[10px]">
+                    🥫
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Atún Dolores en Agua 140g</div>
+<div class="text-[11px] text-slate-400">Lomo de atún aleta amarilla en agua</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 16,50</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 24,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">65</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">15</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Abarrotes y Despensa</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 7: Azúcar Estándar Morena -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501000100012</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-amber-100/50 rounded border border-amber-300 flex items-center justify-center shrink-0 text-amber-800 font-bold text-[10px]">
+                    🌾
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Azúcar Estándar Morena 1kg</div>
+<div class="text-[11px] text-slate-400">Azúcar de caña morena natural para endulzar</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 24,50</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 34,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">54</span> <span class="text-slate-500 text-xxs">Kilogramo</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">15</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Abarrotes y Despensa</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 8: Snickers -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501008010015</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-amber-900/10 rounded border border-amber-900/20 flex items-center justify-center shrink-0 text-amber-900 font-bold text-[10px]">
+                    🍫
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Barra de Chocolate Snickers 48g</div>
+<div class="text-[11px] text-slate-400">Chocolate con leche, turrón, caramelo y cacahuates</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 17,50</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 25,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">35</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">8</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Snacks y Golosinas</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 9: Nishikawa -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501030401018</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-orange-100/50 rounded border border-orange-300 flex items-center justify-center shrink-0 text-orange-700 font-bold text-[10px]">
+                    🥜
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Cacahuates Japoneses Nishikawa 100g</div>
+<div class="text-[11px] text-slate-400">Cacahuate tostado con cubierta crujiente de soya</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 11,00</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 17,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">40</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">10</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Snacks y Golosinas</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 10: Nescafé -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501058611017</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-red-50 rounded border border-red-200 flex items-center justify-center shrink-0 text-red-700 font-bold text-[10px]">
+                    ☕
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Café Soluble Nescafé Clásico 120g</div>
+<div class="text-[11px] text-slate-400">Café 100% puro soluble sabor clásico</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 63,00</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 86,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">25</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">6</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Abarrotes y Despensa</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 11: Corona Extra -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501064191244</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-yellow-50 rounded border border-yellow-200 flex items-center justify-center shrink-0 text-yellow-700 font-bold text-[10px]">
+                    🍺
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Cerveza Corona Extra 355ml Botella</div>
+<div class="text-[11px] text-slate-400">Cerveza clara tipo pilsner mexicana 4.5% alc.</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 18,50</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 26,00</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">56</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">20</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Bebidas y Refrescos</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+<!-- Row 12: Clorox Cloralex -->
+<tr class="product-row transition-colors">
+<td class="py-2 px-3 font-mono text-slate-600 text-[11px]">7501025401011</td>
+<td class="py-2 px-3">
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 bg-blue-100/50 rounded border border-blue-300 flex items-center justify-center shrink-0 text-blue-700 font-bold text-[10px]">
+                    🧪
+                  </div>
+<div>
+<div class="font-bold text-slate-800">Cloro Cloralex El Rendidor 950ml</div>
+<div class="text-[11px] text-slate-400">Desinfectante blanqueador con fórmula concentrada</div>
+</div>
+</div>
+</td>
+<td class="py-2 px-3 text-right font-numeric text-slate-600">$ 13,00</td>
+<td class="py-2 px-3 text-right font-numeric font-bold text-emerald-600">$ 18,50</td>
+<td class="py-2 px-3 text-center font-numeric"><span class="font-bold text-slate-800">46</span> <span class="text-slate-500 text-xxs">Pieza</span></td>
+<td class="py-2 px-3 text-center font-numeric text-slate-500">15</td>
+<td class="py-2 px-3 text-center font-numeric text-slate-600">16%</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-block px-2 py-0.5 rounded text-[11px] bg-slate-100 text-slate-600 border border-slate-200">Limpieza del Hogar</span>
+</td>
+<td class="py-2 px-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>ACTIVO
+                </span>
+</td>
+<td class="py-2 px-3 text-center">
+<div class="flex items-center justify-center space-x-1 text-slate-400">
+<button class="p-1 hover:text-slate-700 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-6.364-2.636 9 9 0 010-12.728m12.728 0L9.172 9.172M3 3l18 18" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-win-accent rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-1 hover:text-red-500 rounded hover:bg-slate-100"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Subfooter / Valuation & Pagination -->
+<div class="px-4 py-2 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs text-slate-600 select-none shrink-0" data-purpose="table-footer-summary">
+<!-- Stock Totals and Accounting Valuation -->
+<div class="flex items-center space-x-4">
+<div>
+            Total Catálogo: <span class="font-bold text-slate-900 font-numeric">53</span> productos
+          </div>
+<span class="text-slate-300">•</span>
+<div>
+            Existencias Totales: <span class="font-bold text-slate-900 font-numeric">1956.5</span> unidades
+          </div>
+<span class="text-slate-300">•</span>
+<div>
+            Valuación Inventario (Costo): <span class="font-bold text-emerald-600 font-numeric">$ 40.569,00</span>
+</div>
+</div>
+<!-- Pagination & Page Size -->
+<div class="flex items-center space-x-3 font-numeric">
+<span class="text-slate-500 text-xxs">Mostrando 1-50 de 53</span>
+<div class="flex items-center space-x-1.5">
+<span class="text-slate-500 text-xxs">Filas</span>
+<select class="py-0.5 px-2 text-xs border border-slate-200 rounded bg-white text-slate-700">
+<option>50</option>
+<option>100</option>
+<option>200</option>
+</select>
+</div>
+<div class="flex items-center space-x-1">
+<button class="px-2 py-0.5 rounded border border-slate-200 bg-white text-slate-400 cursor-not-allowed text-xxs font-medium" disabled="">
+              Anterior
+            </button>
+<span class="px-2 py-0.5 rounded bg-slate-200 text-slate-700 font-bold text-xxs">
+              1 / 2
+            </span>
+<button class="px-2 py-0.5 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 text-xxs font-medium">
+              Siguiente
+            </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- END: MainContentArea -->
+<!-- BEGIN: SystemStatusBar -->
+<footer class="bg-win-statusbar text-white px-3 py-1 flex items-center justify-between text-[11px] font-medium shrink-0 tracking-wide select-none" data-purpose="app-status-bar">
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span>Turno de caja abierto</span>
+</div>
+<div class="flex items-center space-x-4 text-slate-200">
+<button class="flex items-center hover:text-white transition-colors">
+<svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Reportar un problema</span>
+</button>
+<span class="opacity-40">•</span>
+<span class="font-numeric">dom, 22 nov. 2026</span>
+</div>
+</footer>
+<!-- END: SystemStatusBar -->
+<!-- Interactive handlers for keyboard shortcuts simulation -->
+<script data-purpose="event-handlers">
+    document.addEventListener('keydown', function(event) {
+      // F2: Focus Search Input
+      if (event.key === 'F2') {
+        event.preventDefault();
+        const searchInput = document.querySelector('input[type="text"]');
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+        }
+      }
+    });
+  </script>
+</body></html>

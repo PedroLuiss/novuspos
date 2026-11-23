@@ -212,7 +212,7 @@ export const faqs: Faq[] = [
     iconTone: 'primary',
     question: '¿Cómo garantiza NovusPOS que no se pierdan mis datos sin internet?',
     answer:
-      'NovusPOS implementa un motor SQLite nativo en modo WAL (Write-Ahead Logging). Cada venta, cobro o ajuste de inventario se escribe de manera atómica e instantánea en el disco duro o SSD de tu computadora. Si se corta la energía o se desconecta la red, ningún registro queda a medias.',
+      'NovusPOS implementa un motor SQLite nativo en modo WAL (Write-Ahead Logging). Cada venta, cobro o ajuste de inventario se confirma en una transacción atómica y queda persistido en el disco local de tu computadora. Las sesiones posteriores se resuelven contra esa base sin llamar a un servidor remoto; el primer ingreso, la recuperación OTP y los reportes de soporte sí requieren internet.',
   },
   {
     icon: 'settings_input_hdmi',
@@ -226,7 +226,7 @@ export const faqs: Faq[] = [
     iconTone: 'neutral',
     question: '¿Cuáles son los requisitos mínimos de sistema en Windows?',
     answer:
-      'NovusPOS es una aplicación nativa para Windows (Electron de 64 bits) con interfaz Fluent/WinUI 3 y base de datos SQLite local, sin dependencia de un servidor en la fase monopuesto actual. La ventana principal se inicia maximizada y conserva un mínimo de 960 × 600 px para no perder la disposición del POS. No hay cifras oficiales documentadas de CPU, RAM o espacio en disco: el consumo de SQLite crece con el catálogo y los respaldos locales.',
+      'NovusPOS es una aplicación nativa para Windows (Electron) con interfaz Fluent/WinUI 3 y base de datos SQLite local. En la fase monopuesto actual, cobro, inventario y caja operan sin servidor; el primer ingreso, la recuperación OTP, los reportes de soporte y las tasas BCV sí requieren conexión. La ventana principal se inicia maximizada y conserva un mínimo de 960 × 600 px para no perder la disposición del POS. No hay cifras oficiales documentadas de CPU, RAM o espacio en disco: el consumo de SQLite crece con el catálogo y los respaldos locales.',
   },
 ]
 

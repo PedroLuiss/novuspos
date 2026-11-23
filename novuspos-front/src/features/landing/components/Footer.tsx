@@ -26,12 +26,12 @@ export function Footer() {
               <img alt="NovusPOS Logo" className="h-8 w-auto object-contain" src={logoUrl} />
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-              Diseñado para crecer contigo. Software de punto de venta offline-first de ultra-alto rendimiento para comercios
+              Diseñado para crecer contigo. Software de punto de venta offline-first con SQLite local para comercios
               exigentes y franquicias modernas.
             </p>
-            <div className="flex items-center gap-space-sm mt-space-xs">
+            {/* <div className="flex items-center gap-space-sm mt-space-xs">
               <img alt="NovusPOS Logo" className="h-8 w-auto object-contain" src={logoUrl} />
-            </div>
+            </div> */}
           </div>
           {columns.map((col) => (
             <div key={col.title} className="flex flex-col gap-space-xs">

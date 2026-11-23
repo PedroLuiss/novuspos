@@ -21,10 +21,12 @@ export function ReleasePill() {
   )
 }
 
+/** Copy verificado contra `novus-post/docs/context/`: sin "x64" (no documentado)
+ *  ni "sin caídas por internet" (bootstrap, OTP, reportes y BCV sí requieren red). */
 const trustBadges = [
-  { icon: 'terminal', tone: 'text-primary', label: 'Instalador Nativo x64' },
+  { icon: 'terminal', tone: 'text-primary', label: 'Instalador nativo para Windows' },
   { icon: 'storage', tone: 'text-secondary', label: 'Base de datos SQLite local' },
-  { icon: 'wifi_off', tone: 'text-primary', label: 'Sin caídas por internet' },
+  { icon: 'wifi_off', tone: 'text-primary', label: 'Núcleo offline-first' },
   { icon: 'verified', tone: 'text-secondary', label: 'Primer mes $0 USD' },
 ]
 
@@ -43,7 +45,7 @@ export function HeroHeader({ children }: { children: ReactNode }) {
 
           <h1 className="font-display text-display text-on-surface max-w-4xl tracking-tight leading-none mb-space-md">
             El Punto de Venta de escritorio para Windows{' '}
-            <span className="text-primary">más rápido, confiable</span> y sin ataduras a la nube
+            <span className="text-primary">rápido, confiable</span> y con núcleo offline-first
           </h1>
 
           <div className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container mb-space-md">
@@ -54,9 +56,10 @@ export function HeroHeader({ children }: { children: ReactNode }) {
           </div>
 
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mb-space-xl">
-            Procesa transacciones en milisegundos con SQLite local embebido. Opera 100% sin conexión a internet, conecta
-            básculas comerciales RS-232, imprime tickets térmicos ESC/POS de 80mm y controla inventarios masivos con
-            ergonomía de alta velocidad.
+            Cobro, inventario y caja sobre SQLite local con transacciones atómicas. El núcleo opera sin internet; el
+            primer ingreso, la recuperación OTP, los reportes y las tasas BCV sí lo requieren. Lectura de básculas
+            RS-232 (Torrey, Rhino y Dibal, pendiente de validación física), tickets PDF 80/58mm y catálogo paginado
+            para inventarios densos.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-space-md w-full max-w-md mb-space-lg">
@@ -77,7 +80,7 @@ export function HeroHeader({ children }: { children: ReactNode }) {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-space-xs px-space-lg py-space-md rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-container-highest transition-colors"
             >
               <MS name="play_circle" className="text-[20px]" />
-              <span>Ver Demostración</span>
+              <span>Ver capturas del sistema</span>
             </a>
           </div>
 
