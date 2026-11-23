@@ -72,7 +72,7 @@ export function PanelBackups() {
           <MS name="lock" className="text-secondary text-[18px]" />
           <span>Tus respaldos se guardan en tu computadora y puedes descargarlos cuando quieras.</span>
         </div>
-        <a href="#/" className="font-label-sm text-label-sm text-primary hover:underline font-semibold">
+        <a href="/" className="font-label-sm text-label-sm text-primary hover:underline font-semibold">
           Ver cómo funciona
         </a>
       </div>

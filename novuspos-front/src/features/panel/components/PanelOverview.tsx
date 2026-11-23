@@ -30,7 +30,7 @@ export function PanelOverview() {
           </div>
           <div className="flex flex-wrap items-center gap-space-sm pt-space-xs xl:pt-0">
             <a
-              href="#descargar"
+              href="/#descargar"
               className="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg bg-gradient-to-r from-primary-container to-primary text-on-primary font-label-md text-label-md shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
             >
               <MS name="download" className="text-[20px]" />
@@ -137,7 +137,7 @@ export function PanelOverview() {
             <span className="font-label-sm text-label-sm font-mono text-secondary flex items-center gap-1 font-semibold">
               <MS name="check_circle" className="text-[14px]" /> Consulta tus tickets
             </span>
-            <a href="#/" className="font-label-sm text-label-sm text-primary font-semibold cursor-pointer hover:underline">
+            <a href="/" className="font-label-sm text-label-sm text-primary font-semibold cursor-pointer hover:underline">
               Centro de ayuda
             </a>
           </div>

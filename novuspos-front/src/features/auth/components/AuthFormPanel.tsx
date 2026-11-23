@@ -97,14 +97,14 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
       {/* Acciones alternas */}
       <div className="grid grid-cols-2 gap-space-sm">
         <a
-          href="#descargar"
+          href="/#descargar"
           className="h-10 px-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-space-xs transition-colors shadow-sm"
         >
           <MS name="download" className="text-[18px]" />
           <span>Descargar para Windows</span>
         </a>
         <a
-          href="#interfaz-en-vivo"
+          href="/#interfaz-en-vivo"
           className="h-10 px-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-space-xs transition-colors shadow-sm"
         >
           <MS name="play_circle" className="text-[18px]" />
@@ -120,7 +120,7 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
             <span className="font-label-md text-label-md">{alert.title}</span>
             <span className="font-body-sm text-body-sm">{alert.description}</span>
             {alert.kind === 'login' && (
-              <a href="#/panel" className="font-label-sm text-label-sm underline font-semibold w-fit">
+              <a href="/panel" className="font-label-sm text-label-sm underline font-semibold w-fit">
                 Abrir panel de control →
               </a>
             )}
@@ -132,7 +132,7 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
       <div className="mt-space-md pt-space-sm flex flex-col sm:flex-row items-center justify-between text-on-surface-variant font-body-sm text-body-sm gap-2">
         <span>
           ¿Dudas con la instalación?{' '}
-          <a className="text-primary font-semibold hover:underline" href="#">
+          <a className="text-primary font-semibold hover:underline" href="/">
             Hablar con un asesor técnico
           </a>
         </span>

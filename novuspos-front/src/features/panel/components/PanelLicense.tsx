@@ -123,7 +123,7 @@ export function PanelLicense() {
         </div>
         <div className="pt-space-md flex flex-col gap-space-xs">
           <a
-            href="#descargar"
+            href="/#descargar"
             className="w-full py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-2 transition-colors"
           >
             <MS name="download_for_offline" className="text-[18px]" />
@@ -131,7 +131,7 @@ export function PanelLicense() {
           </a>
           <div className="flex items-center justify-between text-on-surface-variant px-space-xs pt-1">
             <span className="font-label-sm text-[11px] font-mono">Windows 10 / 11 • 64 bits</span>
-            <a href="#interfaz-en-vivo" className="font-label-sm text-[11px] text-primary hover:underline">
+            <a href="/#interfaz-en-vivo" className="font-label-sm text-[11px] text-primary hover:underline">
               Ver capturas del sistema
             </a>
           </div>

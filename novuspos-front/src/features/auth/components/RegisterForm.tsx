@@ -49,7 +49,7 @@ export function RegisterForm({ onSubmit }: { onSubmit: () => void }) {
         />
         <label htmlFor="termsCheck" className="font-body-sm text-body-sm text-on-surface-variant cursor-pointer">
           Acepto los{' '}
-          <a className="text-primary font-semibold hover:underline" href="#">
+          <a className="text-primary font-semibold hover:underline" href="/">
             Términos de Servicio
           </a>{' '}
           y la política de privacidad de datos comerciales de NovusPOS.

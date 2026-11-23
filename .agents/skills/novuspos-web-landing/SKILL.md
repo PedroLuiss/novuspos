@@ -23,9 +23,9 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 >
 > ⚠️ **Excepción 7 (sección de productos):** se añadió `ProductCatalog` (`#productos`) entre `KeyFeatures` y la comparativa. No está en el HTML de Stitch; sale del módulo real `inventory` de `novus-post`. Ver §15.
 >
-> ⚠️ **Excepción 8 (vistas de auth):** se replicó la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" como `#/auth` y `#/auth/login`. Layout idéntico; copy auditado con las reglas §14/§14.2. Ver §16.
+> ⚠️ **Excepción 8 (vistas de auth):** se replicó la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" como `/auth` y `/auth/login`. Layout idéntico; copy auditado con las reglas §14/§14.2. Ver §16.
 >
-> ⚠️ **Excepción 9 (panel de control):** se replicó "Panel de Control de Clientes - NovusPOS" como `#/panel`. Layout idéntico (sidebar 64 + header + bento grid), copy auditado. Ver §17.
+> ⚠️ **Excepción 9 (panel de control):** se replicó "Panel de Control de Clientes - NovusPOS" como `/panel`. Layout idéntico (sidebar 64 + header + bento grid), copy auditado. Ver §17.
 
 ---
 
@@ -109,13 +109,12 @@ node -e "const c=require('fs').readFileSync('dist/assets/'+require('fs').readdir
 
 ```text
 src/
-├── App.tsx                             # hash: '#/auth' | '#/auth/login' → AuthPage; '#/panel' → PanelPage
+├── App.tsx                             # rutas: /auth | /auth/login → AuthPage; /panel → PanelPage
 ├── app/LandingPage.tsx                 # SiteHeader + <main class="pt-20"> + secciones + Footer
 ├── app/AuthPage.tsx                    # split 5/7 + barra inferior de confianza
 ├── app/PanelPage.tsx                   # sidebar + header + bento grid del panel
 ├── features/panel/                     # PanelSidebar, PanelOverview, PanelLicense, PanelBilling, PanelBackups, data/
 ├── shared/ui/MS.tsx                    # icono Material Symbols (filled opcional)
-├── shared/hooks/useHashRoute.ts        # hashchange sin dependencias
 ├── features/auth/
 │   ├── components/AuthBrandPanel.tsx   # columna izquierda (logo blanco, métricas, beneficios)
 │   ├── components/AuthFormPanel.tsx    # columna derecha (tabs, formularios, accesos)
@@ -381,7 +380,7 @@ Capacidades: códigos de barras, costo y ganancia, precios por mayoreo, impuesto
 
 Pantalla de Stitch: `projects/14269822984035378146/screens/b7520097c4d14ab9913cf7ab915c00cd`, título **"Iniciar Sesión / Registro - NovusPOS"**, DESKTOP 2560×2048. HTML: `files/b7520097c4d14ab9913cf7ab915c00cd` (28.5 kB). Se bajó con `tools.stitch.download_file` desde `list_screens` del proyecto conocido. Es la fuente de verdad de clases, orden y tokens (el screenshot de Stitch no sirve de referencia tipográfica; ver §1).
 
-**Rutas:** `#/auth` abre registro (estado por defecto en Stitch) y `#/auth/login` abre login. `useHashRoute` escucha `hashchange`; el header "Iniciar Sesión" apunta a `#/auth/login`. Las anclas de la landing (`#productos`, `#descargar`, …) siguen funcionando porque no empiezan por `#/auth`.
+**Rutas:** `/auth` abre registro (estado por defecto en Stitch) y `/auth/login` abre login. `App.tsx` decide por `window.location.pathname`; no hay hook de ruta ni `hashchange`. El header "Iniciar Sesión" apunta a `/auth/login`. El `#` queda reservado para anclas internas de la landing (`#productos`, `#descargar`, …), que se enlazan como `/#productos` desde auth/panel. **No reintroducir `/#/auth/login`**: el doble `#` es un fragmento con barra, no una ruta, y puede fallar en hosting o al compartir enlaces.
 
 **Layout (idéntico a Stitch):** body `bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-center items-center`; `main w-full flex items-center justify-center p-space-md`; contenedor `max-w-7xl my-auto py-space-md lg:py-space-xl`; tarjeta `grid grid-cols-1 lg:grid-cols-12 rounded-xl shadow-xl overflow-hidden bg-surface-container-lowest`; columna izquierda `lg:col-span-5` con gradiente `from-primary-container via-primary to-on-secondary-fixed`; derecha `lg:col-span-7`. Se conservan los dos blur decorativos, el sparkline SVG, los 3 beneficios, la tarjeta de garantía, los 4 items de la barra inferior, los tabs, el banner verde, los dos formularios, el divisor y los dos botones alternos.
 
@@ -410,7 +409,7 @@ Los formularios son **demostrativos**: `onSubmit` solo muestra una alerta; no ex
 
 Pantalla de Stitch: `projects/14269822984035378146/screens/98a61d2fa58e4476ab0d250be8a57755`, título **"Panel de Control de Clientes - NovusPOS"**, DESKTOP 2560×3558. HTML: `screens/98a61d2fa58e4476ab0d250be8a57755/fileEntries/html` (37.8 kB), bajado con `tools.stitch.download_file`.
 
-**Ruta:** `#/panel` (el alert de login exitoso incluye "Abrir panel de control"). `App.tsx` chequea `auth` → `panel` → landing. `PanelPage` = `PanelSidebar` (aside `fixed left-0 top-0 h-full w-64` + header `fixed top-0 left-64 right-0 h-16`) + `<div class="pl-64"><main class="relative pt-16 ...">` con `p-space-md lg:p-space-lg gap-space-lg`. Se conservan el bento grid 7/5, la tabla de facturas y la lista de respaldos.
+**Ruta:** `/panel` (el alert de login exitoso incluye "Abrir panel de control"). `App.tsx` chequea `auth` → `panel` → landing por `window.location.pathname`. `PanelPage` = `PanelSidebar` (aside `fixed left-0 top-0 h-full w-64` + header `fixed top-0 left-64 right-0 h-16`) + `<div class="pl-64"><main class="relative pt-16 ...">` con `p-space-md lg:p-space-lg gap-space-lg`. Se conservan el bento grid 7/5, la tabla de facturas y la lista de respaldos.
 
 **Layout idéntico:** mismos `shadow-sm`, `rounded-xl`, `bg-surface-container-lowest`, `blur-3xl`, `hover:translate-y-[-2px]`, `divide-y divide-surface-container`, `animate-pulse` y tipografías `numeric-keypad`/`font-mono`. El icono del sidebar usa `novuspos-icon.png` (recorte 140×141 del logo) para no duplicar el texto "NovusPOS" junto a "Novus Portal".
 

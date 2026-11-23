@@ -18,7 +18,7 @@ export function PanelSidebar() {
             {panelNavItems.map((item) => (
               <a
                 key={item.label}
-                href="#"
+                href="/panel"
                 className={`flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors ${
                   item.active
                     ? 'bg-primary-container text-on-primary font-semibold'
@@ -41,7 +41,7 @@ export function PanelSidebar() {
           </div>
           <a
             className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors text-center pt-space-xs"
-            href="#/"
+            href="/"
           >
             Ir al Sitio Principal
           </a>

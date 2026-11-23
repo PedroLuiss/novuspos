@@ -16,13 +16,12 @@ npm run preview  # servir el build
 
 ```text
 src/
-├── App.tsx                       # hash: #/auth | #/auth/login → AuthPage; #/panel → PanelPage
+├── App.tsx                       # pathname: /auth | /auth/login → AuthPage; /panel → PanelPage
 ├── app/LandingPage.tsx           # SiteHeader + <main class="pt-20"> + secciones + Footer
 ├── app/AuthPage.tsx              # split 5/7 de Iniciar Sesión / Registro
 ├── app/PanelPage.tsx             # Panel de Control de Clientes (sidebar + bento grid)
 ├── features/panel/               # PanelSidebar, PanelOverview, PanelLicense, PanelBilling, PanelBackups
 ├── shared/ui/MS.tsx              # icono Material Symbols (filled opcional)
-├── shared/hooks/useHashRoute.ts  # hashchange sin dependencias
 ├── features/auth/                # AuthBrandPanel, AuthFormPanel, formularios y datos
 ├── features/landing/
 │   ├── components/               # SiteHeader, Hero, HeroHeader, HeroMockup, KeyFeatures,
@@ -103,11 +102,11 @@ El relevo ya está activo con cinco capturas, en orden de módulo: `novusposvent
 
 ## Vistas de Iniciar Sesión / Registro
 
-Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo proyecto, screen `b7520097c4d14ab9913cf7ab915c00cd`). Se abre con `#/auth` (registro) o `#/auth/login` (login) desde el enlace del header. El layout es class-por-class idéntico al HTML de Stitch; el copy se auditó con las mismas reglas que la landing (sin versión, nube, ESC/POS, TLS, SSO ni métricas inventadas). Los formularios son demostrativos: muestran una alerta, no hay backend. El logo blanco de la columna izquierda es `public/novuspos-logo-white.png` (el original tiene fondo blanco opaco). Ver skill §16 y contexto 09 §5.11.
+Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo proyecto, screen `b7520097c4d14ab9913cf7ab915c00cd`). Se abre con `/auth` (registro) o `/auth/login` (login) desde el enlace del header. El `#` solo se usa para anclas internas (`/#productos`, `/#descargar`). El layout es class-por-class idéntico al HTML de Stitch; el copy se auditó con las mismas reglas que la landing (sin versión, nube, ESC/POS, TLS, SSO ni métricas inventadas). Los formularios son demostrativos: muestran una alerta, no hay backend. El logo blanco de la columna izquierda es `public/novuspos-logo-white.png` (el original tiene fondo blanco opaco). Ver skill §16 y contexto 09 §5.11.
 
 ## Panel de Control de Clientes
 
-Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (screen `98a61d2fa58e4476ab0d250be8a57755`), montado en `#/panel`. Mantiene el sidebar, el header, los KPIs, la licencia, la facturación y los respaldos class-por-class; el copy se auditó igual que auth (sin versión, `.EXE`, ESC/POS, SQLite, nube, AES-256 ni token real). Los botones son demostrativos. El icono del sidebar es `public/novuspos-icon.png` (recorte del logo). Ver skill §17 y contexto 09 §5.12.
+Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (screen `98a61d2fa58e4476ab0d250be8a57755`), montado en `/panel`. Mantiene el sidebar, el header, los KPIs, la licencia, la facturación y los respaldos class-por-class; el copy se auditó igual que auth (sin versión, `.EXE`, ESC/POS, SQLite, nube, AES-256 ni token real). Los botones son demostrativos. El icono del sidebar es `public/novuspos-icon.png` (recorte del logo). Ver skill §17 y contexto 09 §5.12.
 
 ## Copy de la landing
 

@@ -12,7 +12,7 @@ export function AuthBrandPanel() {
       {/* Header / logo */}
       <div className="relative z-10">
         <div className="flex items-center gap-space-sm mb-space-md">
-          <a href="#/" className="flex items-center">
+          <a href="/" className="flex items-center">
             <img alt="NovusPOS Logo" className="h-10 w-auto object-contain" src="/novuspos-logo-white.png" />
           </a>
         </div>

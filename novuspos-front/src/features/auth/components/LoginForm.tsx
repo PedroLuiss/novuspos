@@ -26,7 +26,7 @@ export function LoginForm({ onSubmit }: { onSubmit: () => void }) {
         placeholder="••••••••••••"
         tall
         action={
-          <a className="font-label-sm text-label-sm text-primary hover:underline" href="#">
+          <a className="font-label-sm text-label-sm text-primary hover:underline" href="/">
             ¿Olvidaste tu contraseña?
           </a>
         }
