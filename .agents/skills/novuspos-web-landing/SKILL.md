@@ -24,6 +24,8 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 > ⚠️ **Excepción 7 (sección de productos):** se añadió `ProductCatalog` (`#productos`) entre `KeyFeatures` y la comparativa. No está en el HTML de Stitch; sale del módulo real `inventory` de `novus-post`. Ver §15.
 >
 > ⚠️ **Excepción 8 (vistas de auth):** se replicó la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" como `#/auth` y `#/auth/login`. Layout idéntico; copy auditado con las reglas §14/§14.2. Ver §16.
+>
+> ⚠️ **Excepción 9 (panel de control):** se replicó "Panel de Control de Clientes - NovusPOS" como `#/panel`. Layout idéntico (sidebar 64 + header + bento grid), copy auditado. Ver §17.
 
 ---
 
@@ -107,9 +109,11 @@ node -e "const c=require('fs').readFileSync('dist/assets/'+require('fs').readdir
 
 ```text
 src/
-├── App.tsx                             # hash: '#/auth' | '#/auth/login' → AuthPage; si no, LandingPage
+├── App.tsx                             # hash: '#/auth' | '#/auth/login' → AuthPage; '#/panel' → PanelPage
 ├── app/LandingPage.tsx                 # SiteHeader + <main class="pt-20"> + secciones + Footer
 ├── app/AuthPage.tsx                    # split 5/7 + barra inferior de confianza
+├── app/PanelPage.tsx                   # sidebar + header + bento grid del panel
+├── features/panel/                     # PanelSidebar, PanelOverview, PanelLicense, PanelBilling, PanelBackups, data/
 ├── shared/ui/MS.tsx                    # icono Material Symbols (filled opcional)
 ├── shared/hooks/useHashRoute.ts        # hashchange sin dependencias
 ├── features/auth/
@@ -399,4 +403,18 @@ Pantalla de Stitch: `projects/14269822984035378146/screens/b7520097c4d14ab9913cf
 Los formularios son **demostrativos**: `onSubmit` solo muestra una alerta; no existe backend de auth en la landing. `MS` se movió a `shared/ui/MS.tsx` (con `filled` para `speed` y `workspace_premium`) para que landing y auth no se importen entre sí.
 
 > Al sincronizar con Stitch, conservar el layout y volver a aplicar esta tabla. No reintroducir versión, nube, ESC/POS, TLS, SSO ni métricas inventadas. Verificado con Chrome headless a 1280px en ambos modos.
+
+---
+
+## 17. Panel de Control de Clientes (excepción 9, pedido explícito)
+
+Pantalla de Stitch: `projects/14269822984035378146/screens/98a61d2fa58e4476ab0d250be8a57755`, título **"Panel de Control de Clientes - NovusPOS"**, DESKTOP 2560×3558. HTML: `screens/98a61d2fa58e4476ab0d250be8a57755/fileEntries/html` (37.8 kB), bajado con `tools.stitch.download_file`.
+
+**Ruta:** `#/panel` (el alert de login exitoso incluye "Abrir panel de control"). `App.tsx` chequea `auth` → `panel` → landing. `PanelPage` = `PanelSidebar` (aside `fixed left-0 top-0 h-full w-64` + header `fixed top-0 left-64 right-0 h-16`) + `<div class="pl-64"><main class="relative pt-16 ...">` con `p-space-md lg:p-space-lg gap-space-lg`. Se conservan el bento grid 7/5, la tabla de facturas y la lista de respaldos.
+
+**Layout idéntico:** mismos `shadow-sm`, `rounded-xl`, `bg-surface-container-lowest`, `blur-3xl`, `hover:translate-y-[-2px]`, `divide-y divide-surface-container`, `animate-pulse` y tipografías `numeric-keypad`/`font-mono`. El icono del sidebar usa `novuspos-icon.png` (recorte 140×141 del logo) para no duplicar el texto "NovusPOS" junto a "Novus Portal".
+
+**Copy auditado:** se retiraron `Build 2.4.0 Production`, `Descargar NovusPOS v2.4.0`, `NovusPOS-Setup-2.4.0-x64.exe (64.8 MB)`, `(.EXE)`, `MD5: ...`, `Versión 2.4.0 Estable`, `ESC/POS`, `RS-232`, `SQLite`, `Zstandard`, `AES-256`, "sincronización con la nube", `Auto-Sync`, `Offline-Ready`, `REG-WIN11-04`, `24/7 Disponible`, `Soporte VIP`, `Caja Central #1`, `Sincronizando ahora`, `ID: #8829` y el token real `NVUS-8829-X7K2-W11P-2026` (ahora enmascarado `NVUS-••••-••••-••••-••••`). También "2 terminales autorizadas" → "1 / 1 en uso" (el sistema es monopuesto). La suscripción, el método de pago enmascarado, las facturas y la prueba de 30 días se conservan por ser decisiones comerciales.
+
+> Al sincronizar con Stitch, conservar el layout y volver a aplicar estos reemplazos. Verificado con Chrome headless a 1280px.
 

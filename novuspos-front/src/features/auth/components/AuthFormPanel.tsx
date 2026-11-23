@@ -13,6 +13,7 @@ const tabIdle =
 interface AuthAlert {
   title: string
   description: string
+  kind: 'register' | 'login'
 }
 
 /** Columna derecha del split: tabs, formularios y accesos alternos (réplica de Stitch). */
@@ -67,6 +68,7 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
             setAlert({
               title: '¡Cuenta creada exitosamente!',
               description: 'Tu licencia de prueba de 30 días está activa. Descargando NovusPOS para Windows…',
+              kind: 'register',
             })
           }
         />
@@ -76,6 +78,7 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
             setAlert({
               title: '¡Bienvenido de vuelta!',
               description: 'Autenticación correcta. Abriendo tu panel de control…',
+              kind: 'login',
             })
           }
         />
@@ -116,6 +119,11 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
           <div className="flex flex-col">
             <span className="font-label-md text-label-md">{alert.title}</span>
             <span className="font-body-sm text-body-sm">{alert.description}</span>
+            {alert.kind === 'login' && (
+              <a href="#/panel" className="font-label-sm text-label-sm underline font-semibold w-fit">
+                Abrir panel de control →
+              </a>
+            )}
           </div>
         </div>
       )}
