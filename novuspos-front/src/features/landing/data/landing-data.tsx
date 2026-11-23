@@ -217,6 +217,95 @@ export const faqs: Faq[] = [
   },
 ]
 
+/** Tipos de producto que se pueden dar de alta, explicados con ejemplos reales. */
+export interface ProductGroup {
+  icon: string
+  iconTone: 'primary' | 'secondary' | 'neutral'
+  title: string
+  description: string
+  example: string
+}
+
+/** Datos que se guardan en cada ficha y se usan al cobrar. */
+export interface ProductCapability {
+  icon: string
+  title: string
+  description: string
+}
+
+/**
+ * Tomado del módulo `inventory` de novus-post: categorías sembradas, unidades
+ * de medida, variantes, combos, servicios, insumos y precios por cantidad.
+ * Se cuenta qué se puede hacer, no cómo está implementado.
+ */
+export const productGroups: ProductGroup[] = [
+  {
+    icon: 'shopping_bag',
+    iconTone: 'primary',
+    title: 'Lo de todos los días',
+    description:
+      'Abarrotes, refrescos, lácteos, panadería, limpieza, cuidado personal, frutas y verduras. Las categorías más comunes ya están listas y también puedes crear las tuyas. Si le subes una foto al producto, aparece en la tabla; si no, el programa le pone una letra con su color.',
+    example: 'Arroz, aceite, gaseosas, leche, pan, detergente, shampoo, manzanas.',
+  },
+  {
+    icon: 'scale',
+    iconTone: 'secondary',
+    title: 'Por pieza, por caja o por peso',
+    description:
+      'Hay artículos que se cuentan y otros que se pesan. Trabajas con piezas, cajas y paquetes, o con kilogramos y litros cuando vendes a granel. En esos casos la cantidad admite fracciones: 1,450 kg se cobra por 1,450 kg, no por dos.',
+    example: 'Aguacate 1,450 kg • caja de 12 refrescos • detergente por litro.',
+  },
+  {
+    icon: 'style',
+    iconTone: 'neutral',
+    title: 'Tallas, colores y presentaciones',
+    description:
+      'Un producto puede tener varias versiones. Defines los atributos una sola vez y cada versión guarda su propio código, precio y existencia. En el carrito aparece la versión que elegiste; la ficha general no se cobra por error.',
+    example: 'Camiseta talla M azul • botella de 600 ml • botella de 1,5 L.',
+  },
+  {
+    icon: 'inventory_2',
+    iconTone: 'primary',
+    title: 'Combos, servicios e insumos',
+    description:
+      'Arma paquetes con lo que ya vendes —pan con jamón y queso, shampoo con jabón— y el sistema calcula cuántos puedes preparar con el stock disponible. Al cobrar, descuenta cada producto del paquete. También caben servicios que no consumen existencias e insumos que usas en tu producción.',
+    example: 'Combo desayuno • envío a domicilio • materia prima para tu negocio.',
+  },
+]
+
+export const productCapabilities: ProductCapability[] = [
+  {
+    icon: 'qr_code_2',
+    title: 'Códigos de barras',
+    description: 'Puedes guardar más de un código por producto y encontrarlo con el lector. Las etiquetas salen en el tamaño que elijas.',
+  },
+  {
+    icon: 'payments',
+    title: 'Costo y ganancia',
+    description: 'Entras el costo y el porcentaje de ganancia y el precio de venta se calcula solo. Si quieres redondear, lo cambias a mano.',
+  },
+  {
+    icon: 'local_offer',
+    title: 'Precios por mayoreo',
+    description: 'Defines rangos por cantidad. Si el cliente lleva varias piezas, el precio que corresponde aparece automáticamente en el carrito.',
+  },
+  {
+    icon: 'receipt_long',
+    title: 'Impuestos por producto',
+    description: 'Cada artículo tiene su tasa: general, reducida, exenta o la que uses en tu negocio. El desglose se ve en el ticket.',
+  },
+  {
+    icon: 'calendar_month',
+    title: 'Lotes y caducidad',
+    description: 'Registras lote y fecha de vencimiento. Los productos que vencen primero son los que se descuentan primero.',
+  },
+  {
+    icon: 'inventory',
+    title: 'Existencias y avisos',
+    description: 'Entradas de mercancía, mermas y stock mínimo. La tabla avisa cuando algo se está acabando.',
+  },
+]
+
 /** Catálogo del mockup del terminal (hero). */
 export interface MockProduct {
   sku: string

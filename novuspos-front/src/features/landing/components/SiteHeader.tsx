@@ -19,6 +19,12 @@ export function SiteHeader() {
           </a>
           <a
             className="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors py-space-xs px-space-sm"
+            href="#productos"
+          >
+            Productos
+          </a>
+          <a
+            className="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors py-space-xs px-space-sm"
             href="#precios"
           >
             Precios

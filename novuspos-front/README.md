@@ -19,8 +19,8 @@ src/
 ├── app/LandingPage.tsx           # SiteHeader + <main class="pt-20"> + secciones + Footer
 ├── features/landing/
 │   ├── components/               # SiteHeader, Hero, HeroHeader, HeroMockup, KeyFeatures,
-│   │   │                         # KeyboardCheatSheet, ComparisonTable, Pricing,
-│   │   │                         # HardwareFaq, FinalCta, Footer, Kbd,
+│   │   │                         # ProductCatalog, KeyboardCheatSheet, ComparisonTable,
+│   │   │                         # Pricing, HardwareFaq, FinalCta, Footer, Kbd,
 │   │   │                         # ScreenshotCarousel (carrusel del hero)
 │   │   ├── HeroMockup.tsx           # wrapper que renderiza el carrusel
 │   │   └── product/ProductCard.tsx  # ProductCard + CartRow (sin uso tras el carrusel)
@@ -89,6 +89,10 @@ Viewport de referencia: 1280px. Altura actual ≈4780px (hero de dos columnas; a
 El carrusel se muestra en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`): el texto queda a la izquierda y las capturas se suben desde el fondo hasta la parte superior derecha. En móvil se apilan (texto arriba, capturas abajo).
 
 El relevo ya está activo con cinco capturas, en orden de módulo: `novusposventa.png`, `novuspos_producto.png`, `novuspos_kardex.png`, `novus_caja.png` y `novus_cliente.png`. Las cuatro primeras usan `object-contain`; `novus_caja.png` es 1280×1384 (más alta que el contenedor 5:4) y lleva `fit: 'cover'` para mostrarse con `object-cover object-top`, sin bandas laterales. Para agregar más, coloca el PNG en `public/imagen/` y añade una entrada `{ src, alt }` al array `screenshots` en `src/features/landing/data/landing-data.tsx` (usa `fit: 'cover'` si la imagen es alta).
+
+## Sección de productos (`#productos`)
+
+`ProductCatalog.tsx` explica qué tipos de productos se pueden administrar: 4 grupos (artículos de uso diario, ventas por pieza/caja/peso, variantes de talla o presentación, combos/servicios/insumos) y 6 datos de cada ficha (códigos, costo y ganancia, precios por mayoreo, impuestos, lotes y caducidad, existencias). El contenido vive en `productGroups` y `productCapabilities` (`landing-data.tsx`) y sale del módulo real de inventario de `novus-post` (contexto 03). No está en el diseño de Stitch: se añadió a pedido explícito. Ver skill §15 y contexto 09 §5.10.
 
 ## Copy de la landing
 

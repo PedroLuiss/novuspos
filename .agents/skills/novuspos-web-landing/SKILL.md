@@ -20,6 +20,8 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 > ⚠️ **Excepción 5 (hero y footer):** `HeroHeader` y `Footer` también se auditaron; se eliminaron "100% sin internet", ESC/POS, la latencia en milisegundos y "ultra-alto rendimiento". Ver §13.
 >
 > ⚠️ **Excepción 6 (tono comercial positivo):** todo el copy se reescribió para que hable de beneficios comprensibles para quien va a usar el sistema. No reintroducir detalles internos (SQLite, WAL, transacciones, `append-only`, `soft delete`, `SHA-256`, RS-232, COM/baudios) ni frases restrictivas ("pendiente de validación", "aún no integrados", "no hay cifras oficiales"). Ver §14.
+>
+> ⚠️ **Excepción 7 (sección de productos):** se añadió `ProductCatalog` (`#productos`) entre `KeyFeatures` y la comparativa. No está en el HTML de Stitch; sale del módulo real `inventory` de `novus-post`. Ver §15.
 
 ---
 
@@ -114,6 +116,7 @@ src/
 │   │   ├── Kbd.tsx                     # atajo inline <strong class="font-mono">
 │   │   ├── Hero.tsx                    # glow + HeroHeader + HeroMockup
 │   │   ├── KeyFeatures.tsx             # 6 tarjetas (#caracteristicas)
+│   │   ├── ProductCatalog.tsx          # 4 grupos + 6 datos de ficha (#productos)
 │   │   ├── KeyboardCheatSheet.tsx      # F1-F5, F12, ALT+Q
 │   │   ├── ComparisonTable.tsx         # Desktop vs POS nube
 │   │   ├── Pricing.tsx                 # plan único $4.99 (#precios)
@@ -153,12 +156,13 @@ Espaciado: `space-xl` 2.5rem · `space-lg` 1.5rem · `space-md` 1rem · `space-s
 1. `SiteHeader` (fixed, h-20) → `<main class="pt-20">`
 2. `Hero` — glow; **grid de 2 columnas en desktop**: izquierda = píldora "⚡ TRABAJA SIN DEPENDER DE INTERNET" (sin número de versión), headline, "Lema oficial", subtítulo, CTAs y 4 trust badges (alineados a la izquierda); derecha = carrusel de capturas (#interfaz-en-vivo), movido de abajo hacia arriba. En móvil se apila (texto arriba, capturas abajo).
 3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas con copy verificado contra los contextos 02–06 y 08 (ver §10).
-4. `KeyboardCheatSheet` — 7 atajos reales (`ALT+1`…`ALT+7`, `F12`, `ALT+Q`).
-5. `ComparisonTable` — 5 filas con copy verificado contra contextos 01, 02, 05 y 08 (ver §11).
-6. `Pricing` (`#precios`) — plan único $4.99; checklist técnico verificado (ver §12).
-7. `HardwareFaq` — 3 preguntas; periféricos y requisitos corregidos según docs (ver §11).
-8. `FinalCta` (`#descargar`)
-9. `Footer`
+4. `ProductCatalog` (`#productos`) — 4 grupos de productos + 6 datos de ficha (ver §15). Enlace "Productos" en el header.
+5. `KeyboardCheatSheet` — 7 atajos reales (`ALT+1`…`ALT+7`, `F12`, `ALT+Q`). Actualmente comentado en `LandingPage.tsx`.
+6. `ComparisonTable` — 5 filas con copy verificado contra contextos 01, 02, 05 y 08 (ver §11).
+7. `Pricing` (`#precios`) — plan único $4.99; checklist verificado (ver §12).
+8. `HardwareFaq` — 3 preguntas; periféricos y requisitos corregidos según docs (ver §11).
+9. `FinalCta` (`#descargar`)
+10. `Footer`
 
 ---
 
@@ -334,4 +338,23 @@ Por eso el texto dice que no hace falta la versión más reciente, pero **no men
 ### 14.2 Sin número de versión en la landing (pedido explícito)
 
 Se retiró `2.4.0` de **todo** el copy visible porque se veía mal. `ReleasePill` pasó a llamarse `HighlightPill` y ahora dice `⚡ TRABAJA SIN DEPENDER DE INTERNET`. Los subtítulos de los botones de descarga (hero y `Pricing`) y la línea del CTA final pasaron a `30 días gratis • sin tarjeta`. La columna de la comparativa dice solo `NovusPOS Desktop` y el enlace del footer dice `Novedades`. No reintroducir `v2.4.0`, `Versión 2.4.0`, `~85 MB` ni `(.exe)` en la landing: la versión real sigue viviendo en `novus-post/package.json` y en el nombre del artefacto de `electron-builder.yml`, no en el sitio web.
+
+---
+
+## 15. Sección de productos (excepción 7, pedido explícito)
+
+`ProductCatalog.tsx` añade `#productos` entre `#caracteristicas` y la comparativa, con enlace en `SiteHeader`. No existe en el HTML de Stitch: se creó a pedido del usuario para explicar **qué tipos de productos se pueden administrar**, con texto concreto y tono humano (sin fórmulas tipo "Descubre", "Potencia", "En resumen" ni "Además").
+
+Contenido en `landing-data.tsx`, arrays `productGroups` (4 tarjetas) y `productCapabilities` (6 datos de ficha). Fuente real: `novus-post/docs/context/03-INVENTORY-PRODUCTS.md` y `src/main/adapters/persistence/sqlite/migrations/006_seed_products.ts`.
+
+| Tarjeta | Ejemplo visible | Respaldado por |
+| :--- | :--- | :--- |
+| Lo de todos los días | Abarrotes, refrescos, lácteos, panadería, limpieza, cuidado personal, frutas y verduras | 8 categorías sembradas en `006_seed_products.ts` |
+| Por pieza, por caja o por peso | Aguacate 1,450 kg, caja de 12 refrescos, detergente por litro | unidades `PIEZA`/`CAJA`/`KG`/`L` + `allow_decimal` |
+| Tallas, colores y presentaciones | Camiseta talla M azul, botella 600 ml / 1,5 L | variantes con `attribute_name`/`attribute_value` |
+| Combos, servicios e insumos | Combo desayuno, envío a domicilio, materia prima | `product_type` COMBO/SERVICE/INSUMOS + `combo_items` |
+
+Capacidades: códigos de barras, costo y ganancia, precios por mayoreo, impuestos por producto, lotes y caducidad, existencias y avisos. Se dice *qué hace*, nunca *cómo está implementado*: no aparecen `SKU`, `FEFO`, SQLite, `append-only`, `soft delete` ni IDs de impuestos. "Los productos que vencen primero son los que se descuentan primero" es la versión en lenguaje de negocio del descarte FEFO.
+
+> Si cambia el módulo de productos en `novus-post`, revisar este apartado antes de tocar el copy. Mantener los ejemplos concretos: son los que hacen que el texto no parezca generado.
 

@@ -4,11 +4,12 @@ import { HardwareFaq } from '@/features/landing/components/HardwareFaq'
 import { Hero } from '@/features/landing/components/Hero'
 import { KeyFeatures } from '@/features/landing/components/KeyFeatures'
 import { Pricing } from '@/features/landing/components/Pricing'
+import { ProductCatalog } from '@/features/landing/components/ProductCatalog'
 import { SiteHeader } from '@/features/landing/components/SiteHeader'
 import { Footer } from '@/features/landing/components/Footer'
 
-/** Composición de la landing oficial — idéntica al diseño de Stitch.
- *  Orden de secciones: Hero → KeyFeatures → KeyboardCheatSheet → ComparisonTable → Pricing → HardwareFaq → FinalCta → Footer.
+/** Composición de la landing oficial — idéntica al diseño de Stitch, con la sección de productos añadida.
+ *  Orden: Hero → KeyFeatures → ProductCatalog → KeyboardCheatSheet → ComparisonTable → Pricing → HardwareFaq → FinalCta → Footer.
  */
 export function LandingPage() {
   return (
@@ -17,6 +18,7 @@ export function LandingPage() {
       <main className="w-full pt-20 bg-surface">
         <Hero />
         <KeyFeatures />
+        <ProductCatalog />
         {/* <KeyboardCheatSheet /> */}
         <ComparisonTable />
         <Pricing />

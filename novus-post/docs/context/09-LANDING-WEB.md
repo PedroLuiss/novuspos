@@ -34,6 +34,7 @@ src/
 │   │   ├── Kbd.tsx                    # atajo inline <strong class="font-mono">
 │   │   ├── Hero.tsx                   # glow + HeroHeader + HeroMockup
 │   │   ├── KeyFeatures.tsx            # 6 tarjetas (#caracteristicas)
+│   │   ├── ProductCatalog.tsx         # 4 grupos + 6 datos de ficha (#productos)
 │   │   ├── KeyboardCheatSheet.tsx     # F1,F2,F3,F4,F5,F12,ALT+Q
 │   │   ├── ComparisonTable.tsx        # Desktop vs POS Nube
 │   │   ├── Pricing.tsx                # plan único $4.99 (#precios)
@@ -60,17 +61,18 @@ src/
 
 ---
 
-## 3. Orden de secciones (idéntico a Stitch)
+## 3. Orden de secciones (idéntico a Stitch, más `ProductCatalog`)
 
-1. `SiteHeader` — fijo, logo + Características/Precios/Documentación + Iniciar Sesión.
+1. `SiteHeader` — fijo, logo + Características/**Productos**/Precios/Documentación + Iniciar Sesión.
 2. `Hero` — glow; grid de 2 columnas en desktop: texto a la izquierda (píldora, headline, slogan, CTAs, trust badges) y carrusel de capturas (`#interfaz-en-vivo`) arriba a la derecha. En móvil se apila.
-3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas: terminal POS, inventario, Kardex, Corte Z, básculas RS-232, créditos. Copy verificado contra los contextos 02–06 y 08 (ver §5.3).
-4. `KeyboardCheatSheet` — 7 atajos reales: `ALT+1`…`ALT+7`, `F12` y `ALT+Q`.
-5. `ComparisonTable` — 5 filas comparativas con copy verificado contra contextos 01, 02, 05 y 08 (ver §5.4).
-6. `Pricing` (`#precios`) — licencia profesional $4.99, badge "PRIMER MES $0"; checklist técnico verificado (ver §5.5).
-7. `HardwareFaq` — 3 preguntas (SQLite WAL, periféricos, requisitos Windows); periféricos y requisitos verificados contra docs (ver §5.4).
-8. `FinalCta` (`#descargar`) — gradiente primary→on-primary-fixed-variant.
-9. `Footer` — producto, desarrolladores & soporte, seguridad & legal, línea legal.
+3. `KeyFeatures` (`#caracteristicas`) — 6 tarjetas con copy verificado contra los contextos 02–06 y 08 (ver §5.3).
+4. `ProductCatalog` (`#productos`) — 4 grupos de productos + 6 datos de ficha; añadida a pedido explícito, no está en Stitch (ver §5.10).
+5. `KeyboardCheatSheet` — 7 atajos reales: `ALT+1`…`ALT+7`, `F12` y `ALT+Q`. Actualmente comentado en `LandingPage.tsx`.
+6. `ComparisonTable` — 5 filas comparativas con copy verificado contra contextos 01, 02, 05 y 08 (ver §5.4).
+7. `Pricing` (`#precios`) — licencia profesional $4.99, badge "PRIMER MES $0"; checklist verificado (ver §5.5).
+8. `HardwareFaq` — 3 preguntas; periféricos y requisitos verificados contra docs (ver §5.4).
+9. `FinalCta` (`#descargar`) — gradiente primary→on-primary-fixed-variant.
+10. `Footer` — producto, ayuda, legal, línea legal.
 
 ---
 
@@ -143,13 +145,15 @@ src/
 
 5. **Pricing verificado (pedido explícito):** el checklist de `Pricing.tsx` y su línea "Para Windows 11 / 10 x64" se auditaron contra los contextos 00, 01, 02, 04, 05 y 08. Se eliminó "ultra-alto rendimiento", "sin ralentización", "impresoras térmicas ESC/POS de 58/80mm y cajón de dinero" (08 §1/§6: no integrados; 02 §4: previsualizar no imprime), "actualizaciones continuas v2.x y soporte por WhatsApp y Ticket" (00 §3.7: ticket requiere internet; WhatsApp no es canal de soporte documentado) y "copias de seguridad automáticas a memorias USB o carpetas compartidas" (08 §1: respaldo manual en `userData/backups` con SHA-256 y copia preventiva). Windows 10 se retiró en su momento por no aparecer en los contextos, pero se **reincorporó** en §5.8 al verificar el proyecto de escritorio (Electron 39 admite Windows 10+). El precio ($4.99, primer mes $0), los 30 días gratis y "sin tarjeta" se conservan por ser decisiones comerciales, no claims técnicos (ver §3, ítem 6). El número de versión y el tamaño del instalador se retiraron del copy en §5.9.
 
-6. **Hero y footer verificados (pedido explícito):** `HeroHeader.tsx` —además del carrusel de §5.2— y `Footer.tsx` se auditaron contra los contextos 00, 01, 02, 08 y 09. Se eliminaron el badge "Sin caídas por internet" y el "Opera 100% sin conexión" (bootstrap/OTP, reportes y BCV requieren red: 01 §1/§4, 00 §3.7, 02 §4), "Procesa transacciones en milisegundos" (métrica sin respaldo en los contextos modulares), "imprime tickets térmicos ESC/POS de 80mm" (08 §1/§6: no integrado; solo PDF 80/58mm), "x64" (no documentado), el superlativo "más rápido" y "sin ataduras a la nube". El CTA secundario pasó de "Ver Demostración" a "Ver capturas del sistema" porque el ancla es un carrusel de capturas. El precio, la versión y el tamaño del instalador se conservan por ser decisiones comerciales. Nota: el matiz de "validación pendiente" y la mención de SQLite de este ítem fueron **sustituidos** por el ítem 7.
+6. **Hero y footer verificados (pedido explícito):** `HeroHeader.tsx` —además del carrusel de §5.2— y `Footer.tsx` se auditaron contra los contextos 00, 01, 02, 08 y 09. Se eliminaron el badge "Sin caídas por internet" y el "Opera 100% sin conexión" (bootstrap/OTP, reportes y BCV requieren red: 01 §1/§4, 00 §3.7, 02 §4), "Procesa transacciones en milisegundos" (métrica sin respaldo en los contextos modulares), "imprime tickets térmicos ESC/POS de 80mm" (08 §1/§6: no integrado; solo PDF 80/58mm), "x64" (no documentado), el superlativo "más rápido" y "sin ataduras a la nube". El CTA secundario pasó de "Ver Demostración" a "Ver capturas del sistema" porque el ancla es un carrusel de capturas. El precio se conserva por ser decisión comercial; la versión y el tamaño del instalador se retiraron en §5.9. Nota: el matiz de "validación pendiente" y la mención de SQLite de este ítem fueron **sustituidos** por el ítem 7.
 
 7. **Copy positivo para el usuario final (pedido explícito):** se reescribió el texto de **todas** las secciones (`HeroHeader`, `KeyFeatures`, `landing-data.tsx`, `ComparisonTable`, `HardwareFaq`, `Pricing`, `FinalCta`, `SiteHeader`, `Footer` e `index.html`) para que explique beneficios comprensibles para quien va a usar el sistema, sin detalles de implementación ni frases restrictivas. Se eliminaron del bundle: "pendiente de validación física", "aún no están integrados", "no hay cifras oficiales", SQLite/WAL, "transacción atómica", `append-only`, `soft delete`, `SHA-256`, RS-232/COM/baudios, ESC/POS, "modo WAL", "arquitectura offline-first", "Servidores Cloud Sincronizados", "Certificación Fiscal", "Drivers OPOS", "Mesa de Ayuda 24/7" y "Documentación API". Textos vigentes: datos → "queda registrado al momento y sigue disponible… incluso sin conexión"; básculas → "toma el peso directamente en la venta, sin digitar los gramos"; tickets → "listos para descargar"; requisitos → "NovusPOS funciona en Windows 10 y Windows 11 (en computadoras de 64 bits), así que no necesitas la versión más reciente para empezar" (ver §5.8); respaldos → "respaldos de tu información y restauración". Titulares: hero "rápido, confiable y siempre disponible"; características "PENSADO PARA TU DÍA A DÍA" / "Todo para vender, controlar tu inventario y cerrar el día con confianza"; comparativa "¿Por qué elegir NovusPOS para tu negocio?". Los `subtitle` de atajos dejaron de usar "Modal de pago" y "1-Click ticket directo". `Kbd` se retiró de `landing-data.tsx` (ya no hay atajos inline en las tarjetas). La veracidad funcional se conserva: no se afirma impresión térmica conectada ni rendimiento inventado. Ver skill §14.
 
 8. **Compatibilidad con Windows (pedido explícito):** el FAQ `¿Qué necesito para empezar?` y la línea de `Pricing` pasaron de "Windows 11" a **"Windows 10 o Windows 11"**. Evidencia en `novus-post/`: `package.json` usa `electron: ^39.2.6` (`39.8.10` en lock) y el README oficial de Electron 39 indica *"Windows (Windows 10 and up)"*; `electron-builder.yml` genera `NovusPOS-Setup-${version}-x64.exe`, por lo que se menciona "computadoras de 64 bits". No existe ningún chequeo de versión de Windows en el código: "Windows 11 Fluent Design / WinUI 3" en 00 y AGENTS.md es **estilo visual**, no requisito de SO. No se menciona Windows 7/8/8.1 (Electron los dejó de soportar en v23). La red solo se necesita para descargar, iniciar sesión la primera vez y tasas; el trabajo posterior funciona sin conexión.
 
 9. **Sin número de versión en la landing (pedido explícito):** se retiró `2.4.0` de todo el texto visible porque se veía mal. `ReleasePill` → `HighlightPill` (`⚡ TRABAJA SIN DEPENDER DE INTERNET`); subtítulos de descarga en `HeroHeader` y `Pricing` → `30 días gratis • sin tarjeta`; línea del `FinalCta` → `30 días gratis • sin tarjeta`; cabecera de la comparativa → `NovusPOS Desktop`; enlace del footer → `Novedades`. No reintroducir `v2.4.0`, `Versión 2.4.0`, `~85 MB` ni `(.exe)`: la versión real está en `novus-post/package.json` y en el artefacto de `electron-builder.yml`, no en el sitio web.
+
+10. **Sección de productos (pedido explícito):** se añadió `ProductCatalog.tsx` con el ancla `#productos` entre `#caracteristicas` y la comparativa, más el enlace "Productos" en `SiteHeader`. No existe en Stitch: sale del módulo real `inventory` (contexto 03 y `006_seed_products.ts`). `productGroups` (4 tarjetas): lo de todos los días (8 categorías sembradas), por pieza/caja/peso (unidades y decimales), tallas/colores/presentaciones (variantes), combos/servicios/insumos (tipos de producto y `combo_items`). `productCapabilities` (6 fichas): códigos de barras, costo y ganancia, precios por mayoreo, impuestos por producto, lotes y caducidad, existencias y avisos. Copy con ejemplos concretos y frases naturales ("1,450 kg se cobra por 1,450 kg, no por dos"), sin `SKU`, `FEFO`, SQLite, `append-only` ni detalles de implementación. "Los productos que vencen primero son los que se descuentan primero" es la versión comercial del descarte FEFO. Ver skill §15.
 
 ---
 
@@ -158,7 +162,8 @@ src/
 - ✅ Réplica exacta de Stitch validada sección por sección con capturas headless de Chrome a 1280px contra el HTML renderizado y el screenshot oficial, **excepto** el copy verificado del hero, `KeyFeatures`/`KeyboardCheatSheet`, tabla/FAQ, `Pricing` y `Footer` (ver §5).
 - ✅ Copy de `KeyFeatures` y `KeyboardCheatSheet` auditado contra los contextos 00, 02, 03, 04, 05, 06 y 08; eliminados los claims falsos de Stitch (ver §5.3).
 - ✅ Copy de todas las secciones reescrito en tono positivo y sin detalles internos; verificado en el bundle (ver §5.7).
-- ✅ Altura final ≈4780px con el hero de dos columnas (antes, 5523px con el carrusel apilado abajo; oficial 5350px). Posición del carrusel a 1280px: `x≈660, y≈230, w≈596, h≈477`.
+- ✅ Sección `#productos` renderizada y verificada en DOM con Chrome headless; sin términos internos en el bundle (ver §5.10).
+- ✅ Altura ≈4780px con el hero de dos columnas (antes, 5523px con el carrusel apilado abajo; oficial 5350px). La sección de productos aumentó la altura respecto a la medición original. Posición del carrusel a 1280px: `x≈660, y≈230, w≈596, h≈477`.
 - ✅ Tipografías, iconos y logo autoalojados (funciona offline, sin CDN).
 - ✅ `npm run build` y `npm run lint` limpios.
 - ✅ Autenticación del MCP Stitch configurada vía API key en `~/.config/opencode/secrets/stitch-api-key`.
