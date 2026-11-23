@@ -92,7 +92,7 @@ El relevo ya está activo con cinco capturas, en orden de módulo: `novusposvent
 
 ## Sección de productos (`#productos`)
 
-`ProductCatalog.tsx` explica qué tipos de productos se pueden administrar: 4 grupos (artículos de uso diario, ventas por pieza/caja/peso, variantes de talla o presentación, combos/servicios/insumos) y 6 datos de cada ficha (códigos, costo y ganancia, precios por mayoreo, impuestos, lotes y caducidad, existencias). El contenido vive en `productGroups` y `productCapabilities` (`landing-data.tsx`) y sale del módulo real de inventario de `novus-post` (contexto 03). No está en el diseño de Stitch: se añadió a pedido explícito. Ver skill §15 y contexto 09 §5.10.
+`ProductCatalog.tsx` explica qué tipos de productos se pueden administrar: 4 grupos (artículos de uso diario, ventas por pieza/caja/peso, variantes de talla o presentación, combos/servicios/insumos), 8 categorías con 33 ejemplos concretos y 6 datos de cada ficha (códigos, costo y ganancia, precios por mayoreo, impuestos, lotes y caducidad, existencias). El contenido vive en `productGroups`, `productVarieties` y `productCapabilities` (`landing-data.tsx`) y sale del módulo real de inventario de `novus-post` (contexto 03). No está en el diseño de Stitch: se añadió a pedido explícito. Ver skill §15 y contexto 09 §5.10.
 
 ## Copy de la landing
 

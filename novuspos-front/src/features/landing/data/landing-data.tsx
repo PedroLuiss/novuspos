@@ -306,6 +306,48 @@ export const productCapabilities: ProductCapability[] = [
   },
 ]
 
+/** Ejemplos concretos por categoría, tomados del catálogo de ejemplo del sistema. */
+export interface ProductVariety {
+  category: string
+  items: string[]
+}
+
+/** Nombres y presentaciones reales para que se vea la variedad que se puede manejar. */
+export const productVarieties: ProductVariety[] = [
+  {
+    category: 'Bebidas',
+    items: ['Gaseosa 600 ml', 'Agua mineral', 'Jugo de naranja', 'Cerveza 355 ml'],
+  },
+  {
+    category: 'Lácteos y huevos',
+    items: ['Leche 1 L', 'Queso panela', 'Yogur griego', 'Huevo 12 piezas'],
+  },
+  {
+    category: 'Despensa',
+    items: ['Arroz 1 kg', 'Frijol 1 kg', 'Aceite 850 ml', 'Atún 140 g', 'Pasta 200 g', 'Café soluble'],
+  },
+  {
+    category: 'Snacks y dulces',
+    items: ['Papas fritas', 'Galletas Marías', 'Chocolate', 'Cacahuates'],
+  },
+  {
+    category: 'Panadería',
+    items: ['Pan de caja', 'Pan integral', 'Medias noches', 'Donas', 'Pan tostado'],
+  },
+  {
+    category: 'Limpieza',
+    items: ['Detergente 1 kg', 'Suavizante', 'Cloro', 'Papel higiénico', 'Servilletas'],
+  },
+  {
+    category: 'Cuidado personal',
+    items: ['Jabón de tocador', 'Shampoo 400 ml', 'Pasta dental', 'Desodorante', 'Rastrillos'],
+  },
+  {
+    category: 'Frutas y verduras',
+    items: ['Manzana', 'Plátano', 'Jitomate', 'Aguacate', 'Limón'],
+  },
+]
+
 /** Catálogo del mockup del terminal (hero). */
 export interface MockProduct {
   sku: string

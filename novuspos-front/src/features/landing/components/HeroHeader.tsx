@@ -40,7 +40,7 @@ export function HeroHeader({ children }: { children: ReactNode }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-space-xl">
         {/* Columna izquierda: copy, CTAs y sellos de confianza */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-          <HighlightPill />
+          {/* <HighlightPill /> */}
 
           <h1 className="font-display text-display text-on-surface max-w-4xl tracking-tight leading-none mb-space-md">
             El punto de venta para Windows que tu negocio necesita:{' '}

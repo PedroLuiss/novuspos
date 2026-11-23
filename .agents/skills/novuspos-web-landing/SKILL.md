@@ -345,7 +345,7 @@ Se retiró `2.4.0` de **todo** el copy visible porque se veía mal. `ReleasePill
 
 `ProductCatalog.tsx` añade `#productos` entre `#caracteristicas` y la comparativa, con enlace en `SiteHeader`. No existe en el HTML de Stitch: se creó a pedido del usuario para explicar **qué tipos de productos se pueden administrar**, con texto concreto y tono humano (sin fórmulas tipo "Descubre", "Potencia", "En resumen" ni "Además").
 
-Contenido en `landing-data.tsx`, arrays `productGroups` (4 tarjetas) y `productCapabilities` (6 datos de ficha). Fuente real: `novus-post/docs/context/03-INVENTORY-PRODUCTS.md` y `src/main/adapters/persistence/sqlite/migrations/006_seed_products.ts`.
+Contenido en `landing-data.tsx`, arrays `productGroups` (4 tarjetas), `productVarieties` (8 categorías con ejemplos concretos) y `productCapabilities` (6 datos de ficha). Fuente real: `novus-post/docs/context/03-INVENTORY-PRODUCTS.md` y `src/main/adapters/persistence/sqlite/migrations/006_seed_products.ts`. El bloque "Así se ve el catálogo de un abasto" muestra 33 productos con su medida (gaseosa 600 ml, huevo 12 piezas, detergente 1 kg, aguacate…) para que se aprecie la variedad que se puede manejar; son nombres del catálogo de ejemplo del sistema, acortados para que se lean bien en una etiqueta.
 
 | Tarjeta | Ejemplo visible | Respaldado por |
 | :--- | :--- | :--- |

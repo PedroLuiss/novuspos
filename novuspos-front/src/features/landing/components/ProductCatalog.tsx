@@ -1,4 +1,4 @@
-import { productCapabilities, productGroups } from '@/features/landing/data/landing-data'
+import { productCapabilities, productGroups, productVarieties } from '@/features/landing/data/landing-data'
 import { MS } from './HeroHeader'
 
 const iconToneClass: Record<string, string> = {
@@ -42,6 +42,35 @@ export function ProductCatalog() {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-space-xl">
+        <div className="text-center max-w-3xl mx-auto mb-space-lg">
+          <h3 className="font-headline-sm text-headline-sm text-on-surface font-bold mb-space-xs">
+            Así se ve el catálogo de un abasto
+          </h3>
+          <p className="font-body-md text-body-md text-on-surface-variant">
+            Productos con nombre y medida, tal como los pones en su ficha. Puedes tener todos estos a la vez y seguir
+            agregando los tuyos.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+          {productVarieties.map((variety) => (
+            <div key={variety.category} className="rounded-lg bg-surface-container-low p-space-md">
+              <h4 className="font-label-md text-label-md text-on-surface font-bold mb-space-sm">{variety.category}</h4>
+              <div className="flex flex-wrap gap-space-xs">
+                {variety.items.map((item) => (
+                  <span
+                    key={item}
+                    className="px-space-sm py-space-xs rounded-full bg-surface-container-lowest text-body-sm text-on-surface-variant"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="mt-space-xl text-center max-w-3xl mx-auto mb-space-lg">
