@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NovusPOS - Módulo de Clientes y Crédito</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Font Awesome for POS / Fluent desktop icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#0067c0',
+              600: '#0058a3',
+              700: '#004c8c',
+              800: '#003e73',
+              900: '#002f57',
+            },
+            winbg: '#f1f5f9',
+            wincard: '#ffffff',
+            winborder: '#e2e8f0',
+          },
+          fontFamily: {
+            sans: ['Segoe UI', '-apple-system', 'BlinkMacSystemFont', 'Roboto', 'sans-serif'],
+          },
+          boxShadow: {
+            'fluent-sm': '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            'fluent-card': '0 2px 6px rgba(0,0,0,0.05), 0 0 1px rgba(0,0,0,0.1)',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbars-and-reset">
+    /* Custom desktop scrollbar styling for Windows 11 look */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    body {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    input, table {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+  </style>
+</head>
+<body class="h-full bg-[#eef2f6] text-slate-800 flex flex-col font-sans text-xs antialiased overflow-hidden">
+<!-- BEGIN: Win11TitleAndHeader -->
+<header class="bg-white border-b border-slate-200 select-none flex-shrink-0" data-purpose="application-header">
+<!-- Top Bar: Brand, Status, Currency, User and Native Window Controls -->
+<div class="h-10 px-3 flex items-center justify-between border-b border-slate-100">
+<!-- Brand & Tagline -->
+<div class="flex items-center space-x-2">
+<div class="w-6 h-6 rounded bg-[#0067c0] flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
+          N
+        </div>
+<div class="flex items-baseline space-x-1.5">
+<span class="text-sm font-bold tracking-tight text-[#0067c0]">Novus<span class="text-slate-800">POS</span></span>
+<span class="text-[10px] text-slate-400 hidden md:inline font-normal">Diseñado para crecer contigo</span>
+</div>
+</div>
+<!-- Center-Right Modules: Active Cash Register & BCV Exchange Rate -->
+<div class="flex items-center space-x-3">
+<!-- Register Turn Status -->
+<div class="flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[11px] text-slate-700">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-bold tracking-wider">CAJA ADMIN</span>
+<span class="text-slate-400">•</span>
+<span class="text-slate-500 uppercase text-[9px] tracking-wide">TURNO ACTIVO</span>
+</div>
+<!-- Exchange Rate BCV Indicator -->
+<div class="flex items-center space-x-2 bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200 px-2.5 py-0.5 rounded text-[11px]">
+<div class="flex items-center space-x-1">
+<span class="text-slate-500 font-medium">TASA BCV</span>
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+</div>
+<span class="font-bold text-slate-800">Bs. 918,77</span>
+<span class="text-[9px] text-amber-600 font-medium bg-amber-50 px-1 rounded">Desactualizada</span>
+<button class="text-slate-400 hover:text-[#0067c0] transition-colors p-0.5" title="Actualizar Tasa BCV">
+<i class="fa-solid fa-arrows-rotate text-[10px]"></i>
+</button>
+</div>
+<!-- Operator Profile Info & Lock/Exit -->
+<div class="flex items-center space-x-2 border-l border-slate-200 pl-3">
+<span class="text-slate-500">Admin: <strong class="text-slate-800 font-semibold">Admin Sistema</strong></span>
+<button class="px-2 py-0.5 border border-slate-200 hover:border-slate-300 rounded text-slate-600 hover:bg-slate-100 transition-all flex items-center space-x-1 text-[11px]">
+<i class="fa-solid fa-lock text-[10px] text-slate-500"></i>
+<span>LOCK</span>
+</button>
+<button class="px-2 py-0.5 border border-rose-200 hover:bg-rose-50 text-rose-600 rounded transition-all flex items-center space-x-1 text-[11px]">
+<i class="fa-solid fa-arrow-right-from-bracket text-[10px]"></i>
+<span class="font-medium">Salir</span>
+</button>
+</div>
+</div>
+<!-- Native Windows 11 Window Controls -->
+<div class="flex items-center h-full -mr-3">
+<button class="w-10 h-10 flex items-center justify-center hover:bg-slate-200 text-slate-600 transition-colors" title="Minimizar">
+<i class="fa-solid fa-minus text-[11px]"></i>
+</button>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-slate-200 text-slate-600 transition-colors" title="Maximizar">
+<i class="fa-regular fa-square text-[10px]"></i>
+</button>
+<button class="w-11 h-10 flex items-center justify-center hover:bg-red-600 hover:text-white text-slate-600 transition-colors" title="Cerrar">
+<i class="fa-solid fa-xmark text-[13px]"></i>
+</button>
+</div>
+</div>
+<!-- POS Navigation Tabs with ALT Shortcuts -->
+<nav class="flex items-center px-4 space-x-1 bg-white" data-purpose="top-navigation-tabs">
+<button class="px-3.5 py-2.5 text-xs text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center space-x-1.5">
+<span>Venta (POS)</span>
+<kbd class="text-[9px] bg-slate-100 border border-slate-200 px-1 py-0.5 rounded text-slate-500 font-mono">ALT+1</kbd>
+</button>
+<button class="px-3.5 py-2.5 text-xs text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center space-x-1.5">
+<span>Productos</span>
+<kbd class="text-[9px] bg-slate-100 border border-slate-200 px-1 py-0.5 rounded text-slate-500 font-mono">ALT+2</kbd>
+</button>
+<button class="px-3.5 py-2.5 text-xs text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center space-x-1.5">
+<span>Kardex</span>
+<kbd class="text-[9px] bg-slate-100 border border-slate-200 px-1 py-0.5 rounded text-slate-500 font-mono">ALT+3</kbd>
+</button>
+<button class="px-3.5 py-2.5 text-xs text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center space-x-1.5">
+<span>Caja</span>
+<kbd class="text-[9px] bg-slate-100 border border-slate-200 px-1 py-0.5 rounded text-slate-500 font-mono">ALT+4</kbd>
+</button>
+<!-- Active Tab: Clientes -->
+<button class="px-3.5 py-2.5 text-xs font-bold text-[#0067c0] border-b-2 border-[#0067c0] flex items-center space-x-1.5 bg-blue-50/40">
+<span>Clientes</span>
+<kbd class="text-[9px] bg-blue-100 text-[#0067c0] border border-blue-200 px-1 py-0.5 rounded font-mono font-bold">ALT+5</kbd>
+</button>
+<button class="px-3.5 py-2.5 text-xs text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center space-x-1.5">
+<span>Reportes</span>
+<kbd class="text-[9px] bg-slate-100 border border-slate-200 px-1 py-0.5 rounded text-slate-500 font-mono">ALT+6</kbd>
+</button>
+<button class="px-3.5 py-2.5 text-xs text-slate-600 hover:text-slate-900 border-b-2 border-transparent transition-all flex items-center space-x-1.5">
+<span>Ajustes</span>
+<kbd class="text-[9px] bg-slate-100 border border-slate-200 px-1 py-0.5 rounded text-slate-500 font-mono">ALT+7</kbd>
+</button>
+</nav>
+</header>
+<!-- END: Win11TitleAndHeader -->
+<!-- BEGIN: MainContentArea -->
+<main class="flex-1 overflow-y-auto px-6 py-4 flex flex-col space-y-4" data-purpose="module-main-body">
+<!-- Sub-Header: Module Title & Scope -->
+<div class="flex items-center justify-between" data-purpose="module-header">
+<div class="flex items-center space-x-3">
+<div class="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center text-[#0067c0] shadow-fluent-sm">
+<i class="fa-solid fa-users text-lg"></i>
+</div>
+<div>
+<span class="text-[10px] tracking-wider uppercase font-semibold text-slate-400 block leading-tight">GESTIÓN COMERCIAL</span>
+<h1 class="text-lg font-bold text-slate-900 leading-tight">Clientes y crédito</h1>
+<p class="text-xs text-slate-500">Directorio, cuentas por cobrar y seguimiento de abonos.</p>
+</div>
+</div>
+<!-- Status Pill Badge -->
+<div>
+<div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 shadow-sm text-slate-600 text-xs">
+<i class="fa-solid fa-shield-halved text-emerald-600 text-xs"></i>
+<span class="font-medium text-slate-700">Administración completa</span>
+</div>
+</div>
+</div>
+<!-- BEGIN: FinancialKpiCards -->
+<!-- Grid of 4 Key Performance Indicators -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4" data-purpose="kpi-summary-cards">
+<!-- KPI 1: Clientes Activos -->
+<div class="bg-white border border-slate-200 rounded-lg p-3.5 shadow-fluent-sm flex justify-between items-start">
+<div>
+<span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">CLIENTES ACTIVOS</span>
+<div class="text-2xl font-bold text-slate-900 mt-1">18</div>
+<span class="text-[11px] text-slate-400 mt-0.5 block">0 clientes desactivados</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-blue-50 text-[#0067c0] flex items-center justify-center">
+<i class="fa-regular fa-user text-sm"></i>
+</div>
+</div>
+<!-- KPI 2: Cuentas Por Cobrar -->
+<div class="bg-white border border-slate-200 rounded-lg p-3.5 shadow-fluent-sm flex justify-between items-start">
+<div>
+<span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">CUENTAS POR COBRAR</span>
+<div class="text-2xl font-bold text-rose-600 mt-1">$ 2.532,48</div>
+<span class="text-[11px] text-slate-400 mt-0.5 block">Saldo pendiente de recuperación</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
+<i class="fa-solid fa-circle-exclamation text-sm"></i>
+</div>
+</div>
+<!-- KPI 3: Clientes Con Deuda -->
+<div class="bg-white border border-slate-200 rounded-lg p-3.5 shadow-fluent-sm flex justify-between items-start">
+<div>
+<span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">CLIENTES CON DEUDA</span>
+<div class="text-2xl font-bold text-slate-900 mt-1">5</div>
+<span class="text-[11px] text-slate-400 mt-0.5 block">Cuentas con saldo pendiente</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
+<i class="fa-regular fa-clock text-sm"></i>
+</div>
+</div>
+<!-- KPI 4: Clientes Al Día -->
+<div class="bg-white border border-slate-200 rounded-lg p-3.5 shadow-fluent-sm flex justify-between items-start">
+<div>
+<span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">CLIENTES AL DÍA</span>
+<div class="text-2xl font-bold text-emerald-600 mt-1">13</div>
+<span class="text-[11px] text-slate-400 mt-0.5 block">Sin deuda vigente</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
+<i class="fa-regular fa-circle-check text-sm"></i>
+</div>
+</div>
+</div>
+<!-- END: FinancialKpiCards -->
+<!-- BEGIN: SearchAndActionToolbar -->
+<div class="flex flex-wrap items-center justify-between gap-3 bg-white p-2.5 rounded-lg border border-slate-200 shadow-fluent-sm" data-purpose="filter-toolbar">
+<!-- Left side: Search input and Segmented Filters -->
+<div class="flex items-center space-x-3 flex-1 min-w-[320px]">
+<!-- Search bar -->
+<div class="relative w-80">
+<i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+<input class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0067c0] focus:border-[#0067c0] placeholder:text-slate-400 transition-all" placeholder="Buscar por nombre, código, RFC, teléfono o correo..." type="text"/>
+</div>
+<!-- Segmented Filter Pills -->
+<div class="inline-flex p-0.5 bg-slate-100 border border-slate-200 rounded-md text-xs font-medium">
+<button class="px-3 py-1 bg-white text-[#0067c0] font-semibold rounded shadow-xs">Todos (18)</button>
+<button class="px-3 py-1 text-slate-600 hover:text-slate-900">Con deuda (5)</button>
+<button class="px-3 py-1 text-slate-600 hover:text-slate-900">Al día (13)</button>
+</div>
+</div>
+<!-- Right side: Client count & Action Buttons -->
+<div class="flex items-center space-x-2">
+<span class="text-xs text-slate-400 mr-2 font-medium">18 clientes</span>
+<button class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-md transition-colors flex items-center space-x-1.5 font-medium shadow-2xs">
+<i class="fa-solid fa-arrows-rotate text-slate-400 text-xs"></i>
+<span>Actualizar</span>
+</button>
+<button class="px-2.5 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-md transition-colors flex items-center space-x-1.5 font-medium shadow-2xs">
+<i class="fa-regular fa-trash-can text-slate-400 text-xs"></i>
+<span>Clientes desactivados</span>
+</button>
+<button class="px-3.5 py-1.5 bg-[#0067c0] hover:bg-[#0058a3] text-white rounded-md transition-all flex items-center space-x-2 font-semibold shadow-fluent-sm">
+<i class="fa-solid fa-plus text-xs"></i>
+<span>Nuevo cliente</span>
+<kbd class="text-[9px] bg-blue-700/60 text-white px-1.5 py-0.5 rounded font-mono font-normal">ALT+C</kbd>
+</button>
+</div>
+</div>
+<!-- END: SearchAndActionToolbar -->
+<!-- BEGIN: ClientDataGridSection -->
+<section class="bg-white border border-slate-200 rounded-lg shadow-fluent-sm flex flex-col flex-1 min-h-0" data-purpose="clients-table-container">
+<!-- Section subheader -->
+<div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
+<div>
+<h2 class="font-bold text-slate-900 text-xs">Directorio de clientes</h2>
+<p class="text-[11px] text-slate-400 mt-0.5">Consulta los datos comerciales, el límite de crédito y el saldo de cada cuenta.</p>
+</div>
+<span class="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full font-medium border border-slate-200">18 registros</span>
+</div>
+<!-- Table scrollable wrapper -->
+<div class="overflow-x-auto overflow-y-auto flex-1">
+<table class="w-full text-left text-xs border-collapse">
+<!-- Table Header -->
+<thead class="bg-slate-50/80 sticky top-0 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px] select-none z-10">
+<tr>
+<th class="py-2.5 px-4 w-24" scope="col">CÓDIGO</th>
+<th class="py-2.5 px-4 min-w-[200px]" scope="col">CLIENTE / CONTACTO</th>
+<th class="py-2.5 px-4 w-36" scope="col">RFC / FISCAL</th>
+<th class="py-2.5 px-4 w-32" scope="col">TELÉFONO</th>
+<th class="py-2.5 px-4 text-right w-28" scope="col">LÍMITE</th>
+<th class="py-2.5 px-4 text-right w-32" scope="col">SALDO DEUDOR</th>
+<th class="py-2.5 px-4 text-center w-28" scope="col">ESTADO</th>
+<th class="py-2.5 px-4 text-right w-44" scope="col">ACCIONES</th>
+</tr>
+</thead>
+<!-- Table Body -->
+<tbody class="divide-y divide-slate-100 text-slate-700">
+<!-- Row 1: Comercial Sur C.A. -->
+<tr class="hover:bg-blue-50/40 transition-colors group">
+<td class="py-3 px-4 font-mono font-medium text-slate-600">CLI-003</td>
+<td class="py-3 px-4">
+<div class="font-semibold text-slate-900">Comercial Sur C.A.</div>
+<div class="text-[11px] text-slate-400">contacto@sur.com</div>
+</td>
+<td class="py-3 px-4 font-mono text-slate-500">J-00000000-0</td>
+<td class="py-3 px-4 font-mono text-slate-500">55-2222-3333</td>
+<td class="py-3 px-4 text-right font-mono text-slate-600">$ 10.000,00</td>
+<td class="py-3 px-4 text-right font-mono font-bold text-rose-600">$ 2.500,00</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+<i class="fa-solid fa-circle-exclamation text-[9px]"></i>
+<span>Con deuda</span>
+</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end space-x-2 text-slate-400">
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Ver ficha y estado de cuenta"><i class="fa-regular fa-eye"></i></button>
+<button class="hover:text-emerald-600 transition-colors p-1" title="Abonar / Cobro"><i class="fa-regular fa-credit-card"></i></button>
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Editar cliente"><i class="fa-solid fa-pencil"></i></button>
+<button class="hover:text-amber-600 transition-colors p-1" title="Historial movimientos"><i class="fa-solid fa-rotate-left"></i></button>
+<button class="hover:text-rose-600 transition-colors p-1" title="Desactivar"><i class="fa-solid fa-xmark"></i></button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Distribuidora del Norte S.A. -->
+<tr class="hover:bg-blue-50/40 transition-colors group">
+<td class="py-3 px-4 font-mono font-medium text-slate-600">CLI-001</td>
+<td class="py-3 px-4">
+<div class="font-semibold text-slate-900">Distribuidora del Norte S.A.</div>
+<div class="text-[11px] text-slate-400">ventas@norte.com</div>
+</td>
+<td class="py-3 px-4 font-mono text-slate-500">XAXX010101000</td>
+<td class="py-3 px-4 font-mono text-slate-500">55-1234-5678</td>
+<td class="py-3 px-4 text-right font-mono text-slate-600">$ 5.000,00</td>
+<td class="py-3 px-4 text-right font-mono font-bold text-rose-600">$ 32,48</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+<i class="fa-solid fa-circle-exclamation text-[9px]"></i>
+<span>Con deuda</span>
+</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end space-x-2 text-slate-400">
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Ver ficha y estado de cuenta"><i class="fa-regular fa-eye"></i></button>
+<button class="hover:text-emerald-600 transition-colors p-1" title="Abonar / Cobro"><i class="fa-regular fa-credit-card"></i></button>
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Editar cliente"><i class="fa-solid fa-pencil"></i></button>
+<button class="hover:text-amber-600 transition-colors p-1" title="Historial movimientos"><i class="fa-solid fa-rotate-left"></i></button>
+<button class="hover:text-rose-600 transition-colors p-1" title="Desactivar"><i class="fa-solid fa-xmark"></i></button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Juan Pérez Rodríguez -->
+<tr class="hover:bg-blue-50/40 transition-colors group">
+<td class="py-3 px-4 font-mono font-medium text-slate-600">CLI-002</td>
+<td class="py-3 px-4">
+<div class="font-semibold text-slate-900">Juan Pérez Rodríguez</div>
+<div class="text-[11px] text-slate-400">juan.perez@email.com</div>
+</td>
+<td class="py-3 px-4 font-mono text-slate-500">V-12345678</td>
+<td class="py-3 px-4 font-mono text-slate-500">55-8765-4321</td>
+<td class="py-3 px-4 text-right font-mono text-slate-600">$ 3.000,00</td>
+<td class="py-3 px-4 text-right font-mono font-bold text-emerald-600">$ 0,00</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span>Al día</span>
+</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end space-x-2 text-slate-400">
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Ver ficha y estado de cuenta"><i class="fa-regular fa-eye"></i></button>
+<button class="hover:text-emerald-600 transition-colors p-1" title="Abonar / Cobro"><i class="fa-regular fa-credit-card"></i></button>
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Editar cliente"><i class="fa-solid fa-pencil"></i></button>
+<button class="hover:text-amber-600 transition-colors p-1" title="Historial movimientos"><i class="fa-solid fa-rotate-left"></i></button>
+<button class="hover:text-rose-600 transition-colors p-1" title="Desactivar"><i class="fa-solid fa-xmark"></i></button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Supermercados El Ahorro S.R.L. -->
+<tr class="hover:bg-blue-50/40 transition-colors group">
+<td class="py-3 px-4 font-mono font-medium text-slate-600">CLI-004</td>
+<td class="py-3 px-4">
+<div class="font-semibold text-slate-900">Supermercados El Ahorro S.R.L.</div>
+<div class="text-[11px] text-slate-400">pagos@elahorro.com.ve</div>
+</td>
+<td class="py-3 px-4 font-mono text-slate-500">J-30491823-1</td>
+<td class="py-3 px-4 font-mono text-slate-500">55-9012-3456</td>
+<td class="py-3 px-4 text-right font-mono text-slate-600">$ 15.000,00</td>
+<td class="py-3 px-4 text-right font-mono font-bold text-emerald-600">$ 0,00</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span>Al día</span>
+</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end space-x-2 text-slate-400">
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Ver ficha y estado de cuenta"><i class="fa-regular fa-eye"></i></button>
+<button class="hover:text-emerald-600 transition-colors p-1" title="Abonar / Cobro"><i class="fa-regular fa-credit-card"></i></button>
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Editar cliente"><i class="fa-solid fa-pencil"></i></button>
+<button class="hover:text-amber-600 transition-colors p-1" title="Historial movimientos"><i class="fa-solid fa-rotate-left"></i></button>
+<button class="hover:text-rose-600 transition-colors p-1" title="Desactivar"><i class="fa-solid fa-xmark"></i></button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Farmacia Central & Salud C.A. -->
+<tr class="hover:bg-blue-50/40 transition-colors group">
+<td class="py-3 px-4 font-mono font-medium text-slate-600">CLI-005</td>
+<td class="py-3 px-4">
+<div class="font-semibold text-slate-900">Farmacia Central &amp; Salud C.A.</div>
+<div class="text-[11px] text-slate-400">compras@farmaciacentral.com</div>
+</td>
+<td class="py-3 px-4 font-mono text-slate-500">J-40112938-4</td>
+<td class="py-3 px-4 font-mono text-slate-500">55-4433-2211</td>
+<td class="py-3 px-4 text-right font-mono text-slate-600">$ 8.000,00</td>
+<td class="py-3 px-4 text-right font-mono font-bold text-rose-600">$ 1.120,00</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+<i class="fa-solid fa-circle-exclamation text-[9px]"></i>
+<span>Con deuda</span>
+</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end space-x-2 text-slate-400">
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Ver ficha y estado de cuenta"><i class="fa-regular fa-eye"></i></button>
+<button class="hover:text-emerald-600 transition-colors p-1" title="Abonar / Cobro"><i class="fa-regular fa-credit-card"></i></button>
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Editar cliente"><i class="fa-solid fa-pencil"></i></button>
+<button class="hover:text-amber-600 transition-colors p-1" title="Historial movimientos"><i class="fa-solid fa-rotate-left"></i></button>
+<button class="hover:text-rose-600 transition-colors p-1" title="Desactivar"><i class="fa-solid fa-xmark"></i></button>
+</div>
+</td>
+</tr>
+<!-- Row 6: María Carmen Delgado -->
+<tr class="hover:bg-blue-50/40 transition-colors group">
+<td class="py-3 px-4 font-mono font-medium text-slate-600">CLI-006</td>
+<td class="py-3 px-4">
+<div class="font-semibold text-slate-900">María Carmen Delgado</div>
+<div class="text-[11px] text-slate-400">m.delgado@corporativo.com</div>
+</td>
+<td class="py-3 px-4 font-mono text-slate-500">V-18765432</td>
+<td class="py-3 px-4 font-mono text-slate-500">55-7788-9900</td>
+<td class="py-3 px-4 text-right font-mono text-slate-600">$ 2.500,00</td>
+<td class="py-3 px-4 text-right font-mono font-bold text-emerald-600">$ 0,00</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span>Al día</span>
+</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end space-x-2 text-slate-400">
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Ver ficha y estado de cuenta"><i class="fa-regular fa-eye"></i></button>
+<button class="hover:text-emerald-600 transition-colors p-1" title="Abonar / Cobro"><i class="fa-regular fa-credit-card"></i></button>
+<button class="hover:text-[#0067c0] transition-colors p-1" title="Editar cliente"><i class="fa-solid fa-pencil"></i></button>
+<button class="hover:text-amber-600 transition-colors p-1" title="Historial movimientos"><i class="fa-solid fa-rotate-left"></i></button>
+<button class="hover:text-rose-600 transition-colors p-1" title="Desactivar"><i class="fa-solid fa-xmark"></i></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer / Pagination -->
+<div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-500 flex-shrink-0" data-purpose="table-footer-pagination">
+<!-- Records count -->
+<div>
+          Mostrando <strong class="text-slate-700">1–6</strong> de <strong class="text-slate-700">18</strong> registros
+        </div>
+<!-- Clarifying Accounting Notice -->
+<div class="hidden lg:block text-[11px] text-slate-400 italic">
+<i class="fa-solid fa-circle-info mr-1 text-slate-400"></i>
+          La deuda se aplica por orden de antigüedad y cada abono queda registrado en caja.
+        </div>
+<!-- Pagination Controls -->
+<div class="flex items-center space-x-1">
+<button class="px-2 py-1 rounded border border-slate-200 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled="">
+<i class="fa-solid fa-chevron-left text-[10px]"></i>
+</button>
+<button class="px-2.5 py-1 rounded border border-[#0067c0] bg-[#0067c0] text-white font-bold">1</button>
+<button class="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">2</button>
+<button class="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-700 hover:bg-slate-100">3</button>
+<button class="px-2 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100">
+<i class="fa-solid fa-chevron-right text-[10px]"></i>
+</button>
+</div>
+</div>
+</section>
+<!-- END: ClientDataGridSection -->
+</main>
+<!-- END: MainContentArea -->
+<!-- BEGIN: BottomStatusBar -->
+<!-- NovusPOS Windows Desktop Status Bar -->
+<footer class="h-7 bg-[#004c8c] text-white/90 px-4 flex items-center justify-between text-[11px] flex-shrink-0 select-none" data-purpose="system-status-bar">
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="font-medium">Turno de caja abierto</span>
+</div>
+<span class="text-white/40">|</span>
+<div class="text-white/80">
+        Terminal: <span class="font-mono font-semibold text-white">POS-01 (Principal)</span>
+</div>
+<span class="text-white/40">|</span>
+<div class="text-emerald-300 flex items-center space-x-1">
+<i class="fa-solid fa-cloud text-[10px]"></i>
+<span>Sincronizado con la nube</span>
+</div>
+</div>
+<div class="flex items-center space-x-4 text-white/80">
+<button class="hover:text-white transition-colors flex items-center space-x-1">
+<i class="fa-regular fa-comment-dots text-xs"></i>
+<span>Reportar un problema</span>
+</button>
+<span class="text-white/40">|</span>
+<div class="flex items-center space-x-1.5 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+<span id="current-datetime">dom, 22 nov. 2026 • 15:42</span>
+</div>
+</div>
+</footer>
+<!-- END: BottomStatusBar -->
+<script data-purpose="runtime-clock-and-interactivity">
+    // Interactive clock in status bar
+    function updateClock() {
+      const now = new Date();
+      const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+      const formatted = now.toLocaleDateString('es-ES', options).replace(',', '');
+      const el = document.getElementById('current-datetime');
+      if (el) el.textContent = formatted;
+    }
+    updateClock();
+    setInterval(updateClock, 30000);
+  </script>
+</body></html>

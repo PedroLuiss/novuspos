@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Los HTML de referencia en public/imagen/ no son parte de la UI: excluirlos
+   evita que Tailwind genere ~30 kB de utilidades huérfanas. */
+@source not "../public/imagen/*.html";
+
 /* ==========================================================================
    Material Symbols Outlined — fuente local (idéntica a Stitch, sin CDN)
    ========================================================================== */

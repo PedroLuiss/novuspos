@@ -51,8 +51,8 @@ export function ScreenshotCarousel() {
           <img
             src={slide.src}
             alt={index === active ? slide.alt : ''}
-            className="h-full w-full bg-white object-contain"
-            loading={index === 0 ? 'eager' : 'lazy'}
+            className={`h-full w-full bg-white ${slide.fit === 'cover' ? 'object-cover object-top' : 'object-contain'}`}
+            loading={index < 2 ? 'eager' : 'lazy'}
           />
         </div>
       ))}

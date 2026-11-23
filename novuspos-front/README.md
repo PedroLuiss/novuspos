@@ -43,6 +43,10 @@ public/
 ├── MaterialSymbolsOutlined.ttf                # iconos Material Symbols
 ├── novuspos-logo.png                          # logo del header y footer
 ├── imagen/novusposventa.png                   # captura del sistema en el carrusel del hero
+├── imagen/novuspos_producto.png               # captura del módulo de productos
+├── imagen/novuspos_kardex.png                 # captura del módulo de Kardex
+├── imagen/novus_caja.png                      # captura del módulo de caja
+├── imagen/novus_cliente.png                   # captura del módulo de clientes
 └── favicon.svg
 ```
 
@@ -56,7 +60,7 @@ La fuente visual de verdad es el **HTML + `tailwind.config`** de Stitch (`projec
 
 ### 🚨 Regla de Tailwind v4
 
-Los tokens se declaran en `@theme` con el namespace correcto; **no escribir utilidades a mano**:
+Los tokens se declaran en `@theme` con el namespace correcto; **no escribir utilidades a mano**. Tampoco quitar `@source not "../public/imagen/*.html";` de `src/index.css`: los HTML de referencia de Stitch en esa carpeta generaban ~30 kB de CSS huérfano al ser escaneados por Tailwind.
 
 | Namespace | Genera |
 | :--- | :--- |
@@ -84,6 +88,6 @@ Viewport de referencia: 1280px. Altura actual ≈4780px (hero de dos columnas; a
 
 El carrusel se muestra en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`): el texto queda a la izquierda y las capturas se suben desde el fondo hasta la parte superior derecha. En móvil se apilan (texto arriba, capturas abajo).
 
-Para activar el relevo, agrega más PNG en `public/imagen/` y una entrada `{ src, alt }` al array `screenshots` en `src/features/landing/data/landing-data.tsx`.
+El relevo ya está activo con cinco capturas, en orden de módulo: `novusposventa.png`, `novuspos_producto.png`, `novuspos_kardex.png`, `novus_caja.png` y `novus_cliente.png`. Las cuatro primeras usan `object-contain`; `novus_caja.png` es 1280×1384 (más alta que el contenedor 5:4) y lleva `fit: 'cover'` para mostrarse con `object-cover object-top`, sin bandas laterales. Para agregar más, coloca el PNG en `public/imagen/` y añade una entrada `{ src, alt }` al array `screenshots` en `src/features/landing/data/landing-data.tsx` (usa `fit: 'cover'` si la imagen es alta).
 
 > Antes de modificar, lee `.agents/skills/novuspos-web-landing/SKILL.md` y `novus-post/docs/context/09-LANDING-WEB.md`.

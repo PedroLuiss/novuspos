@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NovusPOS - Módulo de Kardex y Movimientos de Stock</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            fluent: {
+              bg: '#f3f4f6',
+              card: '#ffffff',
+              border: '#e5e7eb',
+              blue: '#0067c0',
+              blueHover: '#005aa3',
+              green: '#107c41',
+              greenBg: '#dff6dd',
+              red: '#d83b01',
+              redBg: '#fed9cc',
+              statusDark: '#004578'
+            }
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Segoe UI Variable Text', '-apple-system', 'BlinkMacSystemFont', 'Roboto', 'Helvetica Neue', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<!-- Typography & Global Custom Styles -->
+<style data-purpose="custom-layout">
+    body {
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+    /* Estilos de barra de desplazamiento para tabla */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  </style>
+</head>
+<body class="bg-[#f4f5f8] text-[#242424] font-sans h-screen flex flex-col overflow-hidden text-xs">
+<!-- BEGIN: MainHeader -->
+<!-- Barra superior estilo aplicación nativa Windows 11 Fluent UI -->
+<header class="bg-white border-b border-[#e5e7eb] px-4 py-1.5 flex items-center justify-between shrink-0" data-purpose="main-header">
+<!-- Logo e Identidad de Marca -->
+<div class="flex items-center space-x-2" data-purpose="brand-logo">
+<div class="flex items-center space-x-1.5">
+<div class="bg-[#0067c0] text-white font-black text-base px-2 py-0.5 rounded tracking-tighter shadow-sm flex items-center justify-center">
+          N
+        </div>
+<div class="flex flex-col leading-none">
+<span class="text-sm font-bold tracking-tight text-[#1b1b1b]">Novus<span class="text-[#0067c0]">POS</span></span>
+<span class="text-[9px] text-[#717171] font-normal">Diseñado para crecer contigo</span>
+</div>
+</div>
+</div>
+<!-- Indicadores Centrales y Acciones Rápidas -->
+<div class="flex items-center space-x-3" data-purpose="header-status-widgets">
+<!-- Indicador Caja Admin -->
+<div class="flex items-center bg-[#f0f9f3] text-[#107c41] px-2.5 py-1 rounded-full border border-[#c3e6cd] text-[11px] font-semibold space-x-1.5">
+<span class="inline-block w-2 h-2 rounded-full bg-[#107c41] animate-pulse"></span>
+<span>CAJA ADMIN</span>
+<span class="text-gray-400 font-normal">•</span>
+<span class="text-gray-600 font-medium">TURNO ACTIVO</span>
+</div>
+<!-- Widget Tasa BCV -->
+<div class="flex items-center bg-[#f9fafb] border border-[#e5e7eb] rounded px-2.5 py-1 space-x-2">
+<div class="flex flex-col text-right leading-none">
+<div class="flex items-center space-x-1">
+<span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">TASA BCV</span>
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+</div>
+<span class="text-[11px] font-bold text-gray-800">Bs. 918,77 <span class="text-[9px] font-normal text-amber-600">Desactualizada</span></span>
+</div>
+<button class="text-gray-500 hover:text-blue-600 border border-gray-300 rounded p-1 hover:bg-gray-100 transition" title="Actualizar tasa" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- Usuario y Sesión -->
+<div class="flex items-center space-x-2 pl-2">
+<div class="text-[11px] text-gray-700">
+          Admin: <span class="font-bold text-[#0067c0]">Admin Sistema</span>
+</div>
+<button class="flex items-center space-x-1 px-2 py-0.5 border border-gray-300 rounded bg-white hover:bg-gray-50 text-[10px] text-gray-700" type="button">
+<svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>LOCK</span>
+</button>
+<button class="flex items-center space-x-1 px-2.5 py-0.5 border border-red-200 rounded text-red-600 bg-red-50 hover:bg-red-100 text-[11px] font-medium transition" type="button">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Salir</span>
+</button>
+</div>
+</div>
+<!-- Controles de Ventana Windows 11 -->
+<div class="flex items-center space-x-3 text-gray-400 pl-4 border-l border-gray-200">
+<button class="hover:text-black">
+<svg class="w-3 h-3" fill="currentColor" viewbox="0 0 24 24"><path d="M19 13H5v-2h14v2z"></path></svg>
+</button>
+<button class="hover:text-black">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="16" stroke-width="2" width="16" x="4" y="4"></rect></svg>
+</button>
+<button class="hover:text-red-600">
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: NavigationTabs -->
+<!-- Pestañas de Navegación de NovusPOS -->
+<nav class="bg-white border-b border-[#e5e7eb] px-4 flex items-center space-x-1 shrink-0" data-purpose="module-navigation">
+<button class="py-2.5 px-3 font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent text-xs flex items-center space-x-1.5 transition" type="button">
+<span>Venta (POS)</span>
+<span class="text-[9px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded border border-gray-200">ALT+1</span>
+</button>
+<button class="py-2.5 px-3 font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent text-xs flex items-center space-x-1.5 transition" type="button">
+<span>Productos</span>
+<span class="text-[9px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded border border-gray-200">ALT+2</span>
+</button>
+<!-- Kardex: Pestaña Activa -->
+<button class="py-2.5 px-3 font-semibold text-[#0067c0] border-b-2 border-[#0067c0] text-xs flex items-center space-x-1.5 bg-blue-50/40" type="button">
+<span>Kardex</span>
+<span class="text-[9px] bg-blue-100 text-[#0067c0] px-1 py-0.5 rounded border border-blue-200 font-bold">ALT+3</span>
+</button>
+<button class="py-2.5 px-3 font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent text-xs flex items-center space-x-1.5 transition" type="button">
+<span>Caja</span>
+<span class="text-[9px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded border border-gray-200">ALT+4</span>
+</button>
+<button class="py-2.5 px-3 font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent text-xs flex items-center space-x-1.5 transition" type="button">
+<span>Clientes</span>
+<span class="text-[9px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded border border-gray-200">ALT+5</span>
+</button>
+<button class="py-2.5 px-3 font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent text-xs flex items-center space-x-1.5 transition" type="button">
+<span>Reportes</span>
+<span class="text-[9px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded border border-gray-200">ALT+6</span>
+</button>
+<button class="py-2.5 px-3 font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent text-xs flex items-center space-x-1.5 transition" type="button">
+<span>Ajustes</span>
+<span class="text-[9px] bg-gray-100 text-gray-500 px-1 py-0.5 rounded border border-gray-200">ALT+7</span>
+</button>
+</nav>
+<!-- END: NavigationTabs -->
+<!-- BEGIN: MainContentArea -->
+<main class="flex-1 flex flex-col p-4 space-y-3 overflow-hidden" data-purpose="kardex-main-container">
+<!-- Tarjetas de Métricas / KPI Cards -->
+<section class="grid grid-cols-4 gap-3 shrink-0" data-purpose="kpi-metrics-row">
+<!-- Tarjeta 1: Movimientos del Período -->
+<div class="bg-white border border-[#e5e7eb] rounded-md p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+<span class="text-[10px] font-bold text-gray-500 tracking-wider uppercase">MOVIMIENTOS DEL PERÍODO</span>
+<div class="my-0.5">
+<span class="text-3xl font-extrabold text-gray-800 tracking-tight">65</span>
+</div>
+<span class="text-[11px] text-gray-500">Registros encontrados en el filtro</span>
+</div>
+<!-- Tarjeta 2: Entradas -->
+<div class="bg-white border border-[#e5e7eb] rounded-md p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+<span class="text-[10px] font-bold text-[#107c41] tracking-wider uppercase flex items-center space-x-1">
+<span>↙ ENTRADAS</span>
+</span>
+<div class="my-0.5">
+<span class="text-3xl font-extrabold text-[#107c41] tracking-tight">1</span>
+</div>
+<span class="text-[11px] text-gray-500 truncate">50 Pieza (pza)</span>
+</div>
+<!-- Tarjeta 3: Salidas -->
+<div class="bg-white border border-[#e5e7eb] rounded-md p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+<span class="text-[10px] font-bold text-[#d83b01] tracking-wider uppercase flex items-center space-x-1">
+<span>↗ SALIDAS</span>
+</span>
+<div class="my-0.5">
+<span class="text-3xl font-extrabold text-[#d83b01] tracking-tight">64</span>
+</div>
+<span class="text-[11px] text-gray-500 truncate" title="8 Kilogramo (kg) • 8 Paquete (paq) • 63 Pieza (pza)">8 Kilogramo (kg) • 8 Paquete (paq) • 63 Pieza (pza)</span>
+</div>
+<!-- Tarjeta 4: Productos Afectados -->
+<div class="bg-white border border-[#e5e7eb] rounded-md p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+<span class="text-[10px] font-bold text-[#0067c0] tracking-wider uppercase flex items-center space-x-1">
+<span>PRODUCTOS AFECTADOS</span>
+</span>
+<div class="my-0.5">
+<span class="text-3xl font-extrabold text-[#0067c0] tracking-tight">16</span>
+</div>
+<span class="text-[11px] text-gray-500">Sin mezclar unidades incompatibles</span>
+</div>
+</section>
+<!-- Barra de Filtros y Búsqueda -->
+<section class="bg-white border border-[#e5e7eb] rounded-md p-2.5 flex items-center justify-between gap-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)] shrink-0" data-purpose="filters-bar">
+<!-- Buscador -->
+<div class="relative flex-1 max-w-md">
+<span class="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-gray-400">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</span>
+<input class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-300 rounded text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 focus:bg-white transition" placeholder="Buscar producto, código, ticket, lote o usuario..." type="text"/>
+</div>
+<!-- Selectores de Filtro y Botones de Acción -->
+<div class="flex items-center space-x-2">
+<!-- Rango de fecha -->
+<select class="text-xs bg-white border border-gray-300 rounded px-2.5 py-1.5 text-gray-700 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+<option>Mes actual (noviembre de 2026)</option>
+<option>Hoy</option>
+<option>Semana actual</option>
+<option>Rango personalizado...</option>
+</select>
+<!-- Filtro Tipo -->
+<select class="text-xs bg-white border border-gray-300 rounded px-2.5 py-1.5 text-gray-700 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+<option>Todos los tipos</option>
+<option>Entradas</option>
+<option>Salidas</option>
+</select>
+<!-- Filtro Motivo -->
+<select class="text-xs bg-white border border-gray-300 rounded px-2.5 py-1.5 text-gray-700 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+<option>Todos los motivos</option>
+<option>Venta POS</option>
+<option>Entrada Masiva</option>
+<option>Ajuste Manual</option>
+</select>
+<!-- Botón Actualizar -->
+<button class="flex items-center space-x-1.5 px-3 py-1.5 border border-gray-300 rounded bg-white hover:bg-gray-50 text-gray-700 font-medium transition text-xs shadow-sm" type="button">
+<svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Actualizar</span>
+</button>
+<!-- Botón Exportar -->
+<button class="flex items-center space-x-1.5 px-3 py-1.5 border border-[#107c41] rounded bg-[#f0f9f3] text-[#107c41] hover:bg-[#e2f4e8] font-medium transition text-xs shadow-sm" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Exportar</span>
+</button>
+</div>
+</section>
+<!-- BEGIN: DataGridSection -->
+<!-- Contenedor de la Tabla Principal / Kardex Inmutable -->
+<section class="flex-1 bg-white border border-[#e5e7eb] rounded-md shadow-sm flex flex-col overflow-hidden" data-purpose="kardex-datagrid">
+<!-- Tabla Scrollable -->
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse table-fixed text-[11px]" id="kardex-table">
+<thead class="bg-[#f8f9fa] border-b border-[#e5e7eb] sticky top-0 z-10 text-[10px] font-bold text-gray-600 uppercase tracking-wider">
+<tr>
+<th class="w-[12%] px-3 py-2">FECHA Y HORA</th>
+<th class="w-[10%] px-3 py-2">REFERENCIA</th>
+<th class="w-[20%] px-3 py-2">PRODUCTO</th>
+<th class="w-[8%] px-3 py-2">ORIGEN</th>
+<th class="w-[10%] px-3 py-2">TIPO / MOTIVO</th>
+<th class="w-[9%] px-3 py-2">LOTE</th>
+<th class="w-[6%] px-2 py-2 text-right">STOCK PREVIO</th>
+<th class="w-[5%] px-2 py-2 text-center">CAMBIO</th>
+<th class="w-[8%] px-2 py-2 text-right">STOCK FINAL</th>
+<th class="w-[6%] px-2 py-2 text-right">COSTO UNITARIO</th>
+<th class="w-[6%] px-2 py-2 text-right">COSTO TOTAL</th>
+<th class="w-[9%] px-3 py-2 text-center">RESPONSABLE</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#efefef] text-gray-700">
+<!-- Fila 1 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                22/11/26, 12:46:02 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                —
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Agua Mineral Peñafiel 600ml</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501071110030 • Pieza (pza)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Inventario
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#dff6dd] text-[#107c41] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#bfe7bf]">
+                  + ENTRADA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">ENTRADA MASIVA</div>
+</td>
+<td class="px-3 py-2 text-[10px] font-mono text-gray-600">
+                AJUSTE-2026-11-22
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                0
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#107c41]">
+                +50
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">50</span> <span class="text-[9.5px] text-gray-500 font-sans">Pieza (pza)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 12,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 600,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Admin Sistema
+                </span>
+</td>
+</tr>
+<!-- Fila 2 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                22/11/26, 10:32:23 a. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795357905351
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Aguacate Hass Extra</div>
+<div class="text-[9.5px] text-gray-500 font-mono">2000000000046 • Kilogramo (kg)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                17
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">16</span> <span class="text-[9.5px] text-gray-500 font-sans">Kilogramo (kg)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 48,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 48,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Admin Sistema
+                </span>
+</td>
+</tr>
+<!-- Fila 3 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 8:28:28 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795307300917
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Aceite Vegetal Nutrioli Puro de Soya 850ml</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501039120101 • Pieza (pza)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                35
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">34</span> <span class="text-[9.5px] text-gray-500 font-sans">Pieza (pza)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 38,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 38,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Admin Sistema
+                </span>
+</td>
+</tr>
+<!-- Fila 4 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 6:16:06 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795299348905
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Agua Mineral Peñafiel 600ml</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501071110030 • Pieza (pza)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-[10px] font-mono text-gray-600">
+                LOTE-2026-11-21
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                10
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -10
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">0</span> <span class="text-[9.5px] text-gray-500 font-sans">Pieza (pza)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 12,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 120,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Admin Sistema
+                </span>
+</td>
+</tr>
+<!-- Fila 5 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 5:33:37 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795296793859
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Rastrillos Desechables Prestobarba 2 Piezas</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501006546013 • Paquete (paq)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                27
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">26</span> <span class="text-[9.5px] text-gray-500 font-sans">Paquete (paq)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 27,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 27,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Pedro Rodriguez
+                </span>
+</td>
+</tr>
+<!-- Fila 6 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 5:33:37 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795296793859
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Salsa Cátsup Heinz 397g</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501043100113 • Pieza (pza)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                32
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">31</span> <span class="text-[9.5px] text-gray-500 font-sans">Pieza (pza)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 20,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 20,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Pedro Rodriguez
+                </span>
+</td>
+</tr>
+<!-- Fila 7 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 5:33:37 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795296793859
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Frijol Negro La Sierra 1kg</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501018310029 • Kilogramo (kg)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                42
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">41</span> <span class="text-[9.5px] text-gray-500 font-sans">Kilogramo (kg)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 29,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 29,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Pedro Rodriguez
+                </span>
+</td>
+</tr>
+<!-- Fila 8 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 5:33:37 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795296793859
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Pasta Dental Colgate Triple Acción 100ml</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501035913012 • Pieza (pza)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                37
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">36</span> <span class="text-[9.5px] text-gray-500 font-sans">Pieza (pza)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 19,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 19,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Pedro Rodriguez
+                </span>
+</td>
+</tr>
+<!-- Fila 9 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 5:33:37 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795296793859
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Donas Bimbo Espolvoreadas 105g</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501000111230 • Paquete (paq)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                27
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">26</span> <span class="text-[9.5px] text-gray-500 font-sans">Paquete (paq)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 17,00
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 17,00
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Pedro Rodriguez
+                </span>
+</td>
+</tr>
+<!-- Fila 10 -->
+<tr class="hover:bg-blue-50/30 transition">
+<td class="px-3 py-2 font-mono text-[10.5px] text-gray-600">
+                21/11/26, 5:33:37 p. m.
+              </td>
+<td class="px-3 py-2 font-mono text-[#0067c0] hover:underline cursor-pointer">
+                TK-1795296793859
+              </td>
+<td class="px-3 py-2">
+<div class="font-bold text-gray-900 leading-tight">Jabón de Tocador Palmolive Oliva 150g</div>
+<div class="text-[9.5px] text-gray-500 font-mono">7501035912015 • Pieza (pza)</div>
+</td>
+<td class="px-3 py-2 text-gray-600">
+                Venta POS
+              </td>
+<td class="px-3 py-2">
+<span class="inline-block bg-[#fed9cc] text-[#d83b01] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#f8b49f]">
+                  − SALIDA
+                </span>
+<div class="text-[9px] text-gray-500 uppercase mt-0.5 tracking-tighter">VENTA</div>
+</td>
+<td class="px-3 py-2 text-gray-400 font-mono">
+                —
+              </td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                57
+              </td>
+<td class="px-2 py-2 text-center font-mono font-bold text-[#d83b01]">
+                -1
+              </td>
+<td class="px-2 py-2 text-right font-mono">
+<span class="font-bold text-gray-900">56</span> <span class="text-[9.5px] text-gray-500 font-sans">Pieza (pza)</span>
+</td>
+<td class="px-2 py-2 text-right font-mono text-gray-700">
+                $ 12,50
+              </td>
+<td class="px-2 py-2 text-right font-mono font-bold text-gray-900">
+                $ 12,50
+              </td>
+<td class="px-3 py-2 text-center">
+<span class="bg-gray-100 text-gray-700 border border-gray-200 px-2 py-0.5 rounded text-[10px]">
+                  Pedro Rodriguez
+                </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pie de Tabla con Controles de Paginación -->
+<footer class="bg-white border-t border-[#e5e7eb] px-4 py-2 flex items-center justify-between text-xs shrink-0" data-purpose="table-pagination">
+<!-- Indicador de cantidad visible -->
+<div class="text-gray-500 font-normal">
+          Mostrando <span class="font-medium text-gray-800">1–50</span> de <span class="font-medium text-gray-800">65</span>
+</div>
+<!-- Paginador central -->
+<div class="flex items-center space-x-2">
+<div class="flex items-center space-x-1">
+<span class="text-gray-500">Filas</span>
+<select class="text-xs bg-white border border-gray-300 rounded px-2 py-0.5 text-gray-700 focus:outline-none">
+<option selected="">50</option>
+<option>100</option>
+<option>200</option>
+</select>
+</div>
+<div class="flex items-center space-x-1 pl-2">
+<button class="px-2.5 py-1 text-xs border border-gray-200 rounded text-gray-400 bg-gray-50 cursor-not-allowed" disabled="" type="button">
+              Anterior
+            </button>
+<span class="px-2 text-gray-600 font-medium">Página 1 de 2</span>
+<button class="px-2.5 py-1 text-xs border border-gray-300 rounded text-gray-700 bg-white hover:bg-gray-50 font-medium transition shadow-sm" type="button">
+              Siguiente
+            </button>
+</div>
+</div>
+<!-- Nota de Seguridad / BD SQLite -->
+<div class="text-gray-400 text-[11px] font-mono">
+          Historial inmutable • Base SQLite local
+        </div>
+</footer>
+</section>
+<!-- END: DataGridSection -->
+</main>
+<!-- END: MainContentArea -->
+<!-- BEGIN: BottomStatusBar -->
+<!-- Barra de estado inferior estilo Fluent Shell -->
+<footer class="bg-[#004578] text-white px-4 py-1 flex items-center justify-between text-[11px] font-medium shrink-0" data-purpose="bottom-status-bar">
+<div class="flex items-center space-x-2">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="tracking-wide">Turno de caja abierto</span>
+</div>
+<div class="flex items-center space-x-3 text-blue-100">
+<button class="hover:text-white flex items-center space-x-1 transition" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span>Reportar un problema</span>
+</button>
+<span>•</span>
+<span class="capitalize">dom, 22 nov. 2026</span>
+</div>
+</footer>
+<!-- END: BottomStatusBar -->
+</body></html>

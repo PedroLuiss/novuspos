@@ -101,6 +101,8 @@ src/
 
 **Síntoma real de este bug:** tarjetas sin padding y página ~25 % más corta que Stitch (4172px vs 5350px). Al corregir los namespaces quedó en 5292px. Además, las utilidades escritas a mano bloquean modificadores de opacidad (`bg-primary-fixed/40`).
 
+**Segundo bug (escaneo de HTML de referencia):** Tailwind v4 escanea por defecto `public/imagen/module_*.html` y generaba ~30 kB de CSS huérfano (65 kB vs 34.5 kB). `src/index.css` los excluye con `@source not "../public/imagen/*.html";`; no eliminar esa línea.
+
 - Material Design 3 completo en `@theme` (`primary #003ec7`, `primary-container #0052ff`, `surface #f7f9fb`, `on-surface #191c1e`, `secondary #006c49`, etc.).
 - Tipografía: display 48/56, headline-lg 36/44, headline-md 24/32, headline-sm 20/28, body-lg 16/24, body-md 14/20, body-sm 12/16, label-md 13/18, label-sm 11/14 (JetBrains Mono), numeric-total 32/38, numeric-keypad 20/26.
 - Espaciado: `space-xl` 2.5rem · `space-lg` 1.5rem · `space-md` 1rem · `space-sm` .5rem · `space-xs` .25rem · `margin` 1.5rem.
@@ -123,7 +125,7 @@ src/
    - Respeta `prefers-reduced-motion`.
    - El ancla `#interfaz-en-vivo` se conserva, ahora en la **columna derecha del hero**: `HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`, con el copy alineado a la izquierda en desktop y el carrusel subido desde el fondo. En móvil se apila con `mt-space-lg`.
 
-   Para agregar capturas: copiar el PNG a `public/imagen/` y añadir un objeto `{ src, alt }` al array `screenshots` en `landing-data.tsx`. Con una sola imagen no hay relevo visible, pero el componente ya está preparado. `ProductCard.tsx` y los mocks del carrito quedaron sin uso (no eliminados por si se requieren después).
+   Para agregar capturas: copiar el PNG a `public/imagen/` y añadir un objeto `{ src, alt }` al array `screenshots` en `landing-data.tsx`. Capturas actuales (5, en orden de módulo): `novusposventa.png` (1600×1280, ventas), `novuspos_producto.png` (1280×1053, productos), `novuspos_kardex.png` (1600×1280, Kardex), `novus_caja.png` (1280×1384, caja) y `novus_cliente.png` (1600×1280, clientes). El relevo de 4s rota sobre todas; las dos primeras se cargan con `loading="eager"` y el resto con `lazy`. `ScreenshotSlide` admite `fit?: 'contain' | 'cover'`: `novus_caja.png` (1280×1384) usa `fit: 'cover'` con `object-cover object-top` para llenar el contenedor 5:4 sin bandas laterales (recorta la parte baja y conserva la cabecera); el resto usa `object-contain`. `ProductCard.tsx` y los mocks del carrito quedaron sin uso (no eliminados por si se requieren después).
 
 3. **Copy verificado contra el sistema real (pedido explícito):** el HTML de Stitch contenía afirmaciones falsas o no verificables. Prevalece `novus-post/docs/context/`:
    - Atajos `F1-F7` → navegación real `ALT+1`…`ALT+7`; `F12` es Cobro Estándar (no "Cobro Mixto", que es `F8`).

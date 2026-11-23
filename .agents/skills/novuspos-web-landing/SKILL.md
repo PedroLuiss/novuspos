@@ -88,6 +88,8 @@ Pantalla: `screens/82fef7e6f4a148cabdc44a42ef4d5ac6` — **"NovusPOS - Landing P
 
 **Síntoma típico de este bug:** las tarjetas se ven "pegadas" al borde, sin padding, y la página queda ~25 % más corta que Stitch. Pasó exactamente eso (4172px vs 5350px); al corregir los namespaces quedó en 5292px.
 
+**Segundo bug de Tailwind v4: escaneo de HTML de referencia.** Por defecto Tailwind escanea todos los archivos del proyecto, incluidos `public/imagen/module_*.html`, y genera utilidades huérfanas: el CSS pasó de 34.5 kB a 65 kB al agregar esos archivos. `src/index.css` excluye esa carpeta con `@source not "../public/imagen/*.html";`. No quitar esa línea; las clases de la landing se generan igual desde `src/`.
+
 **Auditoría rápida** de clases usadas vs. generadas:
 ```bash
 node -e "const c=require('fs').readFileSync('dist/assets/'+require('fs').readdirSync('dist/assets').find(f=>f.endsWith('.css')),'utf8');['.p-space-lg{','.px-margin{','.gap-space-md{'].forEach(s=>console.log(s,c.includes(s)?'OK':'MISSING'))"
@@ -195,19 +197,26 @@ Verificación rápida del layout del hero a 1280px: `#interfaz-en-vivo` debe que
 - La tarjeta activa: `z-20 opacity-100` + `rotateX(15deg) rotateY(-15deg) rotateZ(5deg) translateZ(0)`.
 - La inactiva: `z-10 opacity-30` + `translateZ(-180px) translateY(-90px) translateX(110px)`.
 - Ambas con `transition-all duration-1000 ease-in-out`: la de arriba se oculta suavemente y la de abajo pasa al frente.
-- Contenedor `[transform-style:preserve-3d] [perspective:1200px]`, `max-w-5xl aspect-[5/4]` (la imagen fuente es 1600×1280).
+- Contenedor `[transform-style:preserve-3d] [perspective:1200px]`, `max-w-5xl aspect-[5/4]`; las capturas actuales son 1600×1280 y 1280×1053 y se ajustan con `object-contain`.
+- Las dos primeras capturas se cargan con `loading="eager"` para que el relevo de 4s no muestre un hueco; el resto con `lazy`.
 - Se respeta `prefers-reduced-motion` (no autodesplaza).
 
-**Para agregar capturas:** coloca el PNG en `public/imagen/` y añade una entrada al array `screenshots` en `landing-data.tsx`:
+**Capturas actuales (5):** `/imagen/novusposventa.png` (ventas), `/imagen/novuspos_producto.png` (productos), `/imagen/novuspos_kardex.png` (Kardex), `/imagen/novus_caja.png` (caja) y `/imagen/novus_cliente.png` (clientes), en ese orden. El relevo de 4s rota sobre todas. `ScreenshotSlide` admite `fit?: 'contain' | 'cover'`: por defecto `object-contain`, pero `novus_caja.png` (1280×1384, más alta que el contenedor 5:4) usa `fit: 'cover'` → `object-cover object-top` para llenar el recorte sin dejar bandas laterales; se recorta la parte baja, no la cabecera. Si se agrega otra captura alta, usar el mismo `fit: 'cover'`.
+
+**Para agregar más:** coloca el PNG en `public/imagen/` y añade una entrada al array `screenshots` en `landing-data.tsx`:
 
 ```tsx
 export const screenshots: ScreenshotSlide[] = [
   { src: '/imagen/novusposventa.png', alt: 'Terminal de ventas NovusPOS' },
-  { src: '/imagen/novuspos-inventario.png', alt: 'Catálogo e inventario' }, // ← nueva
+  { src: '/imagen/novuspos_producto.png', alt: 'Catálogo e inventario' },
+  { src: '/imagen/novuspos_kardex.png', alt: 'Kardex y auditoría' },
+  { src: '/imagen/novus_caja.png', alt: 'Caja y corte Z', fit: 'cover' },
+  { src: '/imagen/novus_cliente.png', alt: 'Clientes y créditos' },
+  { src: '/imagen/nueva-captura.png', alt: 'Nueva captura' }, // ← nueva
 ]
 ```
 
-Con una sola imagen el efecto no se aprecia (no hay relevo), pero el componente ya está listo. El ancla `#interfaz-en-vivo` se conserva en el contenedor del carrusel, ahora ubicado en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`; en móvil el carrusel baja con `mt-space-lg`).
+El ancla `#interfaz-en-vivo` se conserva en el contenedor del carrusel, ahora ubicado en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`; en móvil el carrusel baja con `mt-space-lg`).
 
 ---
 

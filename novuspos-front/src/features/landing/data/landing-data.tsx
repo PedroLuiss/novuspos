@@ -291,16 +291,35 @@ export const mockCartRows: MockCartRow[] = [
 export interface ScreenshotSlide {
   src: string
   alt: string
+  /** `cover` para capturas más altas que el contenedor 5:4 (recorta abajo). */
+  fit?: 'contain' | 'cover'
 }
 
 /**
- * Capturas del sistema NovusPOS (carpeta `public/imagen/`).
- * Agrega aquí más entradas con el mismo formato para activar el relevo entre
- * la imagen de arriba y la de abajo; el carrusel las alterna automáticamente.
+ * Capturas del sistema NovusPOS (carpeta `public/imagen/`), en orden de módulo:
+ * ventas → productos → Kardex → caja → clientes. El carrusel las alterna cada
+ * 4s; agrega más entradas con el mismo formato para ampliar la rotación.
  */
 export const screenshots: ScreenshotSlide[] = [
   {
     src: '/imagen/novusposventa.png',
     alt: 'Terminal de ventas NovusPOS Desktop: catálogo, carrito, báscula RS-232 y cobro rápido',
+  },
+  {
+    src: '/imagen/novuspos_producto.png',
+    alt: 'Módulo de productos NovusPOS Desktop: catálogo e inventario con stock y precios',
+  },
+  {
+    src: '/imagen/novuspos_kardex.png',
+    alt: 'Módulo de Kardex NovusPOS Desktop: auditoría y trazabilidad de movimientos de inventario',
+  },
+  {
+    src: '/imagen/novus_caja.png',
+    alt: 'Módulo de caja NovusPOS Desktop: turno, arqueo de efectivo y corte Z',
+    fit: 'cover',
+  },
+  {
+    src: '/imagen/novus_cliente.png',
+    alt: 'Módulo de clientes NovusPOS Desktop: directorio, créditos y abonos',
   },
 ]
