@@ -273,7 +273,7 @@ La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión c
 
 | Antes (Stitch) | Ahora (sistema real) | Fuente |
 | :--- | :--- | :--- |
-| "Para Windows 11 / 10 x64" | "Para Windows 11 (64 bits) Desktop" (Windows 10 no está documentado; alineado con la FAQ corregida) | 00 §1/§3.7 |
+| "Para Windows 11 / 10 x64" | "Para Windows 10 o Windows 11" (Windows 10 reincorporado en §14.1: Electron 39 lo admite) | `novus-post/package.json`, `electron-builder.yml` |
 | "SQLite integrada de ultra-alto rendimiento" | "SQLite integrada y operación offline-first" | 00 §1 |
 | "Productos y transacciones ilimitadas sin ralentización" | "Catálogo y transacciones sin costos por volumen ni comisiones" | — (claims de precio, no de rendimiento) |
 | "Impresoras térmicas ESC/POS de 58/80mm y cajón de dinero" | "Básculas RS-232 (Torrey, Rhino, Dibal) y tickets PDF 80/58mm; ESC/POS y gaveta aún no integrados" | 08 §1/§6, 02 §4 |
@@ -313,11 +313,21 @@ El criterio actual de **toda la landing** es explicar *qué puede hacer el negoc
 | Datos sin internet | "SQLite nativo en modo WAL", "transacción atómica persistida", "se guarda en el ordenado" | "Todo queda registrado al momento y sigue disponible cuando vuelves a abrir el programa, incluso sin conexión" |
 | Básculas | "pendiente de validación física", "puerto COM y baudios persistidos" | "Toma el peso directamente en la venta, sin digitar los gramos. Compatible con Torrey, Rhino y Dibal" |
 | Impresión | "aún no están integrados", "no ESC/POS ni ZPL" | "Tickets en 80 mm, 58 mm o carta, listos para descargar" |
-| Requisitos | "No hay cifras oficiales de CPU, RAM o espacio en disco" | "Una computadora con Windows 11 y conexión solo para descargar e iniciar sesión" |
+| Requisitos | "No hay cifras oficiales de CPU, RAM o espacio en disco" | "NovusPOS funciona en Windows 10 y Windows 11 (en computadoras de 64 bits), así que no necesitas la versión más reciente para empezar" |
 | Seguridad | "Respaldo verificado con SHA-256 en la carpeta de datos" | "Respaldos de tu información y restauración cuando lo necesites" |
 | Footer | "Servidores Cloud Sincronizados", "Certificación Fiscal", "Drivers OPOS", "arquitectura Windows x64", "Mesa de Ayuda 24/7" | "Tu negocio, siempre disponible", "Protección de datos", "Centro de ayuda", "Básculas y periféricos" |
 
 Titulares vigentes: hero `rápido, confiable y siempre disponible`; características `PENSADO PARA TU DÍA A DÍA` / `Todo para vender, controlar tu inventario y cerrar el día con confianza`; comparativa `NOVUSPOS FRENTE A UN POS EN NUBE` / `¿Por qué elegir NovusPOS para tu negocio?`. Los atajos `'Modal de pago'` y `'1-Click ticket directo'` pasaron a `'Ventana de cobro'` y `'Cobro en un clic'`.
 
 > Regla: se mantiene la **veracidad funcional** (no se afirma impresión térmica conectada ni rendimiento inventado), pero se expresa en lenguaje de negocio. Si en el futuro se sincroniza con Stitch, **no restaurar** ninguno de estos textos. `Kbd` ya no se importa en `landing-data.tsx`: las descripciones de tarjetas son prosa, sin atajos inline.
+
+### 14.1 Compatibilidad con Windows (excepción a "solo Windows 11")
+
+El FAQ `¿Qué necesito para empezar?` y la línea de `Pricing` indican **Windows 10 o Windows 11**. Evidencia verificada en el proyecto de escritorio `novus-post/`:
+
+- `package.json`: `electron: ^39.2.6` (resuelto `39.8.10` en `package-lock.json`). El README oficial de Electron 39 indica: *"Windows (Windows 10 and up)"* y que el soporte para Windows 7/8/8.1 se eliminó en Electron 23.
+- `electron-builder.yml`: `nsis.artifactName: NovusPOS-Setup-${version}-x64.exe` → instalador de **64 bits**.
+- No hay ningún chequeo en el código que exija Windows 11; "Windows 11 Fluent Design / WinUI 3" en los contextos 00 y AGENTS.md es **estilo visual**, no requisito de sistema operativo.
+
+Por eso el texto dice que no hace falta la versión más reciente, pero **no menciona Windows 7/8/8.1** (no son compatibles). Si cambia la versión de Electron o el target del instalador, revisar este apartado antes de tocar el copy.
 

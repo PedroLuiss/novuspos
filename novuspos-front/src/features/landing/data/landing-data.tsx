@@ -213,7 +213,7 @@ export const faqs: Faq[] = [
     iconTone: 'neutral',
     question: '¿Qué necesito para empezar?',
     answer:
-      'Una computadora con Windows 11 y conexión a internet solo para descargar e iniciar sesión. Después puedes trabajar sin conexión. El programa se abre maximizado y funciona cómodamente desde 960 × 600 px.',
+      'NovusPOS funciona en Windows 10 y Windows 11 (en computadoras de 64 bits), así que no necesitas la versión más reciente para empezar. Solo necesitas internet para descargar el instalador e iniciar sesión la primera vez; después puedes trabajar sin conexión. El programa se abre maximizado y funciona cómodamente desde 960 × 600 px.',
   },
 ]
 

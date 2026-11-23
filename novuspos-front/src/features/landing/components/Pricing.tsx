@@ -28,7 +28,7 @@ export function Pricing() {
                 Licencia Profesional NovusPOS
               </span>
               <span className="font-body-sm text-body-sm text-on-surface-variant">
-                Para Windows 11
+                Para Windows 10 o Windows 11
               </span>
             </div>
             <div className="mt-space-sm sm:mt-0 text-left sm:text-right">
