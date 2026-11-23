@@ -21,6 +21,8 @@ interface ProductPricingFieldsProps {
   canDeleteProduct: boolean
   /** El stock de un producto con lotes se gestiona desde Lotes y Caducidad. */
   stockManagedByBatches?: boolean
+  /** Los servicios no controlan existencias y no deben capturar stock. */
+  tracksStock?: boolean
 }
 
 const PRESET_MARGINS = [10, 15, 20, 25, 30, 50]
@@ -36,7 +38,8 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
   canModifyPrice,
   canAdjustStock,
   canDeleteProduct,
-  stockManagedByBatches = false
+  stockManagedByBatches = false,
+  tracksStock = true
 }) => {
   const { config } = useBusinessConfig()
   const quantityStep = getProductQuantityStep(values.unit)
@@ -113,10 +116,11 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
                 type="button"
                 onClick={() => setProfitMarginPercent(pct)}
                 disabled={pricingDisabled}
-                className={`px-2.5 py-0.5 text-[11px] font-semibold rounded-[4px] border transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${isSelected
-                  ? 'bg-[#107C41] text-white border-[#107C41] shadow-2xs'
-                  : 'bg-white hover:bg-emerald-50 text-slate-700 border-slate-300'
-                  }`}
+                className={`px-2.5 py-0.5 text-[11px] font-semibold rounded-[4px] border transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${
+                  isSelected
+                    ? 'bg-[#107C41] text-white border-[#107C41] shadow-2xs'
+                    : 'bg-white hover:bg-emerald-50 text-slate-700 border-slate-300'
+                }`}
               >
                 +{pct}%
               </button>
@@ -150,8 +154,8 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
         <div className="mt-2 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[11px] text-slate-600">
           <span>
             Fórmula: {formatCurrency(values.costPrice, config.currency)} costo +{' '}
-            {formatCurrency(marginDollar, config.currency)} (
-            {values.profitMarginPercent.toFixed(1)}%)
+            {formatCurrency(marginDollar, config.currency)} ({values.profitMarginPercent.toFixed(1)}
+            %)
           </span>
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-slate-400">¿Ajuste directo?</span>
@@ -167,7 +171,7 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
         </div>
       </div>
 
-      {/* Stock y mínimo */}
+      {/* Stock y mínimo (los servicios no manejan existencias) */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-medium text-slate-700 mb-1">Stock Inicial</label>
@@ -177,14 +181,26 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
             step={quantityStep}
             value={values.stock}
             onChange={(e) => update('stock', Number(e.target.value))}
-            disabled={!canAdjustStock || stockManagedByBatches}
-            title={stockManagedByBatches ? 'El stock se gestiona desde Lotes y Caducidad' : undefined}
+            disabled={!tracksStock || !canAdjustStock || stockManagedByBatches}
+            title={
+              !tracksStock
+                ? 'Los servicios no manejan existencias'
+                : stockManagedByBatches
+                  ? 'El stock se gestiona desde Lotes y Caducidad'
+                  : undefined
+            }
             className="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-[4px] focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0] disabled:bg-slate-100 disabled:text-slate-500"
           />
-          {stockManagedByBatches && (
+          {!tracksStock ? (
             <span className="block text-[10px] text-slate-500 mt-1">
-              Se gestiona desde Lotes y Caducidad.
+              Los servicios no manejan existencias.
             </span>
+          ) : (
+            stockManagedByBatches && (
+              <span className="block text-[10px] text-slate-500 mt-1">
+                Se gestiona desde Lotes y Caducidad.
+              </span>
+            )
           )}
         </div>
         <div>
@@ -195,7 +211,8 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
             step={quantityStep}
             value={values.minStock}
             onChange={(e) => update('minStock', Number(e.target.value))}
-            className="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-[4px] focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0]"
+            disabled={!tracksStock}
+            className="w-full px-3 py-1.5 text-xs font-mono bg-white border border-slate-300 rounded-[4px] focus:border-[#0067C0] focus:ring-1 focus:ring-[#0067C0] disabled:bg-slate-100 disabled:text-slate-500"
           />
         </div>
       </div>
@@ -219,12 +236,14 @@ export const ProductPricingFields: React.FC<ProductPricingFieldsProps> = ({
           type="button"
           onClick={() => update('active', !values.active)}
           disabled={!canDeleteProduct}
-          className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-50 ${values.active ? 'bg-[#0067C0]' : 'bg-slate-300'
-            }`}
+          className={`relative inline-flex h-5 w-10 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out disabled:cursor-not-allowed disabled:opacity-50 ${
+            values.active ? 'bg-[#0067C0]' : 'bg-slate-300'
+          }`}
         >
           <span
-            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${values.active ? 'translate-x-5' : 'translate-x-0'
-              }`}
+            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+              values.active ? 'translate-x-5' : 'translate-x-0'
+            }`}
           />
         </button>
       </div>

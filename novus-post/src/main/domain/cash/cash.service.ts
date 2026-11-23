@@ -220,6 +220,7 @@ export class CashService {
 
   /**
    * Repone el stock de una línea devuelta.
+   * - Servicio: no repone nada (nunca descontó stock ni generó Kardex al cobrar).
    * - Combo: repone sus COMPONENTES (fueron los que se descontaron al cobrar),
    *   no el producto combo (que nunca se descontó).
    * - Producto con lotes: repone los lotes exactos descontados en la venta;
@@ -232,6 +233,9 @@ export class CashService {
     ticketNumber: string,
     currency: KardexMovement['currency']
   ): void {
+    const soldProduct = this.products.findById(item.productId)
+    if (soldProduct?.trackStock === false) return
+
     if (item.isCombo && item.comboId) {
       const components = this.combos
         .findByComboId(item.comboId)

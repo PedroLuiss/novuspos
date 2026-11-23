@@ -651,7 +651,10 @@ export const POSView: React.FC<POSViewProps> = ({
                     const discountedTotal = rawLineTotal * (1 - item.discountPercent / 100)
                     const hasTierDiscount = effectiveUnitPrice < item.product.salePrice
                     const isSelected = selectedCartItemId === item.product.id
-                    const isOverStock = item.quantity > item.product.stock
+                    // Los servicios (trackStock = false) no controlan existencias:
+                    // nunca deben mostrar alerta de stock insuficiente en el carrito.
+                    const isOverStock =
+                      item.product.trackStock !== false && item.quantity > item.product.stock
 
                     return (
                       <tr

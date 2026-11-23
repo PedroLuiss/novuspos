@@ -48,6 +48,11 @@ export class ProductBatchService {
 
     const product = this.products.findById(normalized.productId)
     if (!product || product.deleted) throw new ValidationError('El producto no existe')
+    if (product.trackStock === false) {
+      throw new ValidationError(
+        `"${product.name}" es un servicio y no maneja stock; no se pueden registrar lotes.`
+      )
+    }
 
     const duplicate = this.batches
       .findByProductId(normalized.productId, false)

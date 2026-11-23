@@ -66,8 +66,9 @@ export const ProductRows: React.FC<ProductRowsProps> = ({
             </tr>
           ) : (
             products.map((p) => {
-              const isLow = p.stock > 0 && p.stock <= p.minStock
-              const isOut = p.stock === 0
+              const isService = p.trackStock === false
+              const isLow = !isService && p.stock > 0 && p.stock <= p.minStock
+              const isOut = !isService && p.stock === 0
               const isSelected = selectedProductId === p.id
               const isDeleting = deletingProductId === p.id
 
@@ -123,19 +124,29 @@ export const ProductRows: React.FC<ProductRowsProps> = ({
                   </td>
 
                   <td className="py-2 px-3 text-center font-mono font-bold">
-                    <span
-                      className={
-                        isOut ? 'text-[#C42B1C]' : isLow ? 'text-amber-600' : 'text-[#1B1B1B]'
-                      }
-                    >
-                      {p.stock}
-                    </span>
-                    <span className="text-[10px] font-normal text-[#717783] ml-1">
-                      {p.unit.split(' ')[0]}
-                    </span>
+                    {isService ? (
+                      <span className="text-[10px] font-semibold text-[#0067C0] bg-blue-50 border border-blue-200 rounded-[3px] px-1.5 py-0.5">
+                        Servicio
+                      </span>
+                    ) : (
+                      <>
+                        <span
+                          className={
+                            isOut ? 'text-[#C42B1C]' : isLow ? 'text-amber-600' : 'text-[#1B1B1B]'
+                          }
+                        >
+                          {p.stock}
+                        </span>
+                        <span className="text-[10px] font-normal text-[#717783] ml-1">
+                          {p.unit.split(' ')[0]}
+                        </span>
+                      </>
+                    )}
                   </td>
 
-                  <td className="py-2 px-3 text-center font-mono text-[#717783]">{p.minStock}</td>
+                  <td className="py-2 px-3 text-center font-mono text-[#717783]">
+                    {isService ? '—' : p.minStock}
+                  </td>
 
                   <td className="py-2 px-3 text-center">
                     {p.taxRate === undefined ? (

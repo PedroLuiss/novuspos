@@ -50,8 +50,16 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
   const product = savedProduct ?? initialProduct ?? null
   const persistedTypeKind =
     types.find((type) => type.id === product?.typeId)?.kind ?? product?.typeKind
+  const selectedTypeKind =
+    types.find((type) => type.id === values.typeId)?.kind ?? persistedTypeKind
+  const isService = selectedTypeKind === 'service'
   const isCombo = persistedTypeKind === 'combo'
   const canEditProduct = hasPermission(user, 'CAN_EDIT_PRODUCT')
+
+  React.useEffect(() => {
+    if (isService && values.trackBatches) update('trackBatches', false)
+  }, [isService, update, values.trackBatches])
+
   const canModifyPrice = hasPermission(user, 'CAN_MODIFY_PRICE')
   const canAdjustStock = hasPermission(user, 'CAN_ADJUST_STOCK')
   const canDeleteProduct = hasPermission(user, 'CAN_DELETE_PRODUCT')
@@ -142,6 +150,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
                 canAdjustStock={canAdjustStock}
                 canDeleteProduct={canDeleteProduct}
                 stockManagedByBatches={Boolean(product) && values.trackBatches}
+                tracksStock={!isService}
               />
             </div>
 
@@ -161,7 +170,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
                     onVariantAttrsChange={(json) => update('variantAttrs', json)}
                   />
                 )}
-                {canAdjustStock && !product.parentId && (
+                {canAdjustStock && !isService && !product.parentId && (
                   <BatchEditor
                     productId={product.id}
                     productName={product.name}
