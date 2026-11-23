@@ -22,6 +22,8 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 > ⚠️ **Excepción 6 (tono comercial positivo):** todo el copy se reescribió para que hable de beneficios comprensibles para quien va a usar el sistema. No reintroducir detalles internos (SQLite, WAL, transacciones, `append-only`, `soft delete`, `SHA-256`, RS-232, COM/baudios) ni frases restrictivas ("pendiente de validación", "aún no integrados", "no hay cifras oficiales"). Ver §14.
 >
 > ⚠️ **Excepción 7 (sección de productos):** se añadió `ProductCatalog` (`#productos`) entre `KeyFeatures` y la comparativa. No está en el HTML de Stitch; sale del módulo real `inventory` de `novus-post`. Ver §15.
+>
+> ⚠️ **Excepción 8 (vistas de auth):** se replicó la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" como `#/auth` y `#/auth/login`. Layout idéntico; copy auditado con las reglas §14/§14.2. Ver §16.
 
 ---
 
@@ -105,7 +107,18 @@ node -e "const c=require('fs').readFileSync('dist/assets/'+require('fs').readdir
 
 ```text
 src/
+├── App.tsx                             # hash: '#/auth' | '#/auth/login' → AuthPage; si no, LandingPage
 ├── app/LandingPage.tsx                 # SiteHeader + <main class="pt-20"> + secciones + Footer
+├── app/AuthPage.tsx                    # split 5/7 + barra inferior de confianza
+├── shared/ui/MS.tsx                    # icono Material Symbols (filled opcional)
+├── shared/hooks/useHashRoute.ts        # hashchange sin dependencias
+├── features/auth/
+│   ├── components/AuthBrandPanel.tsx   # columna izquierda (logo blanco, métricas, beneficios)
+│   ├── components/AuthFormPanel.tsx    # columna derecha (tabs, formularios, accesos)
+│   ├── components/AuthFields.tsx       # TextField / PasswordField / SelectField
+│   ├── components/RegisterForm.tsx     # registro con licencia de prueba
+│   ├── components/LoginForm.tsx        # inicio de sesión con perfil
+│   └── data/auth-data.ts              # beneficios, sectores, perfiles y confianza
 ├── features/landing/
 │   ├── components/
 │   │   ├── SiteHeader.tsx              # header fixed h-20
@@ -357,4 +370,33 @@ Contenido en `landing-data.tsx`, arrays `productGroups` (4 tarjetas), `productVa
 Capacidades: códigos de barras, costo y ganancia, precios por mayoreo, impuestos por producto, lotes y caducidad, existencias y avisos. Se dice *qué hace*, nunca *cómo está implementado*: no aparecen `SKU`, `FEFO`, SQLite, `append-only`, `soft delete` ni IDs de impuestos. "Los productos que vencen primero son los que se descuentan primero" es la versión en lenguaje de negocio del descarte FEFO.
 
 > Si cambia el módulo de productos en `novus-post`, revisar este apartado antes de tocar el copy. Mantener los ejemplos concretos: son los que hacen que el texto no parezca generado.
+
+---
+
+## 16. Vistas de Iniciar Sesión / Registro (excepción 8, pedido explícito)
+
+Pantalla de Stitch: `projects/14269822984035378146/screens/b7520097c4d14ab9913cf7ab915c00cd`, título **"Iniciar Sesión / Registro - NovusPOS"**, DESKTOP 2560×2048. HTML: `files/b7520097c4d14ab9913cf7ab915c00cd` (28.5 kB). Se bajó con `tools.stitch.download_file` desde `list_screens` del proyecto conocido. Es la fuente de verdad de clases, orden y tokens (el screenshot de Stitch no sirve de referencia tipográfica; ver §1).
+
+**Rutas:** `#/auth` abre registro (estado por defecto en Stitch) y `#/auth/login` abre login. `useHashRoute` escucha `hashchange`; el header "Iniciar Sesión" apunta a `#/auth/login`. Las anclas de la landing (`#productos`, `#descargar`, …) siguen funcionando porque no empiezan por `#/auth`.
+
+**Layout (idéntico a Stitch):** body `bg-surface font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-center items-center`; `main w-full flex items-center justify-center p-space-md`; contenedor `max-w-7xl my-auto py-space-md lg:py-space-xl`; tarjeta `grid grid-cols-1 lg:grid-cols-12 rounded-xl shadow-xl overflow-hidden bg-surface-container-lowest`; columna izquierda `lg:col-span-5` con gradiente `from-primary-container via-primary to-on-secondary-fixed`; derecha `lg:col-span-7`. Se conservan los dos blur decorativos, el sparkline SVG, los 3 beneficios, la tarjeta de garantía, los 4 items de la barra inferior, los tabs, el banner verde, los dos formularios, el divisor y los dos botones alternos.
+
+**Assets:** `public/novuspos-logo-white.png` se generó desde `novuspos-logo.png` (que tiene fondo blanco opaco) poniendo transparente lo cercano a blanco y blanco el resto. El `brightness-0 invert` de Stitch convertía todo el PNG en un rectángulo blanco; no reintroducirlo.
+
+**Copy auditado (no restaurar el de Stitch):**
+
+| Stitch | Implementado |
+| :--- | :--- |
+| `VERSIÓN 2025.2 READY · DESKTOP + NUBE` | `LISTO PARA WINDOWS · TRABAJA SIN INTERNET` |
+| `+40% Velocidad`, `1.8 seg`, `100% Uptime` | `Sin depender de internet`, `Al instante`, `Siempre listo` |
+| Testimonial inventado (40% menos filas, 5 min, nunca se traba) | Tarjeta "Prueba sin riesgo" con datos reales de la prueba |
+| "Compatibilidad nativa con impresoras térmicas", "Cancela en un clic", "migración sin cargo" | Básculas y tickets listos; sin tarjeta y sin comisiones; soporte desde la app |
+| `Seguridad Bancaria TLS 1.3`, `Cifrado SSL 256-bit` | `Tu información se queda en tu equipo`, `Tus datos protegidos` |
+| `Compatible con Tickets ESC/POS`, `Sincronización en la Nube` | `Tickets listos para imprimir`, `Respaldos de tu información` |
+| Botones Google Workspace / Microsoft 365 | `Descargar para Windows` y `Ver capturas del sistema` |
+| "Caja / Terminal Asociada" con 3 cajas | `Perfil de acceso`: Cajero / Supervisor / Administrador (RBAC real) |
+
+Los formularios son **demostrativos**: `onSubmit` solo muestra una alerta; no existe backend de auth en la landing. `MS` se movió a `shared/ui/MS.tsx` (con `filled` para `speed` y `workspace_premium`) para que landing y auth no se importen entre sí.
+
+> Al sincronizar con Stitch, conservar el layout y volver a aplicar esta tabla. No reintroducir versión, nube, ESC/POS, TLS, SSO ni métricas inventadas. Verificado con Chrome headless a 1280px en ambos modos.
 

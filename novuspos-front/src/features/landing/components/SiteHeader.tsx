@@ -39,7 +39,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-space-md">
           <a
             className="inline-flex items-center justify-center font-label-md text-label-md px-space-md py-space-xs rounded-lg text-on-surface hover:bg-surface-container transition-colors"
-            href="#inicio"
+            href="#/auth/login"
           >
             Iniciar Sesión
           </a>

@@ -23,7 +23,20 @@
 
 ```text
 src/
+├── App.tsx                            # enrutado por hash: '#/auth' | '#/auth/login' → AuthPage
 ├── app/LandingPage.tsx                # SiteHeader + <main class="pt-20"> + secciones + Footer
+├── app/AuthPage.tsx                   # split de auth (5/7) + barra inferior de confianza
+├── shared/
+│   ├── ui/MS.tsx                      # icono Material Symbols (filled opcional)
+│   └── hooks/useHashRoute.ts          # hashchange sin dependencias
+├── features/auth/
+│   ├── components/
+│   │   ├── AuthBrandPanel.tsx         # columna izquierda: logo blanco, métricas, beneficios
+│   │   ├── AuthFormPanel.tsx          # columna derecha: tabs + formularios + accesos
+│   │   ├── AuthFields.tsx             # TextField / PasswordField / SelectField
+│   │   ├── RegisterForm.tsx           # alta con licencia de prueba
+│   │   └── LoginForm.tsx              # acceso con perfil
+│   └── data/auth-data.ts              # beneficios, sectores, perfiles y barra de confianza
 ├── features/landing/
 │   ├── components/
 │   │   ├── SiteHeader.tsx             # header fixed h-20 (logo local)
@@ -155,6 +168,8 @@ src/
 
 10. **Sección de productos (pedido explícito):** se añadió `ProductCatalog.tsx` con el ancla `#productos` entre `#caracteristicas` y la comparativa, más el enlace "Productos" en `SiteHeader`. No existe en Stitch: sale del módulo real `inventory` (contexto 03 y `006_seed_products.ts`). `productGroups` (4 tarjetas): lo de todos los días (8 categorías sembradas), por pieza/caja/peso (unidades y decimales), tallas/colores/presentaciones (variantes), combos/servicios/insumos (tipos de producto y `combo_items`). Bloque "Así se ve el catálogo de un abasto" (`productVarieties`, 8 categorías / 33 ejemplos con medida, tomados de `006_seed_products.ts` y acortados para etiquetas). `productCapabilities` (6 fichas): códigos de barras, costo y ganancia, precios por mayoreo, impuestos por producto, lotes y caducidad, existencias y avisos. Copy con ejemplos concretos y frases naturales ("1,450 kg se cobra por 1,450 kg, no por dos"), sin `SKU`, `FEFO`, SQLite, `append-only` ni detalles de implementación. "Los productos que vencen primero son los que se descuentan primero" es la versión comercial del descarte FEFO. Ver skill §15.
 
+11. **Vistas de Iniciar Sesión / Registro (pedido explícito):** se replicó la pantalla de Stitch `projects/14269822984035378146/screens/b7520097c4d14ab9913cf7ab915c00cd` ("Iniciar Sesión / Registro - NovusPOS", DESKTOP 2560×2048, HTML `files/b7520097c4d14ab9913cf7ab915c00cd`). Se conservan clases, orden, gradientes, iconos, sparkline y el split `lg:grid-cols-12` 5/7. Se monta como ruta por hash: `#/auth` (registro, estado por defecto de Stitch) y `#/auth/login` (login, enlace del header). `MS` se movió a `shared/ui/MS.tsx` con soporte `filled` para los iconos `speed`/`workspace_premium`; el logo de la columna izquierda usa `novuspos-logo-white.png` (generado desde el logo, fondo transparente y trazo blanco) porque el original tiene fondo blanco opaco y con `brightness-0 invert` salía como un rectángulo. Copy auditado según §5.7 y §5.9: se retiraron `VERSIÓN 2025.2 READY · DESKTOP + NUBE`, `+40% Velocidad`, `1.8 seg`, `100% Uptime`, el testimonial inventado (40% menos filas, nunca se traba), `Seguridad Bancaria TLS 1.3`, `Cifrado SSL 256-bit`, `Compatible con Tickets ESC/POS`, `Sincronización en la Nube`, los botones de Google Workspace / Microsoft 365 y la selección de múltiples cajas. En su lugar: píldora "LISTO PARA WINDOWS · TRABAJA SIN INTERNET", métricas "Al instante / Siempre listo", tarjeta de garantía de prueba, "Respaldos de tu información", "Tus datos protegidos", accesos "Descargar para Windows" y "Ver capturas del sistema", y "Perfil de acceso" (Cajero/Supervisor/Administrador, respaldado por RBAC). Los formularios son demostrativos (`onSubmit` muestra una alerta); no hay backend de auth en la landing. Ver skill §16.
+
 ---
 
 ## 6. Estado y verificación
@@ -163,6 +178,7 @@ src/
 - ✅ Copy de `KeyFeatures` y `KeyboardCheatSheet` auditado contra los contextos 00, 02, 03, 04, 05, 06 y 08; eliminados los claims falsos de Stitch (ver §5.3).
 - ✅ Copy de todas las secciones reescrito en tono positivo y sin detalles internos; verificado en el bundle (ver §5.7).
 - ✅ Sección `#productos` renderizada y verificada en DOM con Chrome headless; sin términos internos en el bundle (ver §5.10).
+- ✅ Vistas `#/auth` y `#/auth/login` renderizadas y verificadas con Chrome headless a 1280px; bundle sin versión, ESC/POS, nube, TLS, SSO ni métricas inventadas (ver §5.11).
 - ✅ Altura ≈4780px con el hero de dos columnas (antes, 5523px con el carrusel apilado abajo; oficial 5350px). La sección de productos aumentó la altura respecto a la medición original. Posición del carrusel a 1280px: `x≈660, y≈230, w≈596, h≈477`.
 - ✅ Tipografías, iconos y logo autoalojados (funciona offline, sin CDN).
 - ✅ `npm run build` y `npm run lint` limpios.

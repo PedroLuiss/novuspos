@@ -16,7 +16,12 @@ npm run preview  # servir el build
 
 ```text
 src/
+├── App.tsx                       # enrutado por hash: #/auth | #/auth/login → AuthPage
 ├── app/LandingPage.tsx           # SiteHeader + <main class="pt-20"> + secciones + Footer
+├── app/AuthPage.tsx              # split 5/7 de Iniciar Sesión / Registro
+├── shared/ui/MS.tsx              # icono Material Symbols (filled opcional)
+├── shared/hooks/useHashRoute.ts  # hashchange sin dependencias
+├── features/auth/                # AuthBrandPanel, AuthFormPanel, formularios y datos
 ├── features/landing/
 │   ├── components/               # SiteHeader, Hero, HeroHeader, HeroMockup, KeyFeatures,
 │   │   │                         # ProductCatalog, KeyboardCheatSheet, ComparisonTable,
@@ -93,6 +98,10 @@ El relevo ya está activo con cinco capturas, en orden de módulo: `novusposvent
 ## Sección de productos (`#productos`)
 
 `ProductCatalog.tsx` explica qué tipos de productos se pueden administrar: 4 grupos (artículos de uso diario, ventas por pieza/caja/peso, variantes de talla o presentación, combos/servicios/insumos), 8 categorías con 33 ejemplos concretos y 6 datos de cada ficha (códigos, costo y ganancia, precios por mayoreo, impuestos, lotes y caducidad, existencias). El contenido vive en `productGroups`, `productVarieties` y `productCapabilities` (`landing-data.tsx`) y sale del módulo real de inventario de `novus-post` (contexto 03). No está en el diseño de Stitch: se añadió a pedido explícito. Ver skill §15 y contexto 09 §5.10.
+
+## Vistas de Iniciar Sesión / Registro
+
+Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo proyecto, screen `b7520097c4d14ab9913cf7ab915c00cd`). Se abre con `#/auth` (registro) o `#/auth/login` (login) desde el enlace del header. El layout es class-por-class idéntico al HTML de Stitch; el copy se auditó con las mismas reglas que la landing (sin versión, nube, ESC/POS, TLS, SSO ni métricas inventadas). Los formularios son demostrativos: muestran una alerta, no hay backend. El logo blanco de la columna izquierda es `public/novuspos-logo-white.png` (el original tiene fondo blanco opaco). Ver skill §16 y contexto 09 §5.11.
 
 ## Copy de la landing
 

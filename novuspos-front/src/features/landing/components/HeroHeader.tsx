@@ -1,13 +1,7 @@
 import type { ReactNode } from 'react'
+import { MS } from '@/shared/ui/MS'
 
-/** Icono Material Symbols Outlined (idéntico a Stitch). */
-export function MS({ name, className }: { name: string; className?: string }) {
-  return (
-    <span className={`material-symbols-outlined ${className ?? ''}`} aria-hidden="true">
-      {name}
-    </span>
-  )
-}
+export { MS }
 
 /** Píldora con el beneficio principal del hero (sin número de versión). */
 export function HighlightPill() {
