@@ -12,10 +12,10 @@ export function ComparisonTable() {
     <section className="w-full px-margin py-space-xl max-w-7xl mx-auto">
       <div className="text-center max-w-3xl mx-auto mb-space-xl">
         <span className="font-label-sm text-label-sm text-primary uppercase font-bold tracking-widest block mb-space-xs">
-          ARQUITECTURA DE ESCRITORIO VS POS NUBE
+          NOVUSPOS FRENTE A UN POS EN NUBE
         </span>
         <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">
-          ¿Por qué NovusPOS Desktop no tiene comparación?
+          ¿Por qué elegir NovusPOS para tu negocio?
         </h2>
       </div>
 

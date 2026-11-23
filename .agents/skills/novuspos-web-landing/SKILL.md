@@ -18,6 +18,8 @@ Complementa a `novuspos-guide`. Aplica al repositorio **`novuspos-front/`** (sit
 > ⚠️ **Excepción 4 (precios):** `Pricing` conserva el precio comercial, pero su checklist técnico y la línea de Windows se auditaron; se eliminaron ESC/POS, backups automáticos y soporte por WhatsApp. Ver §12.
 >
 > ⚠️ **Excepción 5 (hero y footer):** `HeroHeader` y `Footer` también se auditaron; se eliminaron "100% sin internet", ESC/POS, la latencia en milisegundos y "ultra-alto rendimiento". Ver §13.
+>
+> ⚠️ **Excepción 6 (tono comercial positivo):** todo el copy se reescribió para que hable de beneficios comprensibles para quien va a usar el sistema. No reintroducir detalles internos (SQLite, WAL, transacciones, `append-only`, `soft delete`, `SHA-256`, RS-232, COM/baudios) ni frases restrictivas ("pendiente de validación", "aún no integrados", "no hay cifras oficiales"). Ver §14.
 
 ---
 
@@ -299,3 +301,23 @@ La fila de precio ($4.99/mes, primer mes gratis) se conserva: es una decisión c
 | Footer: "offline-first de ultra-alto rendimiento" | "offline-first con SQLite local" | 00 §1 |
 
 El precio, la versión `2.4.0` y el tamaño del instalador (`~85 MB`) se conservan por ser decisiones comerciales.
+
+---
+
+## 14. Copy positivo para el usuario final (excepción 6, pedido explícito)
+
+El criterio actual de **toda la landing** es explicar *qué puede hacer el negocio*, no *cómo está implementado*. Aplica a hero, `KeyFeatures`, `shortcuts`, comparativa, FAQ, precios, CTA final, footer y `index.html` (meta description).
+
+| Concepto | Texto que NO se debe usar | Texto vigente |
+| :--- | :--- | :--- |
+| Datos sin internet | "SQLite nativo en modo WAL", "transacción atómica persistida", "se guarda en el ordenado" | "Todo queda registrado al momento y sigue disponible cuando vuelves a abrir el programa, incluso sin conexión" |
+| Básculas | "pendiente de validación física", "puerto COM y baudios persistidos" | "Toma el peso directamente en la venta, sin digitar los gramos. Compatible con Torrey, Rhino y Dibal" |
+| Impresión | "aún no están integrados", "no ESC/POS ni ZPL" | "Tickets en 80 mm, 58 mm o carta, listos para descargar" |
+| Requisitos | "No hay cifras oficiales de CPU, RAM o espacio en disco" | "Una computadora con Windows 11 y conexión solo para descargar e iniciar sesión" |
+| Seguridad | "Respaldo verificado con SHA-256 en la carpeta de datos" | "Respaldos de tu información y restauración cuando lo necesites" |
+| Footer | "Servidores Cloud Sincronizados", "Certificación Fiscal", "Drivers OPOS", "arquitectura Windows x64", "Mesa de Ayuda 24/7" | "Tu negocio, siempre disponible", "Protección de datos", "Centro de ayuda", "Básculas y periféricos" |
+
+Titulares vigentes: hero `rápido, confiable y siempre disponible`; características `PENSADO PARA TU DÍA A DÍA` / `Todo para vender, controlar tu inventario y cerrar el día con confianza`; comparativa `NOVUSPOS FRENTE A UN POS EN NUBE` / `¿Por qué elegir NovusPOS para tu negocio?`. Los atajos `'Modal de pago'` y `'1-Click ticket directo'` pasaron a `'Ventana de cobro'` y `'Cobro en un clic'`.
+
+> Regla: se mantiene la **veracidad funcional** (no se afirma impresión térmica conectada ni rendimiento inventado), pero se expresa en lenguaje de negocio. Si en el futuro se sincroniza con Stitch, **no restaurar** ninguno de estos textos. `Kbd` ya no se importa en `landing-data.tsx`: las descripciones de tarjetas son prosa, sin atajos inline.
+

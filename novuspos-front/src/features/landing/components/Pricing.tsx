@@ -28,7 +28,7 @@ export function Pricing() {
                 Licencia Profesional NovusPOS
               </span>
               <span className="font-body-sm text-body-sm text-on-surface-variant">
-                Para Windows 11 (64 bits) Desktop
+                Para Windows 11
               </span>
             </div>
             <div className="mt-space-sm sm:mt-0 text-left sm:text-right">
@@ -42,18 +42,15 @@ export function Pricing() {
             </div>
           </div>
 
-          {/* Checklist — copy verificado contra contextos 00, 01, 02, 04, 05 y 08.
-           * Se eliminaron los claims falsos de Stitch: ESC/POS y gaveta
-           * conectados, backups automáticos a USB/red, soporte por WhatsApp y
-           * la garantía de rendimiento sin respaldo documental. */}
+          {/* Beneficios en lenguaje de negocio, sin detalles técnicos internos. */}
           <div className="flex flex-col gap-space-sm mb-space-xl">
             {[
-              { strong: 'Instalación local completa', rest: ' con base de datos SQLite integrada y operación offline-first.' },
-              { strong: 'Catálogo y transacciones', rest: ' sin costos por volumen ni comisiones sobre tus ventas.' },
-              { strong: 'Periféricos conectados:', rest: ' básculas RS-232 (Torrey, Rhino y Dibal) y tickets PDF 80/58mm; impresión ESC/POS y pulso de gaveta aún no integrados.' },
-              { strong: 'Corte Z, control de caja y Kardex inmutable', rest: ' con auditoría exhaustiva.' },
-              { strong: 'Soporte por ticket', rest: ' desde la propia aplicación (requiere conexión a internet).' },
-              { strong: 'Respaldo verificado con SHA-256', rest: ' en la carpeta de datos de la app, con restauración y copia preventiva.' },
+              { strong: 'Instalación completa', rest: ' en tu computadora, lista para trabajar desde el primer día.' },
+              { strong: 'Catálogo y ventas', rest: ' sin costos por volumen ni comisiones sobre tus ventas.' },
+              { strong: 'Básculas conectadas', rest: ' y tickets en 80/58 mm listos para imprimir o descargar.' },
+              { strong: 'Cierre de caja, control de efectivo', rest: ' e historial completo de movimientos.' },
+              { strong: 'Soporte desde la propia aplicación', rest: ', sin salir del programa.' },
+              { strong: 'Respaldos de tu información', rest: ' y restauración cuando lo necesites.' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-space-sm">
                 <MS name="check_circle" className="text-secondary text-[20px] shrink-0 mt-0.5" />

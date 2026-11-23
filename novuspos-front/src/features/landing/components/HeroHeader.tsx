@@ -15,18 +15,17 @@ export function ReleasePill() {
     <div className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-high shadow-sm mb-space-lg">
       <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
       <span className="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">
-        ⚡ NUEVA VERSIÓN 2.4.0 • ARQUITECTURA OFFLINE-FIRST
+        ⚡ NUEVA VERSIÓN 2.4.0 • TRABAJA SIN DEPENDER DE INTERNET
       </span>
     </div>
   )
 }
 
-/** Copy verificado contra `novus-post/docs/context/`: sin "x64" (no documentado)
- *  ni "sin caídas por internet" (bootstrap, OTP, reportes y BCV sí requieren red). */
+/** Sellos de confianza en lenguaje de negocio: beneficios, no detalles técnicos. */
 const trustBadges = [
-  { icon: 'terminal', tone: 'text-primary', label: 'Instalador nativo para Windows' },
-  { icon: 'storage', tone: 'text-secondary', label: 'Base de datos SQLite local' },
-  { icon: 'wifi_off', tone: 'text-primary', label: 'Núcleo offline-first' },
+  { icon: 'terminal', tone: 'text-primary', label: 'Instalador para Windows' },
+  { icon: 'storage', tone: 'text-secondary', label: 'Tu información siempre disponible' },
+  { icon: 'wifi_off', tone: 'text-primary', label: 'Trabaja sin internet' },
   { icon: 'verified', tone: 'text-secondary', label: 'Primer mes $0 USD' },
 ]
 
@@ -44,8 +43,8 @@ export function HeroHeader({ children }: { children: ReactNode }) {
           <ReleasePill />
 
           <h1 className="font-display text-display text-on-surface max-w-4xl tracking-tight leading-none mb-space-md">
-            El Punto de Venta de escritorio para Windows{' '}
-            <span className="text-primary">rápido, confiable</span> y con núcleo offline-first
+            El punto de venta para Windows que tu negocio necesita:{' '}
+            <span className="text-primary">rápido, confiable</span> y siempre disponible
           </h1>
 
           <div className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container mb-space-md">
@@ -56,10 +55,9 @@ export function HeroHeader({ children }: { children: ReactNode }) {
           </div>
 
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mb-space-xl">
-            Cobro, inventario y caja sobre SQLite local con transacciones atómicas. El núcleo opera sin internet; el
-            primer ingreso, la recuperación OTP, los reportes y las tasas BCV sí lo requieren. Lectura de básculas
-            RS-232 (Torrey, Rhino y Dibal, pendiente de validación física), tickets PDF 80/58mm y catálogo paginado
-            para inventarios densos.
+            Cobra, controla tu inventario y cierra tu caja desde una sola aplicación. Todo queda registrado al momento
+            y sigue disponible cuando vuelves a abrir el programa, incluso sin conexión. Además: básculas conectadas,
+            tickets listos para imprimir o descargar y productos que encuentras al instante.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-space-md w-full max-w-md mb-space-lg">

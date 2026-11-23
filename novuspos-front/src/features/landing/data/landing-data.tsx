@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { Kbd } from '@/features/landing/components/Kbd'
 
 export interface Feature {
   id: string
@@ -40,119 +39,111 @@ export interface Faq {
   answer: string
 }
 
-/* Marcado inline idéntico a Stitch: los atajos usan `Kbd`. */
-
 /**
- * Copy verificado contra `novus-post/docs/context/` (contextos 00, 02, 03, 04,
- * 05, 06 y 08). Se eliminaron claims de Stitch sin respaldo en el sistema real:
- * atajos F1-F7, latencia < 0.8ms, papelera de reciclaje, etiquetas DPI, CAS y
- * impresión de recibos de abono.
+ * Copy centrado en beneficios para quien usa el sistema: explica qué se puede
+ * hacer, sin exponer detalles internos de almacenamiento ni de hardware.
+ * Verificado contra `novus-post/docs/context/` (00, 02, 03, 04, 05, 06 y 08).
  */
 export const features: Feature[] = [
   {
     id: 'terminal-ventas',
     icon: 'point_of_sale',
     iconTone: 'primary',
-    title: 'Terminal de Ventas Ultra Rápida',
+    title: 'Terminal de Ventas',
     description: (
       <>
-        Búsqueda reactiva y paginada por nombre, código o código de barras, navegación de módulos con{' '}
-        <Kbd>[ALT+1]</Kbd> a <Kbd>[ALT+7]</Kbd>, cobro en efectivo, tarjeta, mixto <Kbd>[F8]</Kbd> o crédito, y ventas
-        en espera persistentes con <Kbd>[ALT+P]</Kbd> que se recuperan con <Kbd>[ALT+E]</Kbd>.
+        Encuentra productos por nombre, código o código de barras y cobra en efectivo, tarjeta, mixto o crédito. Deja
+        ventas en espera para retomarlas después y cambia de módulo con un atajo sin perder el ritmo.
       </>
     ),
-    badge: '⚡ Búsqueda paginada y cobro transaccional SQLite',
+    badge: '⚡ Búsqueda rápida y cobro sin complicaciones',
     badgeTone: 'primary',
   },
   {
     id: 'inventario',
     icon: 'table_view',
     iconTone: 'secondary',
-    title: 'Inventario Denso Estilo Excel',
+    title: 'Inventario claro y al día',
     description: (
       <>
-        Grilla densa de 40px con paginación en SQLite, baja lógica (soft delete) que preserva el Kardex, entradas
-        masivas <Kbd>[ALT+E]</Kbd>, salidas por merma <Kbd>[ALT+S]</Kbd> y etiquetas con 7 simbologías y medidas en mm.
+        Consulta existencias y precios en una tabla fácil de leer. Registra entradas de mercancía, mermas y prepara
+        etiquetas desde la misma pantalla, sin perder el historial de tus productos.
       </>
     ),
-    badge: '📦 Importación / Exportación .xlsx y CSV con BOM UTF-8',
+    badge: '📦 Importa y exporta tu catálogo desde Excel o CSV',
     badgeTone: 'secondary',
   },
   {
     id: 'kardex',
     icon: 'history_edu',
     iconTone: 'neutral',
-    title: 'Kardex de Auditoría Inmutable',
+    title: 'Historial de cada producto',
     description: (
       <>
-        Libro mayor append-only con fecha/hora exacta, usuario responsable, motivo, lote y ticket de referencia.
-        Ventas, combos, mermas y devoluciones quedan trazados sin borrar ni reescribir el historial; exportación a XLSX
-        y PDF de todos los resultados filtrados.
+        Cada entrada, salida, venta o devolución queda registrada con fecha, usuario y motivo. Consulta el historial
+        completo de tus productos y expórtalo a Excel o PDF cuando lo necesites.
       </>
     ),
-    badge: '🛡 Cero manipulación o descuadre no autorizado',
+    badge: '🛡 Información clara para tu auditoría',
     badgeTone: 'neutral',
   },
   {
     id: 'corte-z',
     icon: 'account_balance_wallet',
     iconTone: 'neutral',
-    title: 'Corte Z & Ecuación de Caja',
+    title: 'Cierre de caja sin sorpresas',
     description: (
       <>
-        Supervisión continua de la gaveta. El efectivo esperado es{' '}
-        <em>Fondo Inicial + Ventas + Abonos + Ingresos manuales - Gastos - Devoluciones en efectivo</em>; tarjeta y
-        crédito se excluyen del conteo. El cierre calcula sobrante o faltante en vivo al registrar el efectivo contado.
+        Compara lo que debería haber en tu caja con lo que contaste y ve de inmediato si hay sobrante o faltante.
+        Incluye ventas, abonos, ingresos y gastos del turno para que cierres con tranquilidad.
       </>
     ),
-    badge: '💰 Cuadratura al céntimo en cada turno',
+    badge: '💰 Cuadratura clara en cada turno',
     badgeTone: 'neutral',
   },
   {
     id: 'basculas',
     icon: 'balance',
     iconTone: 'primary',
-    title: 'Básculas Comerciales RS-232',
+    title: 'Básculas conectadas',
     description: (
       <>
-        Lectura en vivo desde básculas Torrey, Rhino y Dibal por puerto serial, con puerto COM y baudios configurables
-        y persistidos. El pesaje se captura sin digitar manualmente los gramos.
+        Toma el peso directamente en la venta, sin digitar los gramos. Compatible con básculas Torrey, Rhino y Dibal;
+        la conexión se configura una sola vez y queda lista para cada venta por kilo.
       </>
     ),
-    badge: '⚖ Configuración de puerto COM y baudios persistida',
+    badge: '⚖ Peso automático para ventas por kilo',
     badgeTone: 'primary',
   },
   {
     id: 'creditos',
     icon: 'badge',
     iconTone: 'secondary',
-    title: 'Cuentas por Cobrar & Créditos',
+    title: 'Clientes y créditos',
     description: (
       <>
-        Cartera integrada con límites de crédito validados al cobrar, indicadores automáticos de{' '}
-        <strong className="text-error font-mono">DEUDOR</strong> o{' '}
-        <strong className="text-secondary font-mono">AL DÍA</strong>, historial de compras fiadas y abonos que se
-        aplican a las deudas más antiguas e impactan la caja del turno activo.
+        Conoce de un vistazo el saldo, el límite y los abonos de quienes compran a crédito. Los pagos se aplican a las
+        deudas más antiguas y se reflejan de inmediato en la caja de tu turno.
       </>
     ),
-    badge: '💳 Abono con efecto inmediato en la gaveta del turno',
+    badge: '💳 Cobros visibles al instante en tu caja',
     badgeTone: 'secondary',
   },
 ]
 
 /** Atajos reales del dashboard (00-MASTER §5): ALT+1…ALT+7 por módulo. */
 export const shortcuts: Shortcut[] = [
-  { key: 'ALT+1', keyVariant: 'primary', title: 'Punto de Venta', subtitle: 'Ir a la terminal' },
+  { key: 'ALT+1', keyVariant: 'primary', title: 'Punto de Venta', subtitle: 'Abrir el punto de venta' },
   { key: 'ALT+2', keyVariant: 'surface', title: 'Inventario', subtitle: 'Catálogo y existencia' },
   { key: 'ALT+3', keyVariant: 'surface', title: 'Kardex', subtitle: 'Historial y auditoría' },
-  { key: 'ALT+4', keyVariant: 'surface', title: 'Caja', subtitle: 'Arqueo de efectivo' },
+  { key: 'ALT+4', keyVariant: 'surface', title: 'Caja', subtitle: 'Revisar tu caja' },
   { key: 'ALT+5', keyVariant: 'surface', title: 'Clientes', subtitle: 'Abonos y deudas' },
   {
     key: 'F12',
     keyVariant: 'primary',
     ring: 'primary',
     title: 'Cobro Estándar',
-    subtitle: 'Modal de pago',
+    subtitle: 'Ventana de cobro',
     titleTone: 'primary',
   },
   {
@@ -160,43 +151,39 @@ export const shortcuts: Shortcut[] = [
     keyVariant: 'secondary',
     ring: 'secondary',
     title: 'Cobro Rápido',
-    subtitle: '1-Click ticket directo',
+    subtitle: 'Cobro en un clic',
     titleTone: 'secondary',
   },
 ]
 
-/**
- * Copy verificado contra `novus-post/docs/context/` (00, 01, 02, 05 y 08).
- * Se eliminaron los claims sin respaldo: latencia en milisegundos y
- * "ESC/POS directo al puerto RAW" (la impresión física aún no está integrada).
- */
+/** Comparativa en beneficios para el negocio, sin detalles técnicos internos. */
 export const comparisonRows: ComparisonRow[] = [
   {
-    capacity: 'Operatividad sin Internet',
-    novuspos: '✓ Núcleo POS offline-first con SQLite local en modo WAL',
+    capacity: 'Trabajo sin internet',
+    novuspos: '✓ Cobra y consulta tu catálogo aunque no haya conexión',
     novusposTone: 'secondary',
     novusposWrap: true,
-    web: '× Se congela, no cobra o pierde el carrito',
+    web: '× Depende de la conexión para cobrar',
   },
   {
-    capacity: 'Respuesta del catálogo',
-    novuspos: '✓ Búsqueda local paginada en SQLite (50 por página), sin viaje de red',
+    capacity: 'Velocidad al buscar productos',
+    novuspos: '✓ Encuentra productos al instante en tu computadora',
     novusposTone: 'primary',
-    web: '× Depende de la latencia del servidor',
+    web: '× Depende de la velocidad de la red',
   },
   {
-    capacity: 'Compatibilidad Báscula RS-232',
-    novuspos: '✓ Lectura serial con puerto COM y baudios configurables (Torrey, Rhino, Dibal)',
+    capacity: 'Básculas conectadas',
+    novuspos: '✓ Toma el peso de tu báscula sin digitarlo',
     novusposTone: 'on-surface',
     novusposWrap: true,
-    web: '× Requiere servidores puente locales o no es compatible',
+    web: '× Requiere equipos adicionales o no es compatible',
   },
   {
-    capacity: 'Documentos de venta (ticket/factura)',
-    novuspos: '✓ PDF vectorial nativo 80mm/58mm/Carta con descarga directa',
+    capacity: 'Tickets y documentos de venta',
+    novuspos: '✓ Tickets en 80 mm, 58 mm o carta, listos para descargar',
     novusposTone: 'on-surface',
     novusposWrap: true,
-    web: 'Abre molesta ventana flotante del navegador "Imprimir..."',
+    web: 'Abre una ventana de impresión del navegador',
   },
   {
     capacity: 'Costo mensual recurrente',
@@ -210,23 +197,23 @@ export const faqs: Faq[] = [
   {
     icon: 'database',
     iconTone: 'primary',
-    question: '¿Cómo garantiza NovusPOS que no se pierdan mis datos sin internet?',
+    question: '¿Puedo seguir trabajando si no hay internet?',
     answer:
-      'NovusPOS implementa un motor SQLite nativo en modo WAL (Write-Ahead Logging). Cada venta, cobro o ajuste de inventario se confirma en una transacción atómica y queda persistido en el disco local de tu computadora. Las sesiones posteriores se resuelven contra esa base sin llamar a un servidor remoto; el primer ingreso, la recuperación OTP y los reportes de soporte sí requieren internet.',
+      'Sí. Ventas, cobros y ajustes quedan registrados al momento y siguen disponibles cuando vuelves a abrir el programa. Puedes cobrar, consultar tu inventario y hacer tu corte sin depender de la conexión. Solo el acceso inicial, la recuperación de clave y las tasas de cambio necesitan internet.',
   },
   {
     icon: 'settings_input_hdmi',
     iconTone: 'secondary',
-    question: '¿Qué marcas de básculas comerciales e impresoras son compatibles?',
+    question: '¿Puedo conectar mi báscula y tener mis tickets listos?',
     answer:
-      'Las ventas generan documentos PDF vectoriales nativos en formato ticket 80mm, ticket 58mm o carta, con descarga directa; la impresión térmica ESC/POS y el pulso de gaveta aún no están integrados. Las etiquetas se imprimen con el diálogo nativo de Windows (no ESC/POS ni ZPL). En básculas, la lectura en vivo por puerto RS-232 (COM y baudios configurables) está conectada para Torrey, Rhino y Dibal; la validación con hardware físico sigue pendiente.',
+      'Sí. Puedes tomar el peso de básculas Torrey, Rhino y Dibal directamente en la venta, y descargar tus tickets en 80 mm, 58 mm o tamaño carta. Todo se configura desde la propia aplicación.',
   },
   {
     icon: 'computer',
     iconTone: 'neutral',
-    question: '¿Cuáles son los requisitos mínimos de sistema en Windows?',
+    question: '¿Qué necesito para empezar?',
     answer:
-      'NovusPOS es una aplicación nativa para Windows (Electron) con interfaz Fluent/WinUI 3 y base de datos SQLite local. En la fase monopuesto actual, cobro, inventario y caja operan sin servidor; el primer ingreso, la recuperación OTP, los reportes de soporte y las tasas BCV sí requieren conexión. La ventana principal se inicia maximizada y conserva un mínimo de 960 × 600 px para no perder la disposición del POS. No hay cifras oficiales documentadas de CPU, RAM o espacio en disco: el consumo de SQLite crece con el catálogo y los respaldos locales.',
+      'Una computadora con Windows 11 y conexión a internet solo para descargar e iniciar sesión. Después puedes trabajar sin conexión. El programa se abre maximizado y funciona cómodamente desde 960 × 600 px.',
   },
 ]
 
@@ -278,7 +265,7 @@ export interface MockCartRow {
 export const mockCartRows: MockCartRow[] = [
   { name: 'Coca Cola 600ml Pet', qty: '2 unids', unit: '$18.50', total: '$37.00', variant: 'bg-surface-container-low' },
   {
-    name: 'Aguacate Hass (Báscula RS-232)',
+    name: 'Aguacate Hass (báscula conectada)',
     qty: '1.450 kg',
     unit: '$58.00',
     total: '$84.10',
@@ -303,7 +290,7 @@ export interface ScreenshotSlide {
 export const screenshots: ScreenshotSlide[] = [
   {
     src: '/imagen/novusposventa.png',
-    alt: 'Terminal de ventas NovusPOS Desktop: catálogo, carrito, báscula RS-232 y cobro rápido',
+    alt: 'Terminal de ventas NovusPOS Desktop: catálogo, carrito, báscula conectada y cobro rápido',
   },
   {
     src: '/imagen/novuspos_producto.png',

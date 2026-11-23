@@ -19,14 +19,14 @@ export function KeyFeatures() {
     <section id="caracteristicas" className="w-full px-margin py-space-xl max-w-7xl mx-auto">
       <div className="text-center max-w-3xl mx-auto mb-space-xl">
         <span className="font-label-sm text-label-sm text-primary uppercase font-bold tracking-widest block mb-space-xs">
-          ARQUITECTURA DE ESCRITORIO EXTREMA
+          PENSADO PARA TU DÍA A DÍA
         </span>
         <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight mb-space-sm">
-          Potencia nativa diseñada para operar con alto volumen transaccional
+          Todo para vender, controlar tu inventario y cerrar el día con confianza
         </h2>
         <p className="font-body-lg text-body-lg text-on-surface-variant">
-          Despídete de los navegadores lentos, pestañas congeladas y cuelgues repentinos cuando se corta la señal de
-          internet.
+          Olvídate de páginas lentas y de depender de la conexión para cobrar. NovusPOS trabaja desde tu computadora y te
+          acompaña incluso cuando no hay internet.
         </p>
       </div>
 

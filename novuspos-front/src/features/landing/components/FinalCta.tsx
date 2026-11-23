@@ -13,7 +13,7 @@ export function FinalCta() {
           Descarga NovusPOS Desktop y lleva el control total de tu negocio
         </h2>
         <p className="font-body-lg text-body-lg text-primary-fixed max-w-xl mb-space-xl">
-          Instala el archivo ejecutable, importa tus productos desde Excel o comienza a escanear de inmediato. Diseñado para crecer contigo.
+          Instala el programa, agrega tus productos desde Excel o empieza a vender de inmediato. Diseñado para crecer contigo.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-space-md">
           <button className="px-space-xl py-space-md rounded-lg bg-surface-container-lowest text-primary font-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95 inline-flex items-center gap-space-sm">
@@ -21,7 +21,7 @@ export function FinalCta() {
             <span>Descargar Instalador Windows (.exe)</span>
           </button>
           <span className="font-label-sm text-label-sm text-primary-fixed font-mono">
-            Versión 2.4.0 Oficial • SHA-256 Verificado • 85 MB
+            Versión 2.4.0 • 30 días gratis • 85 MB
           </span>
         </div>
       </div>

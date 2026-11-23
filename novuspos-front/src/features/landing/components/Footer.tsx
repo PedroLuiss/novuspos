@@ -5,15 +5,15 @@ export function Footer() {
   const columns = [
     {
       title: 'Producto',
-      links: ['Punto de Venta POS', 'Hardware Soportado', 'Modo Cajero Rápido', 'Planes y Licencias'],
+      links: ['Punto de Venta', 'Básculas y periféricos', 'Cobro rápido', 'Planes y precios'],
     },
     {
-      title: 'Desarrolladores & Soporte',
-      links: ['Documentación API', 'Mesa de Ayuda 24/7', 'Notas de Versión 2.4.0', 'Drivers OPOS & Básculas'],
+      title: 'Ayuda',
+      links: ['Guía de uso', 'Centro de ayuda', 'Novedades 2.4.0', 'Preguntas frecuentes'],
     },
     {
-      title: 'Seguridad & Legal',
-      links: ['Política de Privacidad', 'Términos del Servicio', 'Contrato EULA Offline', 'Certificación Fiscal'],
+      title: 'Legal',
+      links: ['Política de Privacidad', 'Términos del Servicio', 'Licencia de uso', 'Protección de datos'],
     },
   ]
 
@@ -26,8 +26,8 @@ export function Footer() {
               <img alt="NovusPOS Logo" className="h-8 w-auto object-contain" src={logoUrl} />
             </div>
             <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-              Diseñado para crecer contigo. Software de punto de venta offline-first con SQLite local para comercios
-              exigentes y franquicias modernas.
+              Diseñado para crecer contigo. Software de punto de venta para comercios que quieren vender, controlar su
+              inventario y cerrar el día con confianza.
             </p>
             {/* <div className="flex items-center gap-space-sm mt-space-xs">
               <img alt="NovusPOS Logo" className="h-8 w-auto object-contain" src={logoUrl} />
@@ -52,12 +52,12 @@ export function Footer() {
         </div>
         <div className="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md">
           <span className="font-body-sm text-body-sm text-on-surface-variant">
-            © 2024 NovusPOS Technologies Ltd. Todos los derechos reservados. Diseñado para arquitectura Windows x64.
+            © 2026 NovusPOS Technologies Ltd. Todos los derechos reservados.
           </span>
           <div className="flex items-center gap-space-md font-body-sm text-body-sm text-on-surface-variant">
             <span className="inline-flex items-center gap-space-xs">
               <span className="w-2 h-2 rounded-full bg-secondary" />
-              Servidores Cloud Sincronizados
+              Tu negocio, siempre disponible
             </span>
             <span>Moneda: USD ($4.99/mes)</span>
           </div>

@@ -90,4 +90,8 @@ El carrusel se muestra en la **columna derecha del hero** (`HeroHeader` usa `lg:
 
 El relevo ya está activo con cinco capturas, en orden de módulo: `novusposventa.png`, `novuspos_producto.png`, `novuspos_kardex.png`, `novus_caja.png` y `novus_cliente.png`. Las cuatro primeras usan `object-contain`; `novus_caja.png` es 1280×1384 (más alta que el contenedor 5:4) y lleva `fit: 'cover'` para mostrarse con `object-cover object-top`, sin bandas laterales. Para agregar más, coloca el PNG en `public/imagen/` y añade una entrada `{ src, alt }` al array `screenshots` en `src/features/landing/data/landing-data.tsx` (usa `fit: 'cover'` si la imagen es alta).
 
+## Copy de la landing
+
+Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.
+
 > Antes de modificar, lee `.agents/skills/novuspos-web-landing/SKILL.md` y `novus-post/docs/context/09-LANDING-WEB.md`.
