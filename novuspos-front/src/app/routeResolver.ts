@@ -1,10 +1,11 @@
 import type { AuthMode, RecoveryMode } from '@/features/auth/types'
+import type { PanelSection } from './PanelPage'
 
 /** Decisión de ruta pura y testeable; la UI no conoce detalles del pathname. */
 export type AppRoute =
   | { view: 'auth'; mode: AuthMode }
   | { view: 'recovery'; mode: RecoveryMode }
-  | { view: 'panel' }
+  | { view: 'panel'; section: PanelSection }
   | { view: 'landing' }
 
 export function resolveAppRoute(pathname: string): AppRoute {
@@ -14,6 +15,7 @@ export function resolveAppRoute(pathname: string): AppRoute {
   if (pathname.startsWith('/auth')) {
     return { view: 'auth', mode: pathname.includes('login') ? 'login' : 'register' }
   }
-  if (pathname.startsWith('/panel')) return { view: 'panel' }
+  if (pathname.startsWith('/panel/suscripcion')) return { view: 'panel', section: 'subscription' }
+  if (pathname.startsWith('/panel')) return { view: 'panel', section: 'general' }
   return { view: 'landing' }
 }

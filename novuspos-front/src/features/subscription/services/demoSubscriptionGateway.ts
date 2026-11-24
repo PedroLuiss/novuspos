@@ -1,0 +1,107 @@
+import { ValidationError } from '@/shared/services/apiClient'
+import { demoPayments, demoSubscription, plans } from '../data/subscription-data'
+import type { PaymentRecord, SubmitPaymentRequest, Subscription } from '../types'
+import type { BillingOverview, PaymentReviewResult, SubscriptionGateway } from './subscriptionGateway'
+
+const STORAGE_KEY = 'novuspos:demo-billing'
+const DEMO_DELAY_MS = 250
+
+interface DemoBillingState {
+  subscription: Subscription
+  payments: PaymentRecord[]
+}
+
+function initialState(): DemoBillingState {
+  return {
+    subscription: { ...demoSubscription },
+    payments: demoPayments.map((payment) => ({ ...payment })),
+  }
+}
+
+function readState(): DemoBillingState {
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw) as DemoBillingState
+      if (parsed.subscription && Array.isArray(parsed.payments)) return parsed
+    }
+  } catch {
+    // Se usa el estado inicial.
+  }
+  return initialState()
+}
+
+function writeState(state: DemoBillingState): void {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch {
+    // El modo demo sigue funcionando en memoria durante la sesión.
+  }
+}
+
+function wait(): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, DEMO_DELAY_MS))
+}
+
+/** Adaptador demo: mismo contrato que la API, sin red. */
+export const demoSubscriptionGateway: SubscriptionGateway = {
+  async getOverview(): Promise<BillingOverview> {
+    await wait()
+    const state = readState()
+    return { plans: plans.map((plan) => ({ ...plan })), subscription: state.subscription, payments: state.payments }
+  },
+
+  async submitPayment(request: SubmitPaymentRequest): Promise<PaymentRecord> {
+    await wait()
+    const state = readState()
+    const duplicate = state.payments.some(
+      (payment) => payment.reference === request.reference.trim() && payment.bank === request.bank.trim(),
+    )
+    if (duplicate) {
+      throw new ValidationError({ reference: ['Esa referencia ya fue registrada. Revisa tu comprobante.'] })
+    }
+
+    const plan = plans.find((item) => item.id === state.subscription.planId) ?? plans[0]
+    const payment: PaymentRecord = {
+      id: `pay-${Date.now()}`,
+      subscriptionId: request.subscriptionId,
+      reference: request.reference.trim(),
+      method: request.method,
+      bank: request.bank.trim(),
+      paidAt: request.paidAt,
+      amount: plan.price,
+      currency: plan.currency,
+      status: 'pending_review',
+      proofName: request.proofName,
+      proofDataUrl: request.proofDataUrl,
+      createdAt: new Date().toISOString(),
+    }
+
+    state.payments = [payment, ...state.payments]
+    state.subscription = { ...state.subscription, status: 'pending_review' }
+    writeState(state)
+    return payment
+  },
+
+  async reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<PaymentReviewResult> {
+    await wait()
+    const state = readState()
+    const payment = state.payments.find((item) => item.id === paymentId)
+    if (!payment) throw new Error('No encontramos ese pago.')
+
+    payment.status = approved ? 'approved' : 'rejected'
+    payment.reviewNote = note
+    if (approved) {
+      const date = new Date()
+      date.setMonth(date.getMonth() + 1)
+      state.subscription = {
+        ...state.subscription,
+        status: 'active',
+        startedAt: payment.paidAt,
+        renewsAt: date.toISOString().slice(0, 10),
+      }
+    }
+    writeState(state)
+    return { payment: { ...payment }, subscription: { ...state.subscription } }
+  },
+}

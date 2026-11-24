@@ -541,3 +541,70 @@ Se conservan clases y composición de Stitch, pero se sustituyen los textos fals
 
 > Verificado: ambas pantallas renderizan sin los textos sensibles; flujo demo completa llega a `/panel`; sin `token` aparece el aviso; modo `api` con mock 422 muestra error general y por campo en ambos endpoints; build/lint limpios.
 
+---
+
+## 22. Módulo de Suscripción (primer módulo del panel)
+
+No existe diseño de Stitch para este módulo: se construyó con los tokens MD3 del panel y el mismo patrón de §19/§20. Objetivo: que el usuario vea **a qué plan está suscrito**, lleve el **historial de sus pagos** y pueda reportar un pago de forma amigable.
+
+### Rutas y composición
+
+- `/panel` muestra el dashboard Stitch + `<SubscriptionOverview />` en lugar del antiguo `PanelBilling` (eliminado, junto con las facturas falsas de Visa).
+- `/panel/suscripcion` muestra solo `<SubscriptionOverview />`. `resolveAppRoute` devuelve `{ view: 'panel', section: 'subscription' }` y `App` pasa `section` a `PanelPage`.
+- `PanelSidebar` calcula `isActive` desde `window.location.pathname`; el ítem "Suscripción" apunta a `/panel/suscripcion` y ya no incluye el precio en la etiqueta.
+
+### Estructura
+
+```
+features/subscription/
+├── types.ts                         # Plan, Subscription, PaymentRecord, PaymentDraft, SubmitPaymentRequest
+├── data/subscription-data.ts        # plans, demoSubscription, demoPayments, paymentAccounts, banks, statusLabels
+├── lib/
+│   ├── formatters.ts                # formatMoney / formatDate / toDateInputValue
+│   ├── paymentValidation.ts         # reglas puras de referencia, fecha, banco y comprobante
+│   ├── paymentDraftStore.ts         # caché local del borrador por subscriptionId
+│   ├── paymentFormErrors.ts         # ValidationError → errores por campo del modal
+│   └── proofImage.ts                # valida JPG/PNG/WEBP ≤8 MB y comprime a data URL
+├── services/
+│   ├── subscriptionGateway.ts       # puerto: getOverview / submitPayment / reviewPayment
+│   ├── demoSubscriptionGateway.ts   # demo sin red, persiste en localStorage
+│   ├── httpSubscriptionGateway.ts   # endpoints reales
+│   ├── subscriptionGatewayFactory.ts# elige según VITE_AUTH_MODE
+│   └── subscriptionService.ts       # fachada + validación antes de enviar
+├── hooks/
+│   ├── useSubscriptionOverview.ts   # contenedor: carga, alta y evaluación de pagos
+│   ├── usePaymentDraft.ts           # contenedor del borrador cacheado
+│   └── usePaymentSubmission.ts      # caso de uso de envío + errores
+└── components/
+    ├── SubscriptionOverview.tsx     # contenedor de la feature
+    ├── SubscriptionCard.tsx         # plan, estado, vigencia y CTA
+    ├── PaymentHistoryTable.tsx      # historial + aprobación/rechazo (demo y API)
+    ├── PaySubscriptionModal.tsx     # modal de 3 pasos
+    ├── PaymentSteps.tsx             # stepper
+    ├── PaymentMethodSelector.tsx    # pago móvil / transferencia
+    ├── PaymentAccountCard.tsx       # datos de Novus con copiar
+    └── ProofUpload.tsx              # captura del comprobante + vista previa
+```
+
+### Flujo del modal (3 pasos)
+
+1. **Cómo pagar:** monto, selector pago móvil/transferencia y los datos bancarios de Novus; cada dato se copia con un clic.
+2. **Tus datos:** dígitos de la referencia (6–20, solo números), fecha (no futura), banco (datalist libre) y captura del comprobante. La ayuda sigue la lógica de reporte de pago de **Cashea**: en Banco de Venezuela se reporta el número de operación y en depósitos en efectivo el serial. El borrador se guarda en `localStorage` para retomarlo.
+3. **Confirmar:** resumen y envío. La respuesta deja la suscripción en `pending_review`; el modal muestra "Tu pago está en revisión" y el historial se recarga en segundo plano (no desmonta el modal). Al evaluar el pago (`reviewPayment(id, true)`) pasa a `active`. La tabla ofrece *"Simular aprobación"* / *"Rechazar"* en demo y *"Aprobar pago"* / *"Rechazar"* en `api`; en modo real la autorización la debe enforzar el backend (RBAC), no la UI.
+
+### Contrato backend (conectado y verificado)
+
+En `BILLING_ENDPOINTS` (`shared/services/endpoints.ts`):
+
+- `GET /billing/subscription` → idealmente `{ plans, subscription, payments }` en un solo viaje; también acepta la suscripción directa. Si faltan planes o pagos, `httpSubscriptionGateway` completa con `GET /billing/plans` y `GET /billing/payments` (aceptan arreglo, `{ items }` o `{ data }`). Agregar planes no cambia la UI.
+- `POST /billing/payments` con `{ subscriptionId, method, reference, paidAt, bank, proofName, proofDataUrl }` → `PaymentRecord` con `status: 'pending_review'`.
+- `PATCH /billing/payments/{id}/review` con `{ approved, note? }` → `{ payment, subscription }`.
+
+`VITE_AUTH_MODE=api` (con `VITE_API_URL`) usa estos cuatro endpoints; `demo` (predeterminado) no hace red. `ProtectedRoute` **no** debe usar el contador global de peticiones HTTP como estado de sesión: eso desmontaba la página en cada petición y generaba un loop de `GET`. La sesión se hidrata de forma síncrona; `isLoading` del `AuthContext` queda reservado para resolución de sesión.
+
+Los datos bancarios reales se reemplazan **solo** en `data/subscription-data.ts` (`paymentAccounts`). Los actuales son placeholders de demostración y el modal lo advierte en modo demo.
+
+> La intuición inicial de "cachea" se resolvió como **Cashea** (plataforma de referencia para el flujo de validación de pagos) y, además, se implementó caché local del borrador. No mencionar proveedores externos en el copy de la UI.
+
+> Verificado con Chrome CDP: build/lint limpios; demo y `api` (mock) cubren validación por paso, edición desde el resumen, envío → `pending_review` → aprobación → `active`, sin errores de consola. El log del mock confirmó `GET /billing/subscription`, `GET /billing/plans`, `GET /billing/payments`, `POST /billing/payments` y `PATCH /billing/payments/{id}/review`. La UI no muestra Visa/cobro automático ni facturas falsas.
+

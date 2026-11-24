@@ -1,7 +1,11 @@
+import { backups } from '@/features/panel/data/panel-data'
+import { useAuth } from '@/shared/hooks/useAuth'
 import { MS } from '@/shared/ui/MS'
 
 /** Banner de identidad y fila de KPIs del panel (réplica de Stitch). */
 export function PanelOverview() {
+  const { user } = useAuth()
+
   return (
     <>
       <div className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-lg shadow-sm">
@@ -12,10 +16,10 @@ export function PanelOverview() {
             <div className="flex items-center gap-space-sm flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
                 <span className="w-2 h-2 rounded-full bg-secondary" />
-                Membresía Activa
+                Tu cuenta NovusPOS
               </span>
               <span className="font-label-sm text-label-sm font-mono text-on-surface-variant">
-                Suscripción: Plan Mensual ($4.99 USD/mes)
+                Suscripción y pagos en un solo lugar
               </span>
               <span className="font-label-sm text-label-sm font-mono text-outline-variant">•</span>
               <span className="font-label-sm text-label-sm text-primary font-mono font-medium">NovusPOS para Windows</span>
@@ -24,8 +28,8 @@ export function PanelOverview() {
               Panel de Cliente NovusPOS
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant">
-              Bienvenido, <span className="font-semibold text-on-surface">Minisúper Las Palmas</span>. Administra tu
-              licencia, tus respaldos y la descarga de NovusPOS para Windows.
+              Bienvenido, <span className="font-semibold text-on-surface">{user?.organizationName ?? 'tu negocio'}</span>.
+              Administra tu licencia, tus respaldos y la descarga de NovusPOS para Windows.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-space-sm pt-space-xs xl:pt-0">
@@ -56,9 +60,11 @@ export function PanelOverview() {
           <div className="flex items-start justify-between">
             <div className="flex flex-col">
               <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
-                Estado de Membresía
+                Mi Suscripción
               </span>
-              <span className="font-headline-sm text-headline-sm text-on-surface font-bold mt-1">Activa</span>
+              <a href="/panel/suscripcion" className="font-headline-sm text-headline-sm text-on-surface font-bold mt-1 hover:text-primary transition-colors">
+                Ver detalle
+              </a>
             </div>
             <div className="w-10 h-10 rounded-lg bg-secondary-container/50 flex items-center justify-center text-secondary">
               <MS name="verified" className="text-[22px]" />
@@ -66,9 +72,11 @@ export function PanelOverview() {
           </div>
           <div className="mt-space-md pt-space-sm flex items-center justify-between">
             <span className="font-label-sm text-label-sm font-mono text-secondary font-medium flex items-center gap-1">
-              <MS name="event_repeat" className="text-[14px]" /> 28 días restantes
+              <MS name="event_repeat" className="text-[14px]" /> Planes y pagos
             </span>
-            <span className="font-label-sm text-label-sm font-mono text-on-surface-variant font-bold">$4.99 USD</span>
+            <a href="/panel/suscripcion" className="font-label-sm text-label-sm font-mono text-primary font-bold hover:underline">
+              Ir al módulo →
+            </a>
           </div>
         </div>
 
@@ -114,9 +122,11 @@ export function PanelOverview() {
           </div>
           <div className="mt-space-md pt-space-sm flex items-center justify-between">
             <span className="font-label-sm text-label-sm font-mono text-on-surface-variant truncate max-w-[150px]">
-              respaldo_novuspos_2026_03_28
+              {backups[0]?.name ?? 'Aún sin copias'}
             </span>
-            <span className="font-label-sm text-label-sm font-mono text-on-surface font-bold">14.2 MB</span>
+            <span className="font-label-sm text-label-sm font-mono text-on-surface font-bold">
+              {backups[0]?.detail ?? 'En tu equipo'}
+            </span>
           </div>
         </div>
 

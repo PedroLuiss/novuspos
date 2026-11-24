@@ -18,20 +18,27 @@ export function PanelSidebar() {
             </div>
           </div>
           <nav className="flex flex-col gap-space-xs px-space-sm">
-            {panelNavItems.map((item) => (
-              <a
-                key={item.label}
-                href="/panel"
-                className={`flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors ${
-                  item.active
-                    ? 'bg-primary-container text-on-primary font-semibold'
-                    : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md'
-                }`}
-              >
-                <MS name={item.icon} className="text-[20px]" />
-                <span>{item.label}</span>
-              </a>
-            ))}
+            {panelNavItems.map((item) => {
+              const isActive =
+                item.href === '/panel/suscripcion'
+                  ? window.location.pathname.startsWith(item.href)
+                  : Boolean(item.active) && window.location.pathname === '/panel'
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-primary-container text-on-primary font-semibold'
+                      : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-md text-label-md'
+                  }`}
+                >
+                  <MS name={item.icon} className="text-[20px]" />
+                  <span>{item.label}</span>
+                </a>
+              )
+            })}
           </nav>
         </div>
         <div className="px-space-md flex flex-col gap-space-xs">

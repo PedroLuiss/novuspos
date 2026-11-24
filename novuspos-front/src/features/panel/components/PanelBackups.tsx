@@ -49,7 +49,7 @@ export function PanelBackups() {
               </div>
             </div>
             <div className="flex items-center gap-space-md justify-between md:justify-end">
-              <span className="font-label-sm text-label-sm font-mono font-bold text-on-surface">{backup.size}</span>
+              <span className="font-label-sm text-label-sm font-mono font-bold text-on-surface">{backup.detail}</span>
               <div className="flex items-center gap-space-xs">
                 <button className="px-space-md py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-bright text-primary font-label-md text-label-md font-semibold transition-colors flex items-center gap-1 shadow-sm">
                   <MS name="file_download" className="text-[16px]" />

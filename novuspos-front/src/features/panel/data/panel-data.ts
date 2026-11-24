@@ -3,54 +3,47 @@
 export interface PanelNavItem {
   icon: string
   label: string
+  href: string
   active?: boolean
 }
 
 export const panelNavItems: PanelNavItem[] = [
-  { icon: 'grid_view', label: 'Panel General', active: true },
-  { icon: 'devices', label: 'Cajas Registradoras' },
-  { icon: 'credit_card', label: 'Suscripción ($4.99)' },
-  { icon: 'cloud_sync', label: 'Copias de Seguridad' },
-  { icon: 'headset_mic', label: 'Soporte Técnico' },
-]
-
-export interface Invoice {
-  folio: string
-  period: string
-  chargeDate: string
-  method: string
-  amount: string
-  status: string
-}
-
-export const invoices: Invoice[] = [
-  { folio: 'INV-2026-0326', period: '26 Mar 2026 - 26 Abr 2026', chargeDate: '26/03/2026 09:12', method: 'Visa •••• 4821', amount: '$4.99 USD', status: 'PAGADO' },
-  { folio: 'INV-2026-0226', period: '26 Feb 2026 - 26 Mar 2026', chargeDate: '26/02/2026 09:10', method: 'Visa •••• 4821', amount: '$4.99 USD', status: 'PAGADO' },
-  { folio: 'INV-2026-0126', period: '26 Ene 2026 - 26 Feb 2026', chargeDate: '26/01/2026 09:10', method: 'Visa •••• 4821', amount: '$4.99 USD', status: 'PAGADO' },
+  { icon: 'grid_view', label: 'Panel General', href: '/panel', active: true },
+  { icon: 'devices', label: 'Cajas Registradoras', href: '/panel' },
+  { icon: 'credit_card', label: 'Suscripción', href: '/panel/suscripcion' },
+  { icon: 'cloud_sync', label: 'Copias de Seguridad', href: '/panel' },
+  { icon: 'headset_mic', label: 'Soporte Técnico', href: '/panel' },
 ]
 
 export interface BackupItem {
   name: string
   meta: string
-  size: string
+  detail: string
   recent?: boolean
+}
+
+function backupName(daysAgo: number, suffix = ''): string {
+  const date = new Date()
+  date.setDate(date.getDate() - daysAgo)
+  const stamp = date.toISOString().slice(0, 10).replace(/-/g, '_')
+  return `respaldo_novuspos_${stamp}${suffix}`
 }
 
 export const backups: BackupItem[] = [
   {
-    name: 'respaldo_novuspos_2026_03_28_1030',
-    meta: 'Generado hoy a las 10:30 AM • Caja #1 • 1,420 productos • 385 ventas',
-    size: '14.2 MB',
+    name: backupName(0),
+    meta: 'Caja #1 • copia disponible en tu equipo',
+    detail: 'Copia reciente',
     recent: true,
   },
   {
-    name: 'respaldo_novuspos_2026_03_27_2300_cierre',
-    meta: 'Cierre de turno ayer 11:00 PM • Caja #1 • 1,420 productos',
-    size: '14.1 MB',
+    name: backupName(1, '_cierre'),
+    meta: 'Caja #1 • copia al cerrar el turno',
+    detail: 'Cierre de turno',
   },
   {
-    name: 'respaldo_novuspos_2026_03_26_2300_cierre',
-    meta: 'Cierre de turno 26 Mar 11:00 PM • Caja #1 • 1,418 productos',
-    size: '13.9 MB',
+    name: backupName(2, '_cierre'),
+    meta: 'Caja #1 • copia al cerrar el turno',
+    detail: 'Cierre de turno',
   },
 ]

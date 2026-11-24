@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { AuthContext, type AuthContextValue } from './auth-context'
 import { sessionStore, type SessionStore } from '@/shared/lib/auth-storage'
 import type { AuthSession, AuthUser } from '@/shared/lib/auth-types'
-import { clearUnauthorizedHandler, setUnauthorizedHandler, subscribeLoading } from '@/shared/services/apiClient'
+import { clearUnauthorizedHandler, setUnauthorizedHandler } from '@/shared/services/apiClient'
 
 interface AuthProviderProps {
   children: ReactNode
@@ -18,9 +18,12 @@ export function AuthProvider({ children, onUnauthorized, store = sessionStore }:
     const user = store.getUser()
     return token && user ? { token, user } : null
   })
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => subscribeLoading(setIsLoading), [])
+  /**
+   * La sesión se hidrata de forma síncrona desde el almacenamiento local.
+   * El indicador global de peticiones HTTP no debe afectar al guardián de rutas:
+   * si se usara, cada petición de una página desmontaría sus propios efectos.
+   */
+  const isLoading = false
 
   useEffect(() => {
     setUnauthorizedHandler(() => {

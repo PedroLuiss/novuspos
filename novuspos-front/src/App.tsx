@@ -19,7 +19,7 @@ export default function App() {
   if (route.view === 'panel') {
     return (
       <ProtectedRoute>
-        <PanelPage />
+        <PanelPage section={route.section} />
       </ProtectedRoute>
     )
   }

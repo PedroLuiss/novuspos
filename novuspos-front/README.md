@@ -16,11 +16,12 @@ npm run preview  # servir el build
 
 ```text
 src/
-├── App.tsx                       # pathname: /auth | /auth/login → AuthPage; /panel → PanelPage
+├── App.tsx                       # pathname: /auth… → AuthPage; /panel | /panel/suscripcion → PanelPage
 ├── app/LandingPage.tsx           # SiteHeader + <main class="pt-20"> + secciones + Footer
 ├── app/AuthPage.tsx              # split 5/7 de Iniciar Sesión / Registro
 ├── app/PanelPage.tsx             # Panel de Control de Clientes (sidebar + bento grid)
-├── features/panel/               # PanelSidebar, PanelOverview, PanelLicense, PanelBilling, PanelBackups
+├── features/panel/               # PanelSidebar, PanelOverview, PanelLicense, PanelBackups
+├── features/subscription/        # Suscripción: gateway, hooks, tarjeta, historial y modal de pago
 ├── shared/ui/MS.tsx              # icono Material Symbols (filled opcional)
 ├── features/auth/                # AuthBrandPanel, AuthFormPanel, formularios y datos
 ├── features/landing/
@@ -106,17 +107,23 @@ Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo
 
 ## Panel de Control de Clientes
 
-Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (screen `98a61d2fa58e4476ab0d250be8a57755`), montado en `/panel`. Mantiene el sidebar, el header, los KPIs, la licencia, la facturación y los respaldos class-por-class; el copy se auditó igual que auth (sin versión, `.EXE`, ESC/POS, SQLite, nube, AES-256 ni token real). Los botones son demostrativos. El icono del sidebar es `public/novuspos-icon.png` (recorte del logo). Ver skill §17 y contexto 09 §5.12.
+Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (screen `98a61d2fa58e4476ab0d250be8a57755`), montado en `/panel`. Mantiene el sidebar, el header, los KPIs, la licencia y los respaldos class-por-class; el copy se auditó igual que auth (sin versión, `.EXE`, ESC/POS, SQLite, nube, AES-256 ni token real). La antigua facturación con Visa/cobro automático fue reemplazada por el módulo de Suscripción. El icono del sidebar es `public/novuspos-icon.png` (recorte del logo). Ver skill §17 y contexto 09 §5.12.
 
 ## Capa HTTP y sesión
 
 `src/shared/services/apiClient.ts` es la fachada pública; la implementación está en `src/shared/services/http/` (transporte, errores y bus de eventos). Usa `fetch` con base URL `VITE_API_URL` (ver `.env.example`), cabecera Bearer y errores tipados: 401 limpia la sesión y redirige, 422 expone errores por campo, 500 muestra un mensaje amigable. `AuthProvider` (en `main.tsx`) hidrata la sesión desde `localStorage` sin parpadeo; `useAuth` expone `user`, `token`, `isAuthenticated`, `isLoading`, `login`, `logout` y `updateUser`. `/panel` está protegido por `ProtectedRoute` y el login consume `POST /auth/login` con `{ token, user }` a través de `AuthGateway` + `useLogin`. La arquitectura aplica Facade, Repository, Observer, caso de uso con DIP y componentes presentacionales: ver skill §19 y contexto 09 §5.13.
 
-El backend aún no existe: `VITE_AUTH_MODE=demo` (predeterminado) permite entrar con cualquier correo y contraseña de 4+ caracteres; al tener la API, cambia a `VITE_AUTH_MODE=api` y ajusta `VITE_API_URL`. Los endpoints están en `src/shared/services/endpoints.ts`. Ver skill §20.
+El backend aún no existe: `VITE_AUTH_MODE=demo` (predeterminado) permite entrar con cualquier correo y contraseña de 4+ caracteres; al tener la API, cambia a `VITE_AUTH_MODE=api` y ajusta `VITE_API_URL`. Los endpoints están en `src/shared/services/endpoints.ts`. `ProtectedRoute` no usa el contador global de peticiones HTTP como estado de sesión (eso desmontaba las páginas y generaba un loop de peticiones); la sesión se hidrata de forma síncrona. Ver skill §20.
 
 ### Recuperación de contraseña
 
 Dos pantallas replicadas de Stitch: `/auth/recuperar` (solicitar enlace, accesible desde *"¿Olvidaste tu contraseña?"*) y `/auth/restablecer?token=…&email=…` (nueva clave, solo desde el correo). Layout class-por-class; el copy técnico de Stitch se sustituyó por texto honesto. Misma arquitectura que el login: `PasswordRecoveryGateway` con adaptadores demo/API, casos de uso, hooks container y componentes presentacionales. Contrato del backend: `POST /auth/forgot-password` con `{ email }` y `POST /auth/reset-password` con `{ token, email, password }` → `{ token, user }` (auto-login). En modo demo el banner de éxito incluye *"Abrir enlace de demostración →"* para probar el flujo sin API. Ver skill §21 y contexto 09 §5.14.
+
+## Módulo de Suscripción
+
+Ruta limpia `/panel/suscripcion` (también integrado en `/panel`). Muestra el plan contratado, su estado y el historial de pagos. El modal de pago guía en 3 pasos: datos bancarios de Novus y elección de pago móvil/transferencia, datos del comprobante (referencia, fecha, banco, imagen) y confirmación, con edición desde el resumen. El borrador se guarda en el navegador para retomarlo; al enviar, la suscripción queda **pendiente de evaluación** y al aprobar el pago pasa a **activa**. La tabla permite aprobar o rechazar: en demo como simulación y en `api` mediante el endpoint real (el backend debe aplicar RBAC).
+
+Los datos bancarios son ejemplos editables en `src/features/subscription/data/subscription-data.ts`. Contrato conectado en `src/shared/services/endpoints.ts`: `GET /billing/subscription` → `{ plans, subscription, payments }` (si faltan planes o pagos se completan con `GET /billing/plans` y `GET /billing/payments`), `POST /billing/payments` → pago pendiente y `PATCH /billing/payments/{id}/review` → `{ payment, subscription }`. El modo `demo` es el predeterminado; con `VITE_AUTH_MODE=api` y `VITE_API_URL` se usan los endpoints reales. Ver skill §22 y contexto 09 §5.15.
 
 ## Copy de la landing
 

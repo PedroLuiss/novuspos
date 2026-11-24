@@ -7,3 +7,11 @@ export const AUTH_ENDPOINTS = {
   forgotPassword: '/auth/forgot-password',
   resetPassword: '/auth/reset-password',
 } as const
+
+/** Contrato de rutas de facturación y suscripciones. */
+export const BILLING_ENDPOINTS = {
+  plans: '/billing/plans',
+  subscription: '/billing/subscription',
+  payments: '/billing/payments',
+  reviewPayment: (paymentId: string) => `/billing/payments/${paymentId}/review`,
+} as const
