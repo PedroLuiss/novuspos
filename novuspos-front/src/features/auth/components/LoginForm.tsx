@@ -61,7 +61,7 @@ export function LoginForm({ onSubmit, fieldErrors = {}, formError, isSubmitting 
         onChange={setPassword}
         error={fieldErrors.password?.[0]}
         action={
-          <a className="font-label-sm text-label-sm text-primary hover:underline" href="/">
+          <a className="font-label-sm text-label-sm text-primary hover:underline" href="/auth/recuperar">
             ¿Olvidaste tu contraseña?
           </a>
         }

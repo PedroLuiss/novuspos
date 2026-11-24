@@ -1,6 +1,8 @@
 import { AuthPage } from '@/app/AuthPage'
+import { ForgotPasswordPage } from '@/app/ForgotPasswordPage'
 import { LandingPage } from '@/app/LandingPage'
 import { PanelPage } from '@/app/PanelPage'
+import { ResetPasswordPage } from '@/app/ResetPasswordPage'
 import { resolveAppRoute } from '@/app/routeResolver'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 
@@ -9,6 +11,10 @@ export default function App() {
   const route = resolveAppRoute(window.location.pathname)
 
   if (route.view === 'auth') return <AuthPage initialMode={route.mode} />
+
+  if (route.view === 'recovery') {
+    return route.mode === 'request' ? <ForgotPasswordPage /> : <ResetPasswordPage />
+  }
 
   if (route.view === 'panel') {
     return (

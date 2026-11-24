@@ -482,3 +482,62 @@ VITE_AUTH_MODE=demo   # demo | api
 
 > Verificado: demo entra a `/panel` y muestra el email introducido; modo `api` con mock 422 muestra error general y por campo; build/lint limpios en ambos modos. Al terminar una prueba en modo `api`, reconstruir sin la variable para dejar el build por defecto en demo.
 
+---
+
+## 21. Recuperación de contraseña (2 pantallas de Stitch)
+
+Screens de Stitch (mismo proyecto `14269822984035378146`):
+- **Recuperar Contraseña - Solicitar Enlace** → `projects/14269822984035378146/screens/54dd58adf2904fa2b26ba64f3876d27d/fileEntries/html`
+- **Restablecer Nueva Contraseña** → `projects/14269822984035378146/screens/57592e1e7d8241ec9751a890983bd430/fileEntries/html`
+
+### Rutas limpias
+
+| Ruta | Pantalla | Acceso |
+| :--- | :--- | :--- |
+| `/auth/recuperar` | Solicitar enlace | Link *"¿Olvidaste tu contraseña?"* del login |
+| `/auth/restablecer?token=…&email=…` | Crear nueva contraseña | Solamente desde el enlace enviado al correo |
+
+`resolveAppRoute` evalúa estas dos rutas **antes** del prefijo genérico `/auth`. `readRecoveryLinkParams(search)` (en `features/auth/lib/recoveryLink.ts`) es la única función que lee `token`/`email` de la query. Sin `token`, la tarjeta muestra un banner pidiendo un enlace nuevo.
+
+### Estructura (mismos patrones de §19/§20)
+
+```
+app/ForgotPasswordPage.tsx              # layout + glows + cabecera + pie (Stitch)
+app/ResetPasswordPage.tsx               # layout + glows + pie (Stitch)
+features/auth/components/recovery/
+  RequestResetCard.tsx                  # presentacional, tarjeta de solicitud
+  ResetPasswordCard.tsx                 # presentacional, tarjeta de nueva clave
+  PasswordRequirements.tsx              # medidor de fuerza + checklist
+features/auth/lib/
+  recoveryLink.ts                       # parseo/construcción del enlace (puro)
+  passwordStrength.ts                   # analyzePassword / isStrongPassword (puro)
+  formErrors.ts                         # toFormError compartido por los 3 hooks
+features/auth/services/
+  passwordRecoveryGateway.ts            # puerto: requestLink + reset
+  demoPasswordRecoveryGateway.ts        # demo sin red (DEMO_RESET_TOKEN)
+  httpPasswordRecoveryGateway.ts        # endpoints reales
+  passwordRecoveryGatewayFactory.ts     # elige según VITE_AUTH_MODE
+  passwordRecoveryService.ts            # requestPasswordResetUseCase / resetPasswordUseCase
+features/auth/hooks/
+  useForgotPassword.ts                  # container: loader, errores, banner de éxito
+  useResetPassword.ts                   # container: reset + login + redirect a /panel
+```
+
+### Contrato de API (a implementar en el backend)
+
+En `AUTH_ENDPOINTS` (`shared/services/endpoints.ts`):
+- `POST /auth/forgot-password` con `{ email }` → responde 200/204. Errores 422 por campo se normalizan igual que login.
+- `POST /auth/reset-password` con `{ token, email, password }` → responde `{ token, user }` (auto-login: el botón dice *"Restablecer y acceder a mi cuenta"*).
+
+`email` viaja en la query del enlace y se reenvía al endpoint. Si el backend usa otro nombre de campo, cambiar **solo** `httpPasswordRecoveryGateway.ts`.
+
+### Modo demo
+
+`VITE_AUTH_MODE=demo` (predeterminado) no hace red: `requestLink` valida `@` y muestra el banner *"¡Enlace enviado!"*; dentro del banner aparece **"Abrir enlace de demostración →"** que lleva a `/auth/restablecer?token=demo-reset-token&email=…`. El reseteo exige 8 caracteres con mayúscula, minúscula, número y símbolo; al terminar entra a `/panel` con el correo introducido. En modo `api` ese enlace no aparece.
+
+### Copy auditado (layout idéntico, texto honesto)
+
+Se conservan clases y composición de Stitch, pero se sustituyen los textos falsos/técnicos: `TERMINAL AUTORIZADA • CLOUD GATEWAY` → `ACCESO SEGURO A TU CUENTA`; `Cifrado TLS 1.3 • Certificación PCI-DSS Compliant` → `Tus datos están protegidos`; `cifrado AES-256 de extremo a extremo` → `Tus credenciales se guardan de forma segura`; `Validando terminal…` → `Enviando enlace…`; `credencial de terminal` se elimina. Los enlaces de asistencia y legales llevan a `/` porque no hay páginas dedicadas.
+
+> Verificado: ambas pantallas renderizan sin los textos sensibles; flujo demo completa llega a `/panel`; sin `token` aparece el aviso; modo `api` con mock 422 muestra error general y por campo en ambos endpoints; build/lint limpios.
+

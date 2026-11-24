@@ -4,4 +4,6 @@ export const AUTH_ENDPOINTS = {
   register: '/auth/register',
   me: '/auth/me',
   logout: '/auth/logout',
+  forgotPassword: '/auth/forgot-password',
+  resetPassword: '/auth/reset-password',
 } as const

@@ -1,16 +1,14 @@
 import { useCallback, useState } from 'react'
 import { useAuth } from '@/shared/hooks/useAuth'
-import { ApiError, ValidationError, type ValidationIssues } from '@/shared/services/apiClient'
+import { emptyFormErrors, toFormError, type FormErrorState } from '../lib/formErrors'
 import { loginUseCase } from '../services/authService'
 import type { LoginCredentials } from '../types'
 
-interface LoginState {
+interface LoginState extends FormErrorState {
   isSubmitting: boolean
-  fieldErrors: ValidationIssues
-  formError: string | null
 }
 
-const initialState: LoginState = { isSubmitting: false, fieldErrors: {}, formError: null }
+const initialState: LoginState = { ...emptyFormErrors, isSubmitting: false }
 
 /** Orquesta el caso de uso de login; el componente solo renderiza su estado. */
 export function useLogin() {
@@ -29,17 +27,10 @@ export function useLogin() {
           window.location.assign('/panel')
         })
         .catch((error: unknown) => {
-          if (error instanceof ValidationError) {
-            setState({ isSubmitting: false, fieldErrors: error.issues ?? {}, formError: error.message })
-          } else if (error instanceof ApiError) {
-            setState({ isSubmitting: false, fieldErrors: {}, formError: error.message })
-          } else {
-            setState({
-              isSubmitting: false,
-              fieldErrors: {},
-              formError: 'No pudimos iniciar sesión. Inténtalo de nuevo.',
-            })
-          }
+          setState({
+            ...initialState,
+            ...toFormError(error, 'No pudimos iniciar sesión. Inténtalo de nuevo.'),
+          })
         })
     },
     [login],

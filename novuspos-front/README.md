@@ -114,6 +114,10 @@ Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (scre
 
 El backend aún no existe: `VITE_AUTH_MODE=demo` (predeterminado) permite entrar con cualquier correo y contraseña de 4+ caracteres; al tener la API, cambia a `VITE_AUTH_MODE=api` y ajusta `VITE_API_URL`. Los endpoints están en `src/shared/services/endpoints.ts`. Ver skill §20.
 
+### Recuperación de contraseña
+
+Dos pantallas replicadas de Stitch: `/auth/recuperar` (solicitar enlace, accesible desde *"¿Olvidaste tu contraseña?"*) y `/auth/restablecer?token=…&email=…` (nueva clave, solo desde el correo). Layout class-por-class; el copy técnico de Stitch se sustituyó por texto honesto. Misma arquitectura que el login: `PasswordRecoveryGateway` con adaptadores demo/API, casos de uso, hooks container y componentes presentacionales. Contrato del backend: `POST /auth/forgot-password` con `{ email }` y `POST /auth/reset-password` con `{ token, email, password }` → `{ token, user }` (auto-login). En modo demo el banner de éxito incluye *"Abrir enlace de demostración →"* para probar el flujo sin API. Ver skill §21 y contexto 09 §5.14.
+
 ## Copy de la landing
 
 Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.
