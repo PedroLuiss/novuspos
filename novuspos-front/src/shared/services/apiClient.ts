@@ -20,6 +20,9 @@ export interface LoginResponse {
 
 export const apiClient = {
   get: <T>(path: string, options?: ApiRequestOptions) => request<T>(path, { ...options, method: 'GET' }),
+  /** Descarga autenticada; el transporte devuelve un Blob en vez de JSON. */
+  getBlob: (path: string, options?: ApiRequestOptions) =>
+    request<Blob>(path, { ...options, method: 'GET', responseType: 'blob' }),
   post: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>
     request<T>(path, { ...options, method: 'POST', body }),
   put: <T>(path: string, body?: unknown, options?: ApiRequestOptions) =>

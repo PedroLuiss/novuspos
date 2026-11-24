@@ -1,4 +1,3 @@
-import { backups } from '@/features/panel/data/panel-data'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { MS } from '@/shared/ui/MS'
 
@@ -122,11 +121,11 @@ export function PanelOverview() {
           </div>
           <div className="mt-space-md pt-space-sm flex items-center justify-between">
             <span className="font-label-sm text-label-sm font-mono text-on-surface-variant truncate max-w-[150px]">
-              {backups[0]?.name ?? 'Aún sin copias'}
+              Registro de copias
             </span>
-            <span className="font-label-sm text-label-sm font-mono text-on-surface font-bold">
-              {backups[0]?.detail ?? 'En tu equipo'}
-            </span>
+            <a href="/panel/respaldos" className="font-label-sm text-label-sm font-mono text-primary font-bold hover:underline">
+              Ver detalle →
+            </a>
           </div>
         </div>
 

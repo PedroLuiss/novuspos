@@ -20,9 +20,9 @@ export function PanelSidebar() {
           <nav className="flex flex-col gap-space-xs px-space-sm">
             {panelNavItems.map((item) => {
               const isActive =
-                item.href === '/panel/suscripcion'
-                  ? window.location.pathname.startsWith(item.href)
-                  : Boolean(item.active) && window.location.pathname === '/panel'
+                item.href === '/panel'
+                  ? Boolean(item.active) && window.location.pathname === '/panel'
+                  : window.location.pathname.startsWith(item.href)
               return (
                 <a
                   key={item.label}

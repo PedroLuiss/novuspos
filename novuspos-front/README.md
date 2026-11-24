@@ -125,6 +125,12 @@ Ruta limpia `/panel/suscripcion` (también integrado en `/panel`). Muestra el pl
 
 Los datos bancarios son ejemplos editables en `src/features/subscription/data/subscription-data.ts`. Contrato conectado en `src/shared/services/endpoints.ts`: `GET /billing/subscription` → `{ plans, subscription, payments }` (si faltan planes o pagos se completan con `GET /billing/plans` y `GET /billing/payments`), `POST /billing/payments` → pago pendiente y `PATCH /billing/payments/{id}/review` → `{ payment, subscription }`. El modo `demo` es el predeterminado; con `VITE_AUTH_MODE=api` y `VITE_API_URL` se usan los endpoints reales. Ver skill §22 y contexto 09 §5.15.
 
+## Módulo de Copias de Seguridad
+
+Ruta limpia `/panel/respaldos` (también integrado en `/panel`). Registra las copias que crea NovusPOS en la computadora: equipo, tipo, fecha y archivo. Muestra indicadores, historial con estados (*Verificada*, *En espera*, *Con incidencia*) y permite verificar, descargar y eliminar registros. El alta usa los campos reutilizables de `shared/ui/FormFields.tsx` y un formulario validado antes de enviar.
+
+Contrato en `src/shared/services/endpoints.ts`: `GET /backups`, `POST /backups` (multipart con el archivo), `PATCH /backups/{id}/verify`, `GET /backups/{id}/download` y `DELETE /backups/{id}`. El adaptador HTTP usa `FormData` y descargas `Blob` autenticadas. El modo `demo` persiste en `localStorage` y es el predeterminado; con `VITE_AUTH_MODE=api` se usan los endpoints reales. Ver skill §23 y contexto 09 §5.16.
+
 ## Copy de la landing
 
 Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.

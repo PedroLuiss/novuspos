@@ -16,6 +16,7 @@ export function resolveAppRoute(pathname: string): AppRoute {
     return { view: 'auth', mode: pathname.includes('login') ? 'login' : 'register' }
   }
   if (pathname.startsWith('/panel/suscripcion')) return { view: 'panel', section: 'subscription' }
+  if (pathname.startsWith('/panel/respaldos')) return { view: 'panel', section: 'backups' }
   if (pathname.startsWith('/panel')) return { view: 'panel', section: 'general' }
   return { view: 'landing' }
 }

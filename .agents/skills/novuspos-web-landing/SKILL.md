@@ -610,3 +610,59 @@ Los datos bancarios reales se reemplazan **solo** en `data/subscription-data.ts`
 
 > Verificado con Chrome CDP: build/lint limpios; demo y `api` (mock) cubren validación por paso, edición desde el resumen, envío → `pending_review` → aprobación → `active`, sin errores de consola. Los campos de suscripción y del login comparten las mismas clases (`pl-10`, `h-11`, `focus:ring-primary/40`) y sus etiquetas/iconos se verificaron en el DOM. El log del mock confirmó `GET /billing/subscription`, `GET /billing/plans`, `GET /billing/payments`, `POST /billing/payments` y `PATCH /billing/payments/{id}/review`. La UI no muestra Visa/cobro automático ni facturas falsas.
 
+## 23. Módulo de Copias de Seguridad
+
+Registro central de las copias que crea **NovusPOS Desktop**. El portal no crea la copia: la recibe, la lista, permite verificarla, descargarla y quitar el registro. Reemplaza al antiguo `PanelBackups` de Stitch (datos falsos eliminados).
+
+### Rutas y composición
+
+- `/panel/respaldos` muestra `<BackupOverview />` a pantalla completa (`section: 'backups'`).
+- `/panel` también integra `<BackupOverview />` en lugar del antiguo bloque estático.
+- `PanelSidebar` calcula `isActive` de forma genérica: `/panel` solo con pathname exacto; cualquier otra ruta con `startsWith`.
+- `PanelOverview` ya no importa datos falsos de respaldos; su KPI enlaza a `/panel/respaldos`.
+
+### Estructura
+
+```
+features/backups/
+├── types.ts                      # BackupRecord, BackupKind, BackupStatus, RegisterBackupRequest
+├── data/backup-data.ts           # etiquetas, opciones y copias demo con fechas relativas
+├── lib/backupFormatters.ts       # formatBytes, formatBackupDate, toDateTimeLocalValue, backupTitle
+├── lib/backupValidation.ts       # reglas puras del formulario (equipo, tipo, fecha, archivo ≤500 MB)
+├── services/
+│   ├── backupGateway.ts          # puerto: list / register / verify / remove / download
+│   ├── demoBackupGateway.ts      # demo sin red, persiste en localStorage
+│   ├── httpBackupGateway.ts      # endpoints reales (registro multipart)
+│   ├── backupGatewayFactory.ts   # elige según VITE_AUTH_MODE
+│   └── backupService.ts          # fachada + validación antes de enviar
+├── hooks/
+│   ├── useBackups.ts             # contenedor: carga, alta, verificación, descarga y borrado
+│   └── useBackupRegistration.ts  # formulario + errores de campo
+└── components/
+    ├── BackupOverview.tsx        # contenedor de la feature
+    ├── BackupStats.tsx           # indicadores: total, última copia, espacio, estado
+    ├── BackupTable.tsx           # historial y acciones
+    ├── BackupStatusChip.tsx      # Verificada / En espera / Con incidencia
+    ├── BackupFileField.tsx       # selector de archivo con FieldShell
+    └── RegisterBackupModal.tsx   # alta de una copia
+```
+
+### Flujo y contrato
+
+1. **Registrar:** se indican equipo, tipo (automática / manual / al cerrar turno), fecha y hora, y se adjunta el archivo. La copia queda **En espera**.
+2. **Verificar:** el botón de la fila la pasa a **Verificada** (`PATCH …/verify`).
+3. **Descargar:** se obtiene un `Blob` autenticado y se descarga con un nombre amigable; el transporte soporta `responseType: 'blob'` y `FormData` sin forzar `Content-Type`.
+4. **Eliminar:** diálogo de confirmación reutilizable (`shared/ui/ConfirmDialog.tsx`); solo quita el registro del portal, no el archivo del equipo.
+
+En `BACKUP_ENDPOINTS` (`shared/services/endpoints.ts`):
+
+- `GET /backups` → `BackupRecord[]`.
+- `POST /backups` → **multipart** con `device`, `kind`, `createdAt`, `file` y `note?` → `BackupRecord` en estado `pending`.
+- `PATCH /backups/{id}/verify` → `BackupRecord` verificado.
+- `GET /backups/{id}/download` → archivo (Blob).
+- `DELETE /backups/{id}` → 204.
+
+El copy evita nombres de archivo, rutas, extensiones y detalles técnicos en la tabla; solo muestra información operativa. `demo` es el predeterminado y persiste en `novuspos:demo-backups`.
+
+> Verificado con CDP en demo y `api` (mock): carga, validación, alta → en espera → verificación → descarga con nombre `copia-novuspos-…` → eliminación, sin errores de consola. El log del mock confirmó los cinco endpoints. `npm run build` y `npm run lint` limpios.
+

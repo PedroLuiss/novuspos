@@ -15,3 +15,12 @@ export const BILLING_ENDPOINTS = {
   payments: '/billing/payments',
   reviewPayment: (paymentId: string) => `/billing/payments/${paymentId}/review`,
 } as const
+
+/** Contrato de rutas del registro de copias de seguridad. */
+export const BACKUP_ENDPOINTS = {
+  list: '/backups',
+  create: '/backups',
+  verify: (backupId: string) => `/backups/${backupId}/verify`,
+  download: (backupId: string) => `/backups/${backupId}/download`,
+  remove: (backupId: string) => `/backups/${backupId}`,
+} as const

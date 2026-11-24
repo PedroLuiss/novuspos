@@ -1,10 +1,10 @@
-import { PanelBackups } from '@/features/panel/components/PanelBackups'
+import { BackupOverview } from '@/features/backups/components/BackupOverview'
 import { PanelLicense } from '@/features/panel/components/PanelLicense'
 import { PanelOverview } from '@/features/panel/components/PanelOverview'
 import { PanelSidebar } from '@/features/panel/components/PanelSidebar'
 import { SubscriptionOverview } from '@/features/subscription/components/SubscriptionOverview'
 
-export type PanelSection = 'general' | 'subscription'
+export type PanelSection = 'general' | 'subscription' | 'backups'
 
 /** Panel de Control de Clientes — réplica del dashboard de Stitch con módulos. */
 export function PanelPage({ section = 'general' }: { section?: PanelSection }) {
@@ -16,12 +16,14 @@ export function PanelPage({ section = 'general' }: { section?: PanelSection }) {
           <div className="flex flex-col w-full p-space-md lg:p-space-lg gap-space-lg">
             {section === 'subscription' ? (
               <SubscriptionOverview />
+            ) : section === 'backups' ? (
+              <BackupOverview />
             ) : (
               <>
                 <PanelOverview />
                 <PanelLicense />
                 <SubscriptionOverview />
-                <PanelBackups />
+                <BackupOverview />
               </>
             )}
           </div>

@@ -9,6 +9,8 @@ export interface ApiRequestOptions extends Omit<RequestInit, 'body' | 'headers'>
   body?: unknown
   headers?: Record<string, string>
   auth?: boolean
+  /** `blob` para descargas; por defecto se interpreta la respuesta como JSON. */
+  responseType?: 'json' | 'blob'
 }
 
 async function safeJson(response: Response): Promise<unknown> {
@@ -21,20 +23,21 @@ async function safeJson(response: Response): Promise<unknown> {
 
 /** Único punto que ejecuta fetch: inyecta Bearer y traduce códigos HTTP a errores. */
 export async function request<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
-  const { body, headers = {}, auth = true, ...rest } = options
+  const { body, headers = {}, auth = true, responseType = 'json', ...rest } = options
   const token = auth ? sessionStore.getToken() : null
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData
 
   beginRequest()
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...rest,
       headers: {
-        'Content-Type': 'application/json',
         Accept: 'application/json',
+        ...(!isFormData ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
-      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+      ...(body !== undefined ? { body: isFormData ? body : JSON.stringify(body) } : {}),
     })
 
     if (response.status === 401) {
@@ -52,6 +55,7 @@ export async function request<T>(path: string, options: ApiRequestOptions = {}):
       throw new ApiError(response.status, toErrorMessage(payload, `Error ${response.status} (${response.statusText})`))
     }
     if (response.status === 204) return undefined as T
+    if (responseType === 'blob') return (await response.blob()) as T
 
     return (await response.json()) as T
   } finally {
