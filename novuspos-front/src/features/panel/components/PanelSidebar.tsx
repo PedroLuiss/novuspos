@@ -1,8 +1,11 @@
 import { panelNavItems } from '@/features/panel/data/panel-data'
+import { useAuth } from '@/shared/hooks/useAuth'
 import { MS } from '@/shared/ui/MS'
 
 /** Barra lateral y cabecera fija del panel (réplica de Stitch). */
 export function PanelSidebar() {
+  const { user, logout } = useAuth()
+
   return (
     <>
       <aside className="fixed left-0 top-0 h-full w-64 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between py-space-md">
@@ -64,10 +67,23 @@ export function PanelSidebar() {
               <MS name="person" className="text-on-primary text-[18px]" />
             </div>
             <div className="hidden sm:flex flex-col text-left">
-              <span className="font-label-md text-label-md text-on-surface font-semibold leading-tight">Administrador</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">Cuenta principal</span>
+              <span className="font-label-md text-label-md text-on-surface font-semibold leading-tight">
+                {user?.organizationName ?? 'Administrador'}
+              </span>
+              <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">
+                {user?.email ?? 'Cuenta principal'}
+              </span>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={logout}
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+            className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors"
+          >
+            <MS name="logout" className="text-[20px]" />
+          </button>
         </div>
       </header>
     </>

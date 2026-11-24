@@ -7,7 +7,33 @@ const inputBase =
 
 const leftIcon = 'absolute left-3 text-outline text-[20px] pointer-events-none'
 
-function FieldLabel({ id, label, hint, action }: { id: string; label: string; hint?: string; action?: ReactNode }) {
+const fieldClass = (tall: boolean | undefined, right: string, invalid: boolean) =>
+  `${inputBase} ${tall ? 'h-11' : 'h-10'} ${right} ${invalid ? 'ring-2 ring-error/50' : ''}`
+
+interface CommonFieldProps {
+  id: string
+  label: string
+  placeholder: string
+  required?: boolean
+  hint?: string
+  tall?: boolean
+  value?: string
+  onChange?: (value: string) => void
+  disabled?: boolean
+  error?: string
+}
+
+function FieldLabel({
+  id,
+  label,
+  hint,
+  action,
+}: {
+  id: string
+  label: string
+  hint?: string
+  action?: ReactNode
+}) {
   if (!hint && !action) {
     return (
       <label className="font-label-md text-label-md text-on-surface" htmlFor={id}>
@@ -25,19 +51,35 @@ function FieldLabel({ id, label, hint, action }: { id: string; label: string; hi
   )
 }
 
-interface TextFieldProps {
-  id: string
-  label: string
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null
+  return (
+    <span className="font-body-sm text-body-sm text-error" role="alert">
+      {message}
+    </span>
+  )
+}
+
+interface TextFieldProps extends CommonFieldProps {
   icon: string
   type?: string
-  placeholder: string
-  required?: boolean
-  hint?: string
-  tall?: boolean
 }
 
 /** Campo de texto con icono a la izquierda (idéntico a Stitch). */
-export function TextField({ id, label, icon, type = 'text', placeholder, required, hint, tall }: TextFieldProps) {
+export function TextField({
+  id,
+  label,
+  icon,
+  type = 'text',
+  placeholder,
+  required,
+  hint,
+  tall,
+  value,
+  onChange,
+  disabled,
+  error,
+}: TextFieldProps) {
   return (
     <div className="flex flex-col gap-1">
       <FieldLabel id={id} label={label} hint={hint} />
@@ -48,9 +90,14 @@ export function TextField({ id, label, icon, type = 'text', placeholder, require
           type={type}
           placeholder={placeholder}
           required={required}
-          className={`${inputBase} ${tall ? 'h-11' : 'h-10'} pr-3`}
+          disabled={disabled}
+          value={value}
+          onChange={(event) => onChange?.(event.target.value)}
+          aria-invalid={Boolean(error)}
+          className={fieldClass(tall, 'pr-3', Boolean(error))}
         />
       </div>
+      <FieldError message={error} />
     </div>
   )
 }
@@ -64,6 +111,10 @@ export function PasswordField({
   hint,
   action,
   tall,
+  value,
+  onChange,
+  disabled,
+  error,
 }: Omit<TextFieldProps, 'icon' | 'type'> & { action?: ReactNode }) {
   const [visible, setVisible] = useState(false)
   return (
@@ -76,17 +127,22 @@ export function PasswordField({
           type={visible ? 'text' : 'password'}
           placeholder={placeholder}
           required={required}
-          className={`${inputBase} ${tall ? 'h-11' : 'h-10'} pr-10`}
+          disabled={disabled}
+          value={value}
+          onChange={(event) => onChange?.(event.target.value)}
+          aria-invalid={Boolean(error)}
+          className={fieldClass(tall, 'pr-10', Boolean(error))}
         />
         <button
           type="button"
-          onClick={() => setVisible((v) => !v)}
+          onClick={() => setVisible((current) => !current)}
           className="absolute right-3 text-outline hover:text-on-surface focus:outline-none"
           aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         >
           <MS name={visible ? 'visibility_off' : 'visibility'} className="text-[20px]" />
         </button>
       </div>
+      <FieldError message={error} />
     </div>
   )
 }
@@ -97,10 +153,13 @@ interface SelectFieldProps {
   icon: string
   options: { value: string; label: string }[]
   tall?: boolean
+  value?: string
+  onChange?: (value: string) => void
+  disabled?: boolean
 }
 
 /** Selector con icono a la izquierda y chevron a la derecha. */
-export function SelectField({ id, label, icon, options, tall }: SelectFieldProps) {
+export function SelectField({ id, label, icon, options, tall, value, onChange, disabled }: SelectFieldProps) {
   return (
     <div className="flex flex-col gap-1">
       <FieldLabel id={id} label={label} />
@@ -108,7 +167,10 @@ export function SelectField({ id, label, icon, options, tall }: SelectFieldProps
         <MS name={icon} className={leftIcon} />
         <select
           id={id}
-          className={`${inputBase} ${tall ? 'h-11' : 'h-10'} pr-8 appearance-none cursor-pointer`}
+          value={value}
+          onChange={(event) => onChange?.(event.target.value)}
+          disabled={disabled}
+          className={fieldClass(tall, 'pr-8 appearance-none cursor-pointer', false)}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>

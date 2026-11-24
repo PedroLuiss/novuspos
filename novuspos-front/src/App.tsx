@@ -1,17 +1,21 @@
 import { AuthPage } from '@/app/AuthPage'
 import { LandingPage } from '@/app/LandingPage'
 import { PanelPage } from '@/app/PanelPage'
+import { resolveAppRoute } from '@/app/routeResolver'
+import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
 
-/** Punto de entrada de la app web. La composición vive en app/. */
+/** Punto de entrada de la app web: solo compone la vista resuelta. */
 export default function App() {
-  const path = window.location.pathname
+  const route = resolveAppRoute(window.location.pathname)
 
-  if (path.startsWith('/auth')) {
-    return <AuthPage initialMode={path.includes('login') ? 'login' : 'register'} />
-  }
+  if (route.view === 'auth') return <AuthPage initialMode={route.mode} />
 
-  if (path.startsWith('/panel')) {
-    return <PanelPage />
+  if (route.view === 'panel') {
+    return (
+      <ProtectedRoute>
+        <PanelPage />
+      </ProtectedRoute>
+    )
   }
 
   return <LandingPage />

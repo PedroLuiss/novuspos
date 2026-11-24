@@ -1,25 +1,25 @@
 import { useState } from 'react'
+import { useLogin } from '@/features/auth/hooks/useLogin'
+import type { AuthMode } from '@/features/auth/types'
 import { MS } from '@/shared/ui/MS'
 import { LoginForm } from './LoginForm'
 import { RegisterForm } from './RegisterForm'
-
-export type AuthMode = 'register' | 'login'
 
 const tabActive =
   'px-space-md py-2 rounded-lg font-label-md text-label-md transition-all bg-surface-container-lowest text-primary shadow-sm'
 const tabIdle =
   'px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant transition-all hover:text-on-surface'
 
-interface AuthAlert {
+interface RegisterAlert {
   title: string
   description: string
-  kind: 'register' | 'login'
 }
 
-/** Columna derecha del split: tabs, formularios y accesos alternos (réplica de Stitch). */
+/** Columna derecha del split (presentacional): tabs, formularios y accesos alternos. */
 export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
   const [mode, setMode] = useState<AuthMode>(initialMode)
-  const [alert, setAlert] = useState<AuthAlert | null>(null)
+  const [alert, setAlert] = useState<RegisterAlert | null>(null)
+  const login = useLogin()
 
   const switchMode = (next: AuthMode) => {
     setMode(next)
@@ -68,19 +68,15 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
             setAlert({
               title: '¡Cuenta creada exitosamente!',
               description: 'Tu licencia de prueba de 30 días está activa. Descargando NovusPOS para Windows…',
-              kind: 'register',
             })
           }
         />
       ) : (
         <LoginForm
-          onSubmit={() =>
-            setAlert({
-              title: '¡Bienvenido de vuelta!',
-              description: 'Autenticación correcta. Abriendo tu panel de control…',
-              kind: 'login',
-            })
-          }
+          onSubmit={login.submit}
+          fieldErrors={login.fieldErrors}
+          formError={login.formError}
+          isSubmitting={login.isSubmitting}
         />
       )}
 
@@ -112,18 +108,13 @@ export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
         </a>
       </div>
 
-      {/* Confirmación dinámica */}
+      {/* Confirmación del registro */}
       {alert && (
         <div className="mt-space-md p-space-sm rounded-lg bg-secondary-container text-on-secondary-container flex items-center gap-space-sm animate-pulse">
           <MS name="task_alt" className="text-[24px]" />
           <div className="flex flex-col">
             <span className="font-label-md text-label-md">{alert.title}</span>
             <span className="font-body-sm text-body-sm">{alert.description}</span>
-            {alert.kind === 'login' && (
-              <a href="/panel" className="font-label-sm text-label-sm underline font-semibold w-fit">
-                Abrir panel de control →
-              </a>
-            )}
           </div>
         </div>
       )}

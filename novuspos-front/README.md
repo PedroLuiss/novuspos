@@ -108,6 +108,12 @@ Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo
 
 Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (screen `98a61d2fa58e4476ab0d250be8a57755`), montado en `/panel`. Mantiene el sidebar, el header, los KPIs, la licencia, la facturación y los respaldos class-por-class; el copy se auditó igual que auth (sin versión, `.EXE`, ESC/POS, SQLite, nube, AES-256 ni token real). Los botones son demostrativos. El icono del sidebar es `public/novuspos-icon.png` (recorte del logo). Ver skill §17 y contexto 09 §5.12.
 
+## Capa HTTP y sesión
+
+`src/shared/services/apiClient.ts` es la fachada pública; la implementación está en `src/shared/services/http/` (transporte, errores y bus de eventos). Usa `fetch` con base URL `VITE_API_URL` (ver `.env.example`), cabecera Bearer y errores tipados: 401 limpia la sesión y redirige, 422 expone errores por campo, 500 muestra un mensaje amigable. `AuthProvider` (en `main.tsx`) hidrata la sesión desde `localStorage` sin parpadeo; `useAuth` expone `user`, `token`, `isAuthenticated`, `isLoading`, `login`, `logout` y `updateUser`. `/panel` está protegido por `ProtectedRoute` y el login consume `POST /auth/login` con `{ token, user }` a través de `AuthGateway` + `useLogin`. La arquitectura aplica Facade, Repository, Observer, caso de uso con DIP y componentes presentacionales: ver skill §19 y contexto 09 §5.13.
+
+El backend aún no existe: `VITE_AUTH_MODE=demo` (predeterminado) permite entrar con cualquier correo y contraseña de 4+ caracteres; al tener la API, cambia a `VITE_AUTH_MODE=api` y ajusta `VITE_API_URL`. Los endpoints están en `src/shared/services/endpoints.ts`. Ver skill §20.
+
 ## Copy de la landing
 
 Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.

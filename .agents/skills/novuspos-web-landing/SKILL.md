@@ -397,11 +397,11 @@ Pantalla de Stitch: `projects/14269822984035378146/screens/b7520097c4d14ab9913cf
 | `Seguridad Bancaria TLS 1.3`, `Cifrado SSL 256-bit` | `Tu información se queda en tu equipo`, `Tus datos protegidos` |
 | `Compatible con Tickets ESC/POS`, `Sincronización en la Nube` | `Tickets listos para imprimir`, `Respaldos de tu información` |
 | Botones Google Workspace / Microsoft 365 | `Descargar para Windows` y `Ver capturas del sistema` |
-| "Caja / Terminal Asociada" con 3 cajas | `Perfil de acceso`: Cajero / Supervisor / Administrador (RBAC real) |
+| "Caja / Terminal Asociada" con 3 cajas | Campo eliminado: el login solo pide correo y contraseña |
 
 Los formularios son **demostrativos**: `onSubmit` solo muestra una alerta; no existe backend de auth en la landing. `MS` se movió a `shared/ui/MS.tsx` (con `filled` para `speed` y `workspace_premium`) para que landing y auth no se importen entre sí.
 
-> Al sincronizar con Stitch, conservar el layout y volver a aplicar esta tabla. No reintroducir versión, nube, ESC/POS, TLS, SSO ni métricas inventadas. Verificado con Chrome headless a 1280px en ambos modos.
+> Al sincronizar con Stitch, conservar el layout y volver a aplicar esta tabla. No reintroducir versión, nube, ESC/POS, TLS, SSO ni métricas inventadas. Tampoco reintroducir el selector de "Perfil de acceso": el login solo envía `email` y `password` a `POST /auth/login`. Verificado con Chrome headless a 1280px en ambos modos.
 
 ---
 
@@ -416,4 +416,69 @@ Pantalla de Stitch: `projects/14269822984035378146/screens/98a61d2fa58e4476ab0d2
 **Copy auditado:** se retiraron `Build 2.4.0 Production`, `Descargar NovusPOS v2.4.0`, `NovusPOS-Setup-2.4.0-x64.exe (64.8 MB)`, `(.EXE)`, `MD5: ...`, `Versión 2.4.0 Estable`, `ESC/POS`, `RS-232`, `SQLite`, `Zstandard`, `AES-256`, "sincronización con la nube", `Auto-Sync`, `Offline-Ready`, `REG-WIN11-04`, `24/7 Disponible`, `Soporte VIP`, `Caja Central #1`, `Sincronizando ahora`, `ID: #8829` y el token real `NVUS-8829-X7K2-W11P-2026` (ahora enmascarado `NVUS-••••-••••-••••-••••`). También "2 terminales autorizadas" → "1 / 1 en uso" (el sistema es monopuesto). La suscripción, el método de pago enmascarado, las facturas y la prueba de 30 días se conservan por ser decisiones comerciales.
 
 > Al sincronizar con Stitch, conservar el layout y volver a aplicar estos reemplazos. Verificado con Chrome headless a 1280px.
+
+---
+
+## 18. Capa HTTP y sesión global
+
+`src/shared/services/apiClient.ts` usa **fetch nativo** (no añadir axios): `API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'`, inyección de `Authorization: Bearer` leyendo el token en cada petición, y errores tipados `ApiError` / `UnauthorizedError` / `ValidationError`. En 401 se limpia la sesión y se redirige a `/auth/login`; en 422 se normalizan `issues` de FastAPI (`detail[].loc/msg`) y Laravel/Express (`errors`); en 500 se devuelve un mensaje genérico. `setUnauthorizedHandler` permite que el provider limpie el estado sin acoplar `apiClient` al contexto; `subscribeLoading` alimenta `isLoading`.
+
+`src/shared/context/AuthContext.tsx` (provider) + `auth-context.ts` (definición, para fast refresh) + `src/shared/hooks/useAuth.ts`. El estado `session` se inicializa de forma **síncrona** desde `localStorage` (cookie como respaldo del token), así que no hay parpadeo al recargar. Métodos: `login(token,user)`, `logout()`, `updateUser(partial)`. Usuario: `{ id, email, organizationName, role }`.
+
+`src/shared/components/ProtectedRoute.tsx` muestra un skeleton MD3 (`progress_activity` + barra `animate-pulse`) mientras `isLoading` o no hay sesión; la redirección se hace en `useEffect` con `window.location.replace('/auth/login')`. `App.tsx` envuelve `/panel` con él. `main.tsx` monta `<AuthProvider>`. El login real usa `POST /auth/login` → `{ token, user }` y el sidebar ofrece logout. `vite-env.d.ts` y `.env.example` documentan `VITE_API_URL`.
+
+> El registro sigue siendo demostrativo hasta que exista `POST /auth/register`. No mover la definición del contexto dentro de `AuthContext.tsx`: oxlint `only-export-components` avisa y rompe fast refresh.
+
+---
+
+## 19. Patrones de diseño y SOLID (regla para todo el front)
+
+La capa de sesión se refactorizó para que **cada módulo tenga una sola razón de cambio**. Mantener esta separación al añadir código:
+
+| Patrón | Dónde | Responsabilidad |
+| :--- | :--- | :--- |
+| **Facade** | `src/shared/services/apiClient.ts` | Única API pública (`get/post/...`, errores y eventos re-exportados). El resto de la app **nunca** importa `services/http/*`. |
+| **Transport** | `src/shared/services/http/transport.ts` | Solo `fetch`, Bearer y traducción de códigos HTTP. |
+| **Error type + parser** | `src/shared/services/http/errors.ts` | Errores tipados y normalización de 422. |
+| **Observer / event bus** | `src/shared/services/http/events.ts` | `unauthorized` y contador de peticiones en curso; desacopla HTTP del provider. |
+| **Repository (DIP)** | `src/shared/lib/auth-storage.ts` | Interfaz `SessionStore` + implementación `sessionStore`; `AuthProvider` acepta `store` inyectable. |
+| **Use case + Gateway (DIP)** | `src/features/auth/services/authService.ts` | `AuthGateway` (puerto), `httpAuthGateway` (adaptador) y `loginUseCase.execute`. |
+| **Presentational / Container** | `AuthFormPanel` (presentacional) + `useLogin` (container) | El panel solo renderiza; el hook orquesta loader, errores y navegación. |
+| **Guard** | `src/shared/components/ProtectedRoute.tsx` | Único lugar que decide si se renderiza una ruta privada. |
+| **Route resolver** | `src/app/routeResolver.ts` | Función pura `resolveAppRoute(pathname)`; `App` solo compone. |
+| **Context + hook** | `auth-context.ts` / `AuthContext.tsx` / `useAuth.ts` | Definición, provider y consumidor separados (fast refresh + SRP). |
+
+Reglas derivadas:
+
+- **SRP:** un archivo = una responsabilidad. Si un componente empieza a parsear errores o a navegar, extrae un hook o un caso de uso.
+- **OCP:** para cambiar el backend basta otro `AuthGateway`; para cambiar la persistencia, otro `SessionStore`. No tocar UI.
+- **LSP:** cualquier `AuthGateway`/`SessionStore` debe cumplir la interfaz sin condicionar al consumidor.
+- **ISP:** puertos pequeños (una sola operación en `AuthGateway`; cuatro en `SessionStore`).
+- **DIP:** los módulos de alto nivel (hook, provider) dependen de interfaces, no de `fetch` ni de `localStorage`.
+- Componentes ≤ 300 líneas, hooks ≤ 200. Contenido y tipos compartidos en `data/`, `types.ts`, `lib/`; nunca imports cruzados entre features.
+
+> No reintroducir lógica de login dentro de `AuthFormPanel` ni llamadas directas a `fetch` desde componentes. Verificado: build/lint limpios y 422/401/protected route funcionando tras el refactor.
+
+---
+
+## 20. Modo demo y conexión a la API (API aún no lista)
+
+El backend todavía no existe, así que el login tiene **dos adaptadores intercambiables** bajo el mismo puerto `AuthGateway` (§19):
+
+- `demoAuthGateway` — sin red; acepta cualquier correo con `@` y contraseña de 4+ caracteres, simula 350 ms y devuelve `{ token: 'demo-token-*', user: { id, email, organizationName, role } }`. Valida con `ValidationError` para poder probar los mensajes de campo.
+- `httpAuthGateway` — llama a `AUTH_ENDPOINTS.login` (`/auth/login`) mediante `apiClient` y espera `{ token, user }`.
+
+`authGatewayFactory.resolveAuthGateway()` elige uno según `VITE_AUTH_MODE`:
+
+```dotenv
+# .env.example
+VITE_API_URL=http://localhost:8000/api/v1
+VITE_AUTH_MODE=demo   # demo | api
+```
+
+**Predeterminado: `demo`** (fallback cuando la variable no está definida). Para conectar al backend real, poner `VITE_AUTH_MODE=api` y la URL correcta; el comportamiento de la UI y del `AuthProvider` no cambia. Las rutas de la API viven en `src/shared/services/endpoints.ts` (`login`, `register`, `me`, `logout`).
+
+`LoginForm` muestra un aviso *"Modo demostración: entra con cualquier correo y contraseña de 4 caracteres o más"* solo cuando `IS_DEMO_AUTH`; desaparece en modo `api`. El registro sigue demostrativo aunque exista `AUTH_ENDPOINTS.register`: no se introduce hasta que el backend lo implemente.
+
+> Verificado: demo entra a `/panel` y muestra el email introducido; modo `api` con mock 422 muestra error general y por campo; build/lint limpios en ambos modos. Al terminar una prueba en modo `api`, reconstruir sin la variable para dejar el build por defecto en demo.
 

@@ -33,12 +33,6 @@ export const businessSectors = [
   { value: 'general', label: 'Comercio General' },
 ]
 
-export const accessProfiles = [
-  { value: 'cashier', label: 'Cajero (Predeterminado)' },
-  { value: 'supervisor', label: 'Supervisor de turno' },
-  { value: 'admin', label: 'Administrador / Gerencia' },
-]
-
 export interface AuthTrustItem {
   icon: string
   tone: 'primary' | 'secondary'

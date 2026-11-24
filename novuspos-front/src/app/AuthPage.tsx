@@ -1,5 +1,6 @@
 import { AuthBrandPanel } from '@/features/auth/components/AuthBrandPanel'
-import { AuthFormPanel, type AuthMode } from '@/features/auth/components/AuthFormPanel'
+import { AuthFormPanel } from '@/features/auth/components/AuthFormPanel'
+import type { AuthMode } from '@/features/auth/types'
 import { authTrustBar } from '@/features/auth/data/auth-data'
 import { MS } from '@/shared/ui/MS'
 
