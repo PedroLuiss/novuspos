@@ -115,10 +115,11 @@ src/
 ├── app/PanelPage.tsx                   # sidebar + header + bento grid del panel
 ├── features/panel/                     # PanelSidebar, PanelOverview, PanelLicense, PanelBilling, PanelBackups, data/
 ├── shared/ui/MS.tsx                    # icono Material Symbols (filled opcional)
+├── shared/ui/FormFields.tsx            # FieldShell / TextField / PasswordField / SelectField reutilizables
 ├── features/auth/
 │   ├── components/AuthBrandPanel.tsx   # columna izquierda (logo blanco, métricas, beneficios)
 │   ├── components/AuthFormPanel.tsx    # columna derecha (tabs, formularios, accesos)
-│   ├── components/AuthFields.tsx       # TextField / PasswordField / SelectField
+│   ├── components/AuthFields.tsx       # re-export de shared/ui/FormFields (compatibilidad)
 │   ├── components/RegisterForm.tsx     # registro con licencia de prueba
 │   ├── components/LoginForm.tsx        # inicio de sesión con perfil
 │   └── data/auth-data.ts              # beneficios, sectores, perfiles y confianza
@@ -583,13 +584,14 @@ features/subscription/
     ├── PaymentSteps.tsx             # stepper
     ├── PaymentMethodSelector.tsx    # pago móvil / transferencia
     ├── PaymentAccountCard.tsx       # datos de Novus con copiar
+    ├── PaymentSummary.tsx           # resumen del paso 3 (extraído del modal)
     └── ProofUpload.tsx              # captura del comprobante + vista previa
 ```
 
 ### Flujo del modal (3 pasos)
 
 1. **Cómo pagar:** monto, selector pago móvil/transferencia y los datos bancarios de Novus; cada dato se copia con un clic.
-2. **Tus datos:** dígitos de la referencia (6–20, solo números), fecha (no futura), banco (datalist libre) y captura del comprobante. La ayuda sigue la lógica de reporte de pago de **Cashea**: en Banco de Venezuela se reporta el número de operación y en depósitos en efectivo el serial. El borrador se guarda en `localStorage` para retomarlo.
+2. **Tus datos:** dígitos de la referencia (6–20, solo números), fecha (no futura), banco (datalist libre) y captura del comprobante. Los tres campos usan `shared/ui/FormFields` (mismo icono, foco, anillo de error y texto de ayuda del login); el selector de método y la subida usan `FieldShell`. La ayuda sigue la lógica de reporte de pago de **Cashea**: en Banco de Venezuela se reporta el número de operación y en depósitos en efectivo el serial. El borrador se guarda en `localStorage` para retomarlo.
 3. **Confirmar:** resumen y envío. La respuesta deja la suscripción en `pending_review`; el modal muestra "Tu pago está en revisión" y el historial se recarga en segundo plano (no desmonta el modal). Al evaluar el pago (`reviewPayment(id, true)`) pasa a `active`. La tabla ofrece *"Simular aprobación"* / *"Rechazar"* en demo y *"Aprobar pago"* / *"Rechazar"* en `api`; en modo real la autorización la debe enforzar el backend (RBAC), no la UI.
 
 ### Contrato backend (conectado y verificado)
@@ -606,5 +608,5 @@ Los datos bancarios reales se reemplazan **solo** en `data/subscription-data.ts`
 
 > La intuición inicial de "cachea" se resolvió como **Cashea** (plataforma de referencia para el flujo de validación de pagos) y, además, se implementó caché local del borrador. No mencionar proveedores externos en el copy de la UI.
 
-> Verificado con Chrome CDP: build/lint limpios; demo y `api` (mock) cubren validación por paso, edición desde el resumen, envío → `pending_review` → aprobación → `active`, sin errores de consola. El log del mock confirmó `GET /billing/subscription`, `GET /billing/plans`, `GET /billing/payments`, `POST /billing/payments` y `PATCH /billing/payments/{id}/review`. La UI no muestra Visa/cobro automático ni facturas falsas.
+> Verificado con Chrome CDP: build/lint limpios; demo y `api` (mock) cubren validación por paso, edición desde el resumen, envío → `pending_review` → aprobación → `active`, sin errores de consola. Los campos de suscripción y del login comparten las mismas clases (`pl-10`, `h-11`, `focus:ring-primary/40`) y sus etiquetas/iconos se verificaron en el DOM. El log del mock confirmó `GET /billing/subscription`, `GET /billing/plans`, `GET /billing/payments`, `POST /billing/payments` y `PATCH /billing/payments/{id}/review`. La UI no muestra Visa/cobro automático ni facturas falsas.
 

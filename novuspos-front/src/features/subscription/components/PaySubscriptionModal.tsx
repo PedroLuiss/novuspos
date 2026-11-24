@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { IS_DEMO_AUTH } from '@/shared/lib/env'
+import { TextField } from '@/shared/ui/FormFields'
 import { MS } from '@/shared/ui/MS'
 import { banks, paymentAccounts } from '../data/subscription-data'
 import { usePaymentDraft } from '../hooks/usePaymentDraft'
@@ -10,6 +11,7 @@ import type { PaymentFieldErrors, PaymentRecord, Plan, Subscription } from '../t
 import { PaymentAccountCard } from './PaymentAccountCard'
 import { PaymentMethodSelector } from './PaymentMethodSelector'
 import { PaymentSteps } from './PaymentSteps'
+import { PaymentSummary } from './PaymentSummary'
 import { ProofUpload } from './ProofUpload'
 
 interface Props {
@@ -164,43 +166,45 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
               {step === 2 && (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-sm">
-                    <label className="flex flex-col gap-space-xs">
-                      <span className="font-label-md text-label-md text-on-surface font-semibold">Dígitos de la referencia</span>
-                      <input
-                        inputMode="numeric"
-                        value={draft.reference}
-                        onChange={(event) => patch({ reference: event.target.value.replace(/[^\d]/g, '').slice(0, 20) })}
-                        placeholder="Ej. 48291573"
-                        className="h-11 px-space-sm rounded-lg bg-surface-container-low text-on-surface font-mono focus:outline-none focus:bg-surface-container-lowest"
-                      />
-                      {errors.reference && <span className="font-body-sm text-body-sm text-error" role="alert">{errors.reference}</span>}
-                    </label>
-                    <label className="flex flex-col gap-space-xs">
-                      <span className="font-label-md text-label-md text-on-surface font-semibold">Fecha del pago</span>
-                      <input
-                        type="date"
-                        max={toDateInputValue()}
-                        value={draft.paidAt}
-                        onChange={(event) => patch({ paidAt: event.target.value })}
-                        className="h-11 px-space-sm rounded-lg bg-surface-container-low text-on-surface focus:outline-none focus:bg-surface-container-lowest"
-                      />
-                      {errors.paidAt && <span className="font-body-sm text-body-sm text-error" role="alert">{errors.paidAt}</span>}
-                    </label>
-                  </div>
-                  <label className="flex flex-col gap-space-xs">
-                    <span className="font-label-md text-label-md text-on-surface font-semibold">Banco desde el que pagaste</span>
-                    <input
-                      list="novus-banks"
-                      value={draft.bank}
-                      onChange={(event) => patch({ bank: event.target.value })}
-                      placeholder="Selecciona o escribe tu banco"
-                      className="h-11 px-space-sm rounded-lg bg-surface-container-low text-on-surface focus:outline-none focus:bg-surface-container-lowest"
+                    <TextField
+                      id="pay-reference"
+                      label="Dígitos de la referencia"
+                      icon="receipt_long"
+                      inputMode="numeric"
+                      mono
+                      tall
+                      value={draft.reference}
+                      onChange={(reference) => patch({ reference: reference.replace(/[^\d]/g, '').slice(0, 20) })}
+                      placeholder="Ej. 48291573"
+                      hint="Solo números"
+                      error={errors.reference}
                     />
-                    <datalist id="novus-banks">
-                      {banks.map((bank) => <option key={bank} value={bank} />)}
-                    </datalist>
-                    {errors.bank && <span className="font-body-sm text-body-sm text-error" role="alert">{errors.bank}</span>}
-                  </label>
+                    <TextField
+                      id="pay-date"
+                      label="Fecha del pago"
+                      icon="calendar_today"
+                      type="date"
+                      tall
+                      max={toDateInputValue()}
+                      value={draft.paidAt}
+                      onChange={(paidAt) => patch({ paidAt })}
+                      error={errors.paidAt}
+                    />
+                  </div>
+                  <TextField
+                    id="pay-bank"
+                    label="Banco desde el que pagaste"
+                    icon="account_balance"
+                    tall
+                    list="novus-banks"
+                    value={draft.bank}
+                    onChange={(bank) => patch({ bank })}
+                    placeholder="Selecciona o escribe tu banco"
+                    error={errors.bank}
+                  />
+                  <datalist id="novus-banks">
+                    {banks.map((bank) => <option key={bank} value={bank} />)}
+                  </datalist>
                   <div className="rounded-lg bg-surface-container p-space-sm">
                     <p className="font-body-sm text-body-sm text-on-surface-variant">
                       <strong className="text-on-surface">Un tip:</strong> revisa el comprobante. En Banco de Venezuela el
@@ -218,46 +222,14 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
               )}
 
               {step === 3 && account && (
-                <>
-                  <div className="rounded-lg bg-surface-container-low p-space-md flex flex-col gap-space-xs">
-                    <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
-                      Resumen de tu pago
-                    </span>
-                    <div className="flex items-center justify-between font-body-md text-body-md text-on-surface">
-                      <span>Plan</span><span className="font-semibold">{plan.name}</span>
-                    </div>
-                    <div className="flex items-center justify-between font-body-md text-body-md text-on-surface">
-                      <span>Método</span>
-                      <span className="flex items-center gap-2">
-                        <span className="font-semibold">{account.label}</span>
-                        <button type="button" onClick={() => setStep(1)} className="font-label-sm text-label-sm text-primary hover:underline">Editar</button>
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between font-body-md text-body-md text-on-surface">
-                      <span>Banco</span><span className="font-semibold">{draft.bank}</span>
-                    </div>
-                    <div className="flex items-center justify-between font-body-md text-body-md text-on-surface">
-                      <span>Referencia</span><span className="font-mono font-semibold">{draft.reference}</span>
-                    </div>
-                    <div className="flex items-center justify-between font-body-md text-body-md text-on-surface">
-                      <span>Fecha</span><span className="font-semibold">{draft.paidAt}</span>
-                    </div>
-                    <div className="flex justify-end">
-                      <button type="button" onClick={() => setStep(2)} className="font-label-sm text-label-sm text-primary hover:underline">Editar datos del comprobante</button>
-                    </div>
-                    <div className="flex items-center justify-between border-t border-outline-variant pt-space-xs">
-                      <span className="font-label-md text-label-md text-on-surface font-semibold">Monto</span>
-                      <span className="font-headline-sm text-headline-sm text-primary font-mono font-bold">{amount}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-space-xs rounded-lg bg-tertiary-fixed/50 p-space-sm">
-                    <MS name="schedule" className="text-tertiary text-[18px] shrink-0 mt-0.5" />
-                    <p className="font-body-sm text-body-sm text-on-surface-variant">
-                      Al enviar, tu suscripción queda pendiente de evaluación. No necesitas hacer nada más: revisaremos el
-                      comprobante y verás el cambio de estado aquí.
-                    </p>
-                  </div>
-                </>
+                <PaymentSummary
+                  planName={plan.name}
+                  account={account}
+                  draft={draft}
+                  amount={amount}
+                  onEditMethod={() => setStep(1)}
+                  onEditProof={() => setStep(2)}
+                />
               )}
             </div>
           </>

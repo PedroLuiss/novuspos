@@ -1,5 +1,6 @@
 import { paymentAccounts } from '../data/subscription-data'
 import type { PaymentMethod } from '../types'
+import { FieldShell } from '@/shared/ui/FormFields'
 import { MS } from '@/shared/ui/MS'
 
 interface Props {
@@ -13,9 +14,8 @@ export function PaymentMethodSelector({ value, error, onChange }: Props) {
   const options: PaymentMethod[] = ['mobile', 'transfer']
 
   return (
-    <div className="flex flex-col gap-space-xs">
-      <span className="font-label-md text-label-md text-on-surface font-semibold">¿Cómo realizaste el pago?</span>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-xs">
+    <FieldShell id="payment-method" label="¿Cómo realizaste el pago?" error={error}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-xs" role="group" aria-labelledby="payment-method-label">
         {options.map((method) => {
           const account = paymentAccounts[method]
           const selected = value === method
@@ -40,11 +40,6 @@ export function PaymentMethodSelector({ value, error, onChange }: Props) {
           )
         })}
       </div>
-      {error && (
-        <span className="font-body-sm text-body-sm text-error px-1" role="alert">
-          {error}
-        </span>
-      )}
-    </div>
+    </FieldShell>
   )
 }

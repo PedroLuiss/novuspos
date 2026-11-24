@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { FieldShell } from '@/shared/ui/FormFields'
 import { MS } from '@/shared/ui/MS'
 import { prepareProofImage, type ProofImageResult } from '../lib/proofImage'
 
@@ -37,13 +38,15 @@ export function ProofUpload({ proofName, proofDataUrl, error, onSelect, onClear 
   }
 
   return (
-    <div className="flex flex-col gap-space-xs">
-      <span className="font-label-md text-label-md text-on-surface font-semibold">Captura de tu comprobante</span>
-      <p className="font-body-sm text-body-sm text-on-surface-variant">
-        Toma una captura donde se vean el banco, la fecha, el monto y los dígitos de la referencia.
-      </p>
+    <FieldShell
+      id="payment-proof"
+      label="Captura de tu comprobante"
+      helper="Toma una captura donde se vean el banco, la fecha, el monto y los dígitos de la referencia."
+      error={localError ?? error}
+    >
       <input
         ref={inputRef}
+        id="payment-proof"
         type="file"
         accept="image/jpeg,image/png,image/webp"
         className="hidden"
@@ -80,11 +83,6 @@ export function ProofUpload({ proofName, proofDataUrl, error, onSelect, onClear 
           <span className="font-body-sm text-body-sm">JPG, PNG o WEBP · máximo 8 MB</span>
         </button>
       )}
-      {(localError ?? error) && (
-        <span className="font-body-sm text-body-sm text-error px-1" role="alert">
-          {localError ?? error}
-        </span>
-      )}
-    </div>
+    </FieldShell>
   )
 }
