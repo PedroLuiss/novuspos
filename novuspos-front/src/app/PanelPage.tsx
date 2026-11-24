@@ -1,12 +1,12 @@
 import { BackupOverview } from '@/features/backups/components/BackupOverview'
-import { PanelLicense } from '@/features/panel/components/PanelLicense'
-import { PanelOverview } from '@/features/panel/components/PanelOverview'
+import { DashboardSection } from '@/features/dashboard/components/DashboardSection'
 import { PanelSidebar } from '@/features/panel/components/PanelSidebar'
 import { SubscriptionOverview } from '@/features/subscription/components/SubscriptionOverview'
+import { SupportOverview } from '@/features/support/components/SupportOverview'
 
-export type PanelSection = 'general' | 'subscription' | 'backups'
+export type PanelSection = 'general' | 'subscription' | 'backups' | 'support'
 
-/** Panel de Control de Clientes — réplica del dashboard de Stitch con módulos. */
+/** Panel de Control de Clientes: portada y tres módulos conectados a la API. */
 export function PanelPage({ section = 'general' }: { section?: PanelSection }) {
   return (
     <div className="w-full bg-surface font-body-md text-on-surface antialiased">
@@ -18,13 +18,10 @@ export function PanelPage({ section = 'general' }: { section?: PanelSection }) {
               <SubscriptionOverview />
             ) : section === 'backups' ? (
               <BackupOverview />
+            ) : section === 'support' ? (
+              <SupportOverview />
             ) : (
-              <>
-                <PanelOverview />
-                <PanelLicense />
-                <SubscriptionOverview />
-                <BackupOverview />
-              </>
+              <DashboardSection />
             )}
           </div>
         </main>

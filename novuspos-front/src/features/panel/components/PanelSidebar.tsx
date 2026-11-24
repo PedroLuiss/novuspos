@@ -44,8 +44,8 @@ export function PanelSidebar() {
         <div className="px-space-md flex flex-col gap-space-xs">
           <div className="p-space-sm rounded-lg bg-surface-container flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="font-label-sm text-label-sm text-on-surface font-bold">Caja Principal</span>
-              <span className="font-label-sm text-label-sm text-secondary font-mono">Trabaja sin internet</span>
+              <span className="font-label-sm text-label-sm text-on-surface font-bold">Tu cuenta NovusPOS</span>
+              <span className="font-label-sm text-label-sm text-secondary font-mono">Todo listo para vender</span>
             </div>
             <MS name="check_circle" className="text-secondary text-[18px]" />
           </div>
@@ -60,7 +60,7 @@ export function PanelSidebar() {
 
       <header className="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg">
         <div className="flex items-center gap-space-sm">
-          <span className="font-label-md text-label-md text-on-surface-variant font-mono">Equipo: Windows 10 / 11</span>
+          <span className="font-label-md text-label-md text-on-surface-variant font-semibold">Panel de Cliente NovusPOS</span>
         </div>
         <div className="flex items-center gap-space-md">
           <button className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors">

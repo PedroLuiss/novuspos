@@ -16,11 +16,22 @@ export const BILLING_ENDPOINTS = {
   reviewPayment: (paymentId: string) => `/billing/payments/${paymentId}/review`,
 } as const
 
-/** Contrato de rutas del registro de copias de seguridad. */
+/** Contrato de rutas del panel general. */
+export const PANEL_ENDPOINTS = {
+  overview: '/panel/overview',
+} as const
+
+/**
+ * Contrato de rutas de copias de seguridad.
+ * Solo se guarda la copia más reciente: `POST` reemplaza a la anterior.
+ * El multipart es compatible con lo que envía NovusPOS Desktop.
+ */
 export const BACKUP_ENDPOINTS = {
-  list: '/backups',
-  create: '/backups',
-  verify: (backupId: string) => `/backups/${backupId}/verify`,
-  download: (backupId: string) => `/backups/${backupId}/download`,
-  remove: (backupId: string) => `/backups/${backupId}`,
+  latest: '/backups/latest',
+  upload: '/backups',
+} as const
+
+/** Contrato de rutas del centro de soporte. */
+export const SUPPORT_ENDPOINTS = {
+  submit: '/support/tickets',
 } as const

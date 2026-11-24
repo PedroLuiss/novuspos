@@ -3,6 +3,7 @@ import { MS } from '@/shared/ui/MS'
 import { useSubscriptionOverview } from '../hooks/useSubscriptionOverview'
 import { PaymentHistoryTable } from './PaymentHistoryTable'
 import { PaySubscriptionModal } from './PaySubscriptionModal'
+import { PlanCatalog } from './PlanCatalog'
 import { SubscriptionCard } from './SubscriptionCard'
 
 /** Contenedor del módulo: obtiene datos y coordina el modal con el historial. */
@@ -55,8 +56,15 @@ export function SubscriptionOverview() {
         </div>
       )}
 
+      <PlanCatalog plans={overview.plans} currentPlanId={overview.subscription.planId} />
       {plan && <SubscriptionCard subscription={overview.subscription} plan={plan} onPay={() => setIsPayOpen(true)} />}
-      <PaymentHistoryTable payments={overview.payments} reviewingId={reviewingId} onReview={(id, approved) => void reviewPayment(id, approved)} />
+      <PaymentHistoryTable
+        payments={overview.payments}
+        plans={overview.plans}
+        subscription={overview.subscription}
+        reviewingId={reviewingId}
+        onReview={(id, approved) => void reviewPayment(id, approved)}
+      />
 
       {isPayOpen && plan && (
         <PaySubscriptionModal

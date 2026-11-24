@@ -1,10 +1,8 @@
-import type { BackupRecord, RegisterBackupRequest } from '../types'
+import type { BackupSnapshot, BackupUploadRequest } from '../types'
 
 /** Contrato único para el modo demo y para la API del portal. */
 export interface BackupGateway {
-  list(): Promise<BackupRecord[]>
-  register(request: RegisterBackupRequest): Promise<BackupRecord>
-  verify(backupId: string): Promise<BackupRecord>
-  remove(backupId: string): Promise<void>
-  download(backupId: string): Promise<Blob>
+  getLatest(): Promise<BackupSnapshot | null>
+  /** Reemplaza la copia anterior; el servidor guarda siempre solo una. */
+  upload(request: BackupUploadRequest): Promise<BackupSnapshot>
 }

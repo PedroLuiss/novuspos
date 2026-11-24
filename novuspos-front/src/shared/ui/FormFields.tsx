@@ -201,6 +201,52 @@ export function PasswordField({
   )
 }
 
+interface TextAreaFieldProps {
+  id: string
+  label: string
+  icon: string
+  placeholder?: string
+  helper?: ReactNode
+  error?: string
+  rows?: number
+  value?: string
+  onChange?: (value: string) => void
+  disabled?: boolean
+}
+
+/** Área de texto con el mismo estilo MD3 que los demás campos. */
+export function TextAreaField({
+  id,
+  label,
+  icon,
+  placeholder,
+  helper,
+  error,
+  rows = 4,
+  value,
+  onChange,
+  disabled,
+}: TextAreaFieldProps) {
+  return (
+    <FieldShell id={id} label={label} helper={helper} error={error}>
+      <div className="relative">
+        <MS name={icon} className={iconClass} />
+        <textarea
+          id={id}
+          rows={rows}
+          placeholder={placeholder}
+          disabled={disabled}
+          value={value}
+          onChange={(event) => onChange?.(event.target.value)}
+          aria-invalid={Boolean(error)}
+          aria-describedby={describedBy(id, error, Boolean(helper))}
+          className={`${controlBase(false)} h-auto py-2.5 pr-3 resize-y ${error ? 'ring-2 ring-error/50' : ''}`}
+        />
+      </div>
+    </FieldShell>
+  )
+}
+
 interface SelectFieldProps {
   id: string
   label: string

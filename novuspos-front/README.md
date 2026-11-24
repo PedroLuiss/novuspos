@@ -107,7 +107,7 @@ Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo
 
 ## Panel de Control de Clientes
 
-Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (screen `98a61d2fa58e4476ab0d250be8a57755`), montado en `/panel`. Mantiene el sidebar, el header, los KPIs, la licencia y los respaldos class-por-class; el copy se auditó igual que auth (sin versión, `.EXE`, ESC/POS, SQLite, nube, AES-256 ni token real). La antigua facturación con Visa/cobro automático fue reemplazada por el módulo de Suscripción. El icono del sidebar es `public/novuspos-icon.png` (recorte del logo). Ver skill §17 y contexto 09 §5.12.
+Réplica del dashboard de Stitch "Panel de Control de Clientes - NovusPOS" (screen `98a61d2fa58e4476ab0d250be8a57755`), montado en `/panel`. Conserva sidebar y header; la portada muestra la clave completa y copiable, el estado de la suscripción y la fecha del último respaldo, sin KPIs ni asignación de equipo. El menú tiene cuatro items (ya no *Cajas Registradoras*) y las rutas limpias son `/panel/suscripcion`, `/panel/respaldos` y `/panel/soporte`. El copy se auditó igual que auth (sin versión, `.EXE`, ESC/POS, SQLite, nube, AES-256 ni token real). El icono del sidebar es `public/novuspos-icon.png`. Ver skill §17 y contexto 09 §5.12.
 
 ## Capa HTTP y sesión
 
@@ -121,15 +121,27 @@ Dos pantallas replicadas de Stitch: `/auth/recuperar` (solicitar enlace, accesib
 
 ## Módulo de Suscripción
 
-Ruta limpia `/panel/suscripcion` (también integrado en `/panel`). Muestra el plan contratado, su estado y el historial de pagos. El modal de pago guía en 3 pasos: datos bancarios de Novus y elección de pago móvil/transferencia, datos del comprobante (referencia, fecha, banco, imagen) y confirmación, con edición desde el resumen. Los campos usan `src/shared/ui/FormFields.tsx`, los mismos componentes reutilizables del login (etiqueta, icono, foco, error y ayuda); el selector de método y la subida comparten `FieldShell`, y el resumen vive en `PaymentSummary.tsx`. El borrador se guarda en el navegador para retomarlo; al enviar, la suscripción queda **pendiente de evaluación** y al aprobar el pago pasa a **activa**. La tabla permite aprobar o rechazar: en demo como simulación y en `api` mediante el endpoint real (el backend debe aplicar RBAC).
+Ruta limpia `/panel/suscripcion`. Muestra las suscripciones disponibles (plan actual marcado), el plan contratado y el historial de pagos con la suscripción asociada, el mes pagado, un resumen con totales, filtros por estado y búsqueda por referencia o banco. El modal de pago guía en 3 pasos: datos bancarios de Novus y elección de pago móvil/transferencia, datos del comprobante (referencia, fecha, banco, imagen) y confirmación, con edición desde el resumen. Los campos usan `src/shared/ui/FormFields.tsx`, los mismos componentes reutilizables del login (etiqueta, icono, foco, error y ayuda); el selector de método y la subida comparten `FieldShell`, y el resumen vive en `PaymentSummary.tsx`. El borrador se guarda en el navegador para retomarlo; al enviar, la suscripción queda **pendiente de evaluación** y al aprobar el pago pasa a **activa**. La tabla permite aprobar o rechazar: en demo como simulación y en `api` mediante el endpoint real (el backend debe aplicar RBAC).
 
 Los datos bancarios son ejemplos editables en `src/features/subscription/data/subscription-data.ts`. Contrato conectado en `src/shared/services/endpoints.ts`: `GET /billing/subscription` → `{ plans, subscription, payments }` (si faltan planes o pagos se completan con `GET /billing/plans` y `GET /billing/payments`), `POST /billing/payments` → pago pendiente y `PATCH /billing/payments/{id}/review` → `{ payment, subscription }`. El modo `demo` es el predeterminado; con `VITE_AUTH_MODE=api` y `VITE_API_URL` se usan los endpoints reales. Ver skill §22 y contexto 09 §5.15.
 
 ## Módulo de Copias de Seguridad
 
-Ruta limpia `/panel/respaldos` (también integrado en `/panel`). Registra las copias que crea NovusPOS en la computadora: equipo, tipo, fecha y archivo. Muestra indicadores, historial con estados (*Verificada*, *En espera*, *Con incidencia*) y permite verificar, descargar y eliminar registros. El alta usa los campos reutilizables de `shared/ui/FormFields.tsx` y un formulario validado antes de enviar.
+Ruta limpia `/panel/respaldos`. Muestra **una sola tarjeta** con la copia más reciente de la cuenta, sin historial, verificación, descarga, alta manual ni indicadores de espacio. Si vuelves a instalar NovusPOS y entras con tu cuenta, tus datos quedan como si no hubiera pasado nada.
 
-Contrato en `src/shared/services/endpoints.ts`: `GET /backups`, `POST /backups` (multipart con el archivo), `PATCH /backups/{id}/verify`, `GET /backups/{id}/download` y `DELETE /backups/{id}`. El adaptador HTTP usa `FormData` y descargas `Blob` autenticadas. El modo `demo` persiste en `localStorage` y es el predeterminado; con `VITE_AUTH_MODE=api` se usan los endpoints reales. Ver skill §23 y contexto 09 §5.16.
+Contrato en `src/shared/services/endpoints.ts`: `GET /backups/latest` y `POST /backups` (upsert multipart con `database`, `created_at`, `sha256` y `source`, compatible con lo que envía el escritorio; esos campos no se muestran). El modo `demo` persiste un único objeto en `localStorage` y es el predeterminado; con `VITE_AUTH_MODE=api` se usan los endpoints reales. Ver skill §23 y contexto 09 §5.16.
+
+## Panel general
+
+La ruta `/panel` ya no usa bloques estáticos: `src/features/dashboard/` obtiene un único resumen mediante gateway + adaptadores demo/API + factory + servicio fachada + hook contenedor, y compone `DashboardBanner`, `AccessCard`, `LastBackupCard` e `InstallerCard`. La clave se muestra completa y copiable (la renueva la API con cada pago), el estado lo decide la API (*Activa*, *Pago en revisión*, *Inactiva · pendiente de pago*, *Cancelada*) y solo aparece la fecha del último respaldo. No hay KPIs, equipo asignado ni historial de pagos en la portada.
+
+Contrato en `src/shared/services/endpoints.ts`: `GET /panel/overview` → `{ organizationName, planName, subscriptionStatus, dueAt, activationKey, activationKeyRenewsAt, lastBackupAt }`. El modo `demo` es el predeterminado; con `VITE_AUTH_MODE=api` se consumen los endpoints reales sin tocar la UI. Ver skill §24 y contexto 09 §5.17.
+
+## Módulo de Soporte Técnico
+
+Ruta limpia `/panel/soporte`. Formulario con correo precargado de la sesión, tema, asunto y detalle, validado con reglas puras antes de enviar. Usa los campos reutilizables de `shared/ui/FormFields.tsx` (se añadió `TextAreaField` con el mismo estilo del login). Al enviar aparece una alerta de éxito con el número de reporte y la opción de enviar otro; no hay listado de tickets.
+
+Contrato: `POST /support/tickets` con `{ email, topic, subject, description, source: 'web' }` → `{ id, reference, message }`. Misma arquitectura de gateway + adaptadores demo/API + factory + fachada + hook contenedor + componentes. Ver skill §25 y contexto 09 §5.18.
 
 ## Copy de la landing
 
