@@ -186,11 +186,21 @@ export const comparisonRows: ComparisonRow[] = [
     web: 'Abre una ventana de impresión del navegador',
   },
   {
-    capacity: 'Costo mensual recurrente',
-    novuspos: 'Solo $4.99 USD / mes (1er mes Gratis)',
+    capacity: 'Precio de la suscripción',
+    novuspos: 'Mensual $4.99 USD o anual $59.99 USD (1er mes gratis)',
     novusposTone: 'secondary',
     web: '$29 a $79 USD / mes + cobros por terminal',
   },
+]
+
+/** Beneficios compartidos por las dos formas de pago en la sección de precios. */
+export const pricingBenefits: { strong: string; rest: string }[] = [
+  { strong: 'Instalación completa', rest: ' en tu computadora, lista para trabajar desde el primer día.' },
+  { strong: 'Catálogo y ventas', rest: ' sin costos por volumen ni comisiones sobre tus ventas.' },
+  { strong: 'Básculas conectadas', rest: ' y tickets en 80/58 mm listos para imprimir o descargar.' },
+  { strong: 'Cierre de caja, control de efectivo', rest: ' e historial completo de movimientos.' },
+  { strong: 'Soporte desde la propia aplicación', rest: ', sin salir del programa.' },
+  { strong: 'Respaldos de tu información', rest: ' y restauración cuando lo necesites.' },
 ]
 
 export const faqs: Faq[] = [

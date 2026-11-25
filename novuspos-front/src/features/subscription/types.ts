@@ -31,6 +31,8 @@ export type PaymentStatus = 'pending_review' | 'approved' | 'rejected'
 export interface PaymentRecord {
   id: string
   subscriptionId: string
+  /** Plan al que aplica el pago; la API puede omitirlo para pagos antiguos. */
+  planId?: PlanId
   reference: string
   method: PaymentMethod
   bank: string
@@ -57,6 +59,8 @@ export interface PaymentDraft {
 
 export interface SubmitPaymentRequest {
   subscriptionId: string
+  /** Plan que se quiere activar con este pago. */
+  planId: string
   method: PaymentMethod
   reference: string
   paidAt: string

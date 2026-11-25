@@ -61,10 +61,11 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
       throw new ValidationError({ reference: ['Esa referencia ya fue registrada. Revisa tu comprobante.'] })
     }
 
-    const plan = plans.find((item) => item.id === state.subscription.planId) ?? plans[0]
+    const plan = plans.find((item) => item.id === request.planId) ?? plans[0]
     const payment: PaymentRecord = {
       id: `pay-${Date.now()}`,
       subscriptionId: request.subscriptionId,
+      planId: request.planId,
       reference: request.reference.trim(),
       method: request.method,
       bank: request.bank.trim(),
@@ -92,13 +93,20 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
     payment.status = approved ? 'approved' : 'rejected'
     payment.reviewNote = note
     if (approved) {
-      const date = new Date()
-      date.setMonth(date.getMonth() + 1)
+      const plan = plans.find((item) => item.id === payment.planId) ?? plans[0]
+      const start = new Date(payment.paidAt)
+      if (Number.isNaN(start.getTime())) start.setTime(Date.now())
+      const renews = new Date(start)
+      if (plan.interval === 'year') renews.setFullYear(renews.getFullYear() + 1)
+      else renews.setMonth(renews.getMonth() + 1)
       state.subscription = {
         ...state.subscription,
+        planId: plan.id,
         status: 'active',
-        startedAt: payment.paidAt,
-        renewsAt: date.toISOString().slice(0, 10),
+        startedAt: start.toISOString().slice(0, 10),
+        renewsAt: renews.toISOString().slice(0, 10),
+        amount: plan.price,
+        currency: plan.currency,
       }
     }
     writeState(state)

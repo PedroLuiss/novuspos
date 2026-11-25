@@ -42,12 +42,16 @@ export function SubscriptionCard({ subscription, plan, onPay }: Props) {
           <span className="font-body-sm text-body-sm text-on-surface-variant">{plan.description}</span>
         </div>
         <div className="flex flex-col p-space-sm rounded-lg bg-surface-container-low">
-          <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Mensualidad</span>
+          <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
+            {plan.interval === 'year' ? 'Anualidad' : 'Mensualidad'}
+          </span>
           <div className="flex items-baseline gap-1">
             <span className="font-headline-sm text-headline-sm font-bold text-on-surface font-mono">
               {formatMoney(subscription.amount || plan.price, subscription.currency || plan.currency)}
             </span>
-            <span className="font-body-sm text-body-sm text-on-surface-variant">al mes</span>
+            <span className="font-body-sm text-body-sm text-on-surface-variant">
+              al {plan.interval === 'year' ? 'año' : 'mes'}
+            </span>
           </div>
           <span className="font-body-sm text-body-sm text-on-surface-variant">Un comercio por suscripción.</span>
         </div>

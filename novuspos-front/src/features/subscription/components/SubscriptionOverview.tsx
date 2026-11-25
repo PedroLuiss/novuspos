@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MS } from '@/shared/ui/MS'
 import { useSubscriptionOverview } from '../hooks/useSubscriptionOverview'
+import type { Plan } from '../types'
 import { PaymentHistoryTable } from './PaymentHistoryTable'
 import { PaySubscriptionModal } from './PaySubscriptionModal'
 import { PlanCatalog } from './PlanCatalog'
@@ -10,6 +11,15 @@ import { SubscriptionCard } from './SubscriptionCard'
 export function SubscriptionOverview() {
   const { overview, isLoading, error, reviewingId, refresh, reviewPayment } = useSubscriptionOverview()
   const [isPayOpen, setIsPayOpen] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
+  const openPayment = (plan: Plan) => {
+    setSelectedPlan(plan)
+    setIsPayOpen(true)
+  }
+  const closePayment = () => {
+    setIsPayOpen(false)
+    setSelectedPlan(null)
+  }
 
   if (isLoading && !overview) {
     return (
@@ -56,8 +66,8 @@ export function SubscriptionOverview() {
         </div>
       )}
 
-      <PlanCatalog plans={overview.plans} currentPlanId={overview.subscription.planId} />
-      {plan && <SubscriptionCard subscription={overview.subscription} plan={plan} onPay={() => setIsPayOpen(true)} />}
+      <PlanCatalog plans={overview.plans} currentPlanId={overview.subscription.planId} onSelect={openPayment} />
+      {plan && <SubscriptionCard subscription={overview.subscription} plan={plan} onPay={() => openPayment(plan)} />}
       <PaymentHistoryTable
         payments={overview.payments}
         plans={overview.plans}
@@ -66,11 +76,11 @@ export function SubscriptionOverview() {
         onReview={(id, approved) => void reviewPayment(id, approved)}
       />
 
-      {isPayOpen && plan && (
+      {isPayOpen && (selectedPlan ?? plan) && (
         <PaySubscriptionModal
           subscription={overview.subscription}
-          plan={plan}
-          onClose={() => setIsPayOpen(false)}
+          plan={(selectedPlan ?? plan)!}
+          onClose={closePayment}
           onPaid={() => void refresh()}
         />
       )}

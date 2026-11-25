@@ -5,10 +5,11 @@ import type { Plan } from '../types'
 interface Props {
   plans: Plan[]
   currentPlanId: string
+  onSelect: (plan: Plan) => void
 }
 
-/** Suscripciones disponibles; hoy hay una, pero la UI admite más. */
-export function PlanCatalog({ plans, currentPlanId }: Props) {
+/** Suscripciones disponibles; la lista la envía la API de Laravel. */
+export function PlanCatalog({ plans, currentPlanId, onSelect }: Props) {
   return (
     <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm flex flex-col gap-space-md">
       <div className="flex items-center gap-space-xs">
@@ -55,6 +56,19 @@ export function PlanCatalog({ plans, currentPlanId }: Props) {
                   </span>
                 ))}
               </div>
+              {current ? (
+                <span className="font-label-sm text-label-sm font-semibold text-secondary flex items-center gap-1">
+                  <MS name="check_circle" className="text-[16px]" /> Plan contratado
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onSelect(plan)}
+                  className="mt-auto w-full py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5"
+                >
+                  <MS name="payments" className="text-[16px]" /> Elegir este plan
+                </button>
+              )}
             </div>
           )
         })}

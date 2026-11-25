@@ -26,6 +26,12 @@ function readBilling(): DemoBillingLite {
   return {}
 }
 
+function planNameFor(planId: string | undefined, fallback: string): string {
+  if (planId === 'novus-anual') return 'NovusPOS Anual'
+  if (planId === 'novus-mensual') return 'NovusPOS Mensual'
+  return fallback
+}
+
 function statusOf(status: string | undefined, renewsAt: string | undefined): DashboardSubscriptionStatus {
   if (status === 'pending_review') return 'pending_review'
   if (status === 'cancelled') return 'cancelled'
@@ -50,7 +56,7 @@ export const demoDashboardGateway: DashboardGateway = {
     const seed = `${subscription.id ?? 'demo'}-${subscription.startedAt ?? 'inicial'}`
     return {
       organizationName: fallback.organizationName,
-      planName: subscription.planId === 'novus-mensual' ? 'NovusPOS Mensual' : fallback.planName,
+      planName: planNameFor(subscription.planId, fallback.planName),
       subscriptionStatus: statusOf(subscription.status, dueAt),
       dueAt,
       activationKey: demoActivationKey(seed),

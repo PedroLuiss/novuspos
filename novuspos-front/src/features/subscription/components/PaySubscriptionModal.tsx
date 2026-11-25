@@ -43,7 +43,12 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
 
   const errors = { ...stepErrors, ...fieldErrors }
   const account = draft.method ? paymentAccounts[draft.method] : null
-  const amount = formatMoney(subscription.amount || plan.price, subscription.currency || plan.currency)
+  const isCurrentPlan = plan.id === subscription.planId
+  const amount = formatMoney(
+    isCurrentPlan ? subscription.amount || plan.price : plan.price,
+    isCurrentPlan ? subscription.currency || plan.currency : plan.currency,
+  )
+  const intervalLabel = plan.interval === 'year' ? 'al año' : 'al mes'
 
   const patch = (values: Parameters<typeof update>[0]) => {
     setStepErrors({})
@@ -72,6 +77,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
     if (!draft.method || !draft.proofDataUrl) return
     void submit({
       subscriptionId: subscription.id,
+      planId: plan.id,
       method: draft.method,
       reference: draft.reference,
       paidAt: draft.paidAt,
@@ -100,7 +106,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
               {submitted ? '¡Recibimos tu pago!' : 'Pagar suscripción'}
             </h2>
             <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-              {plan.name} · {amount} al mes
+              {plan.name} · {amount} {intervalLabel}
             </p>
           </div>
           <button
@@ -148,7 +154,8 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                   <div className="rounded-lg bg-primary-fixed/40 p-space-sm flex items-start gap-space-xs">
                     <MS name="info" className="text-primary text-[18px] shrink-0 mt-0.5" />
                     <p className="font-body-sm text-body-sm text-on-surface-variant">
-                      Realiza el pago por {amount} con los datos de NovusPOS y luego regresa aquí para reportarlo.
+                      Realiza el pago de {amount} ({intervalLabel}) con los datos de NovusPOS y luego regresa aquí para
+                      reportarlo.
                     </p>
                   </div>
                   <PaymentMethodSelector value={draft.method} error={errors.method} onChange={(method) => patch({ method })} />
@@ -227,6 +234,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                   account={account}
                   draft={draft}
                   amount={amount}
+                  intervalLabel={intervalLabel}
                   onEditMethod={() => setStep(1)}
                   onEditProof={() => setStep(2)}
                 />

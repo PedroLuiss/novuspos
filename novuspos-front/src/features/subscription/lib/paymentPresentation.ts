@@ -5,7 +5,8 @@ export type PaymentFilter = 'all' | PaymentStatus
 
 /** Presentación pura del historial: sin red y sin estado de React. */
 export function paymentPlanName(payment: PaymentRecord, plans: Plan[], subscription: Subscription): string {
-  const planId = payment.subscriptionId === subscription.id ? subscription.planId : payment.subscriptionId
+  const planId =
+    payment.planId ?? (payment.subscriptionId === subscription.id ? subscription.planId : payment.subscriptionId)
   return plans.find((plan) => plan.id === planId)?.name ?? 'NovusPOS Mensual'
 }
 

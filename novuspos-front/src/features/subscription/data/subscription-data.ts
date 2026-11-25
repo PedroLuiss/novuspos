@@ -1,6 +1,6 @@
 import type { PaymentAccount, PaymentRecord, Plan, Subscription } from '../types'
 
-/** Catálogo de planes. Hoy hay uno; agregar otro aquí no requiere tocar la UI. */
+/** Catálogo de planes. La API de Laravel puede enviar más; la UI se adapta sola. */
 export const plans: Plan[] = [
   {
     id: 'novus-mensual',
@@ -15,6 +15,21 @@ export const plans: Plan[] = [
       'Clientes y cuentas corrientes',
       'Respaldos de tu información',
       'Actualizaciones y soporte',
+    ],
+  },
+  {
+    id: 'novus-anual',
+    name: 'NovusPOS Anual',
+    description: 'El mismo sistema, pagando una sola vez al año.',
+    price: 59.99,
+    currency: 'USD',
+    interval: 'year',
+    features: [
+      'Ventas, inventario y caja en el mismo equipo',
+      'Clientes y cuentas corrientes',
+      'Respaldos de tu información',
+      'Actualizaciones y soporte',
+      'Un solo pago al año, sin mensualidades',
     ],
   },
 ]
