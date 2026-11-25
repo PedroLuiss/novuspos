@@ -546,7 +546,9 @@ En `AUTH_ENDPOINTS` (`shared/services/endpoints.ts`):
 
 Se conservan clases y composición de Stitch, pero se sustituyen los textos falsos/técnicos: `TERMINAL AUTORIZADA • CLOUD GATEWAY` → `ACCESO SEGURO A TU CUENTA`; `Cifrado TLS 1.3 • Certificación PCI-DSS Compliant` → `Tus datos están protegidos`; `cifrado AES-256 de extremo a extremo` → `Tus credenciales se guardan de forma segura`; `Validando terminal…` → `Enviando enlace…`; `credencial de terminal` se elimina. Los enlaces de asistencia y legales llevan a `/` porque no hay páginas dedicadas.
 
-> Verificado: ambas pantallas renderizan sin los textos sensibles; flujo demo completa llega a `/panel`; sin `token` aparece el aviso; modo `api` con mock 422 muestra error general y por campo en ambos endpoints; build/lint limpios.
+**Tipo de Comercio (pedido explícito):** `businessSectors` en `auth-data.ts` enumera 14 perfiles de pymes venezolanas que el escritorio atiende realmente: Abarrotes y Minisúper, Bodega / Tienda de Barrio, Supermercado / Almacén, Ferretería y Materiales, Farmacia, Panadería y Pastelería, Frutería y Verdulería, Carnicería y Pescadería, Boutique y Moda, Calzado y Accesorios, Perfumería y Cosméticos, Librería y Papelería, Cafetería y Repostería y Comercio General. Se respaldan en kg/litro con báscula (02 §1), lotes con caducidad FEFO (03 §12), variantes de talla/color, combos y servicios (03 §9/§13) y cuentas corrientes (06). El `SelectField` inicia en *Selecciona el tipo de comercio* y es obligatorio; se añadió la prop `required` al componente compartido.
+
+> Verificado: ambas pantallas renderizan sin los textos sensibles; flujo demo completa llega a `/panel`; sin `token` aparece el aviso; modo `api` con mock 422 muestra error general y por campo en ambos endpoints; el registro lista los 14 tipos con placeholder y campo obligatorio; build/lint limpios.
 
 ---
 ## 22. Módulo de Suscripción

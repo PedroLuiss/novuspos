@@ -103,7 +103,7 @@ El relevo ya está activo con cinco capturas, en orden de módulo: `novusposvent
 
 ## Vistas de Iniciar Sesión / Registro
 
-Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo proyecto, screen `b7520097c4d14ab9913cf7ab915c00cd`). Se abre con `/auth` (registro) o `/auth/login` (login) desde el enlace del header. El `#` solo se usa para anclas internas (`/#productos`, `/#descargar`). El layout es class-por-class idéntico al HTML de Stitch; el copy se auditó con las mismas reglas que la landing (sin versión, nube, ESC/POS, TLS, SSO ni métricas inventadas). Los formularios son demostrativos: muestran una alerta, no hay backend. El logo blanco de la columna izquierda es `public/novuspos-logo-white.png` (el original tiene fondo blanco opaco). Ver skill §16 y contexto 09 §5.11.
+Réplica de la pantalla de Stitch "Iniciar Sesión / Registro - NovusPOS" (mismo proyecto, screen `b7520097c4d14ab9913cf7ab915c00cd`). Se abre con `/auth` (registro) o `/auth/login` (login) desde el enlace del header. El `#` solo se usa para anclas internas (`/#productos`, `/#descargar`). El layout es class-por-class idéntico al HTML de Stitch; el copy se auditó con las mismas reglas que la landing (sin versión, nube, ESC/POS, TLS, SSO ni métricas inventadas). Los formularios son demostrativos: muestran una alerta, no hay backend. El logo blanco de la columna izquierda es `public/novuspos-logo-white.png` (el original tiene fondo blanco opaco). El registro ofrece 14 opciones en *Tipo de Comercio*, perfiles de pymes venezolanas que el escritorio atiende (peso por kg, lotes con vencimiento, variantes, combos y cuentas corrientes), con selección obligatoria. Ver skill §16 y contexto 09 §5.11.
 
 ## Panel de Control de Clientes
 

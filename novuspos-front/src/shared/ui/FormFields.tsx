@@ -255,6 +255,7 @@ interface SelectFieldProps {
   hint?: string
   helper?: ReactNode
   tall?: boolean
+  required?: boolean
   value?: string
   onChange?: (value: string) => void
   disabled?: boolean
@@ -270,6 +271,7 @@ export function SelectField({
   hint,
   helper,
   tall,
+  required,
   value,
   onChange,
   disabled,
@@ -282,6 +284,7 @@ export function SelectField({
         <select
           id={id}
           value={value}
+          required={required}
           onChange={(event) => onChange?.(event.target.value)}
           disabled={disabled}
           aria-invalid={Boolean(error)}

@@ -23,7 +23,13 @@ export function RegisterForm({ onSubmit }: { onSubmit: () => void }) {
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
-        <SelectField id="regSector" label="Tipo de Comercio" icon="category" options={businessSectors} />
+        <SelectField
+          id="regSector"
+          label="Tipo de Comercio"
+          icon="category"
+          required
+          options={[{ value: '', label: 'Selecciona el tipo de comercio' }, ...businessSectors]}
+        />
         <TextField
           id="regEmail"
           label="Correo Electrónico"

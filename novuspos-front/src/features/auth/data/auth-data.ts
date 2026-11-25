@@ -24,12 +24,26 @@ export const authBenefits: AuthBenefit[] = [
   },
 ]
 
+/**
+ * Tipos de comercio de pequeñas y medianas tiendas venezolanas.
+ * Cada opción corresponde a una forma real en que novus-post maneja productos:
+ * kg/litro con báscula, lotes con caducidad, variantes de talla/color,
+ * combos, servicios y cuentas corrientes.
+ */
 export const businessSectors = [
   { value: 'abarrotes', label: 'Abarrotes y Minisúper' },
-  { value: 'ferreteria', label: 'Ferretería y Materiales' },
+  { value: 'bodega', label: 'Bodega / Tienda de Barrio' },
   { value: 'supermercado', label: 'Supermercado / Almacén' },
-  { value: 'farmacia', label: 'Farmacia y Droguería' },
+  { value: 'ferreteria', label: 'Ferretería y Materiales' },
+  { value: 'farmacia', label: 'Farmacia' },
+  { value: 'panaderia', label: 'Panadería y Pastelería' },
+  { value: 'fruteria', label: 'Frutería y Verdulería' },
+  { value: 'carniceria', label: 'Carnicería y Pescadería' },
   { value: 'ropa', label: 'Boutique y Moda' },
+  { value: 'calzado', label: 'Calzado y Accesorios' },
+  { value: 'cosmeticos', label: 'Perfumería y Cosméticos' },
+  { value: 'papeleria', label: 'Librería y Papelería' },
+  { value: 'cafeteria', label: 'Cafetería y Repostería' },
   { value: 'general', label: 'Comercio General' },
 ]
 
