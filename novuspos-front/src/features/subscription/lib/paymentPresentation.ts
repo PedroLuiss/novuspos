@@ -1,4 +1,3 @@
-import { formatMoney } from './formatters'
 import type { PaymentRecord, PaymentStatus, Plan, Subscription } from '../types'
 
 export type PaymentFilter = 'all' | PaymentStatus
@@ -31,14 +30,3 @@ export function filterPayments(payments: PaymentRecord[], status: PaymentFilter,
     .sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())
 }
 
-export function paymentTotals(payments: PaymentRecord[]) {
-  const approved = payments.filter((payment) => payment.status === 'approved')
-  const total = approved.reduce((sum, payment) => sum + payment.amount, 0)
-  const currency = approved[0]?.currency ?? payments[0]?.currency ?? 'USD'
-  const latest = [...approved].sort((a, b) => new Date(b.paidAt).getTime() - new Date(a.paidAt).getTime())[0]
-  return {
-    approvedCount: approved.length,
-    totalLabel: formatMoney(total, currency),
-    latestLabel: latest ? paymentPeriod(latest.paidAt) : 'Sin pagos aprobados',
-  }
-}

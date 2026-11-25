@@ -3,10 +3,9 @@ import { IS_DEMO_AUTH } from '@/shared/lib/env'
 import { MS } from '@/shared/ui/MS'
 import { paymentStatusLabels } from '../data/subscription-data'
 import { formatDate, formatMoney } from '../lib/formatters'
-import { filterPayments, paymentPeriod, paymentPlanName, paymentTotals, type PaymentFilter } from '../lib/paymentPresentation'
+import { filterPayments, paymentPeriod, paymentPlanName, type PaymentFilter } from '../lib/paymentPresentation'
 import type { PaymentRecord, Plan, Subscription } from '../types'
 import { PaymentFilterBar } from './PaymentFilterBar'
-import { PaymentSummaryStrip } from './PaymentSummaryStrip'
 
 interface Props {
   payments: PaymentRecord[]
@@ -27,7 +26,6 @@ export function PaymentHistoryTable({ payments, plans, subscription, reviewingId
   const [status, setStatus] = useState<PaymentFilter>('all')
   const [query, setQuery] = useState('')
   const visible = filterPayments(payments, status, query)
-  const totals = paymentTotals(payments)
 
   return (
     <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm flex flex-col gap-space-md">
@@ -41,7 +39,6 @@ export function PaymentHistoryTable({ payments, plans, subscription, reviewingId
         </div>
       </div>
 
-      <PaymentSummaryStrip {...totals} />
       <PaymentFilterBar
         status={status}
         query={query}

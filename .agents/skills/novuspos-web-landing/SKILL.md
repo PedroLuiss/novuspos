@@ -585,14 +585,13 @@ features/subscription/
     ├── PlanCatalog.tsx              # planes disponibles, actual marcado y "Elegir este plan"
     ├── SubscriptionCard.tsx         # plan contratado, estado, anualidad/mensualidad y vigencia
     ├── PaymentHistoryTable.tsx      # tabla con resumen, filtros y búsqueda
-    ├── PaymentSummaryStrip.tsx      # aprobados, total pagado y último mes
     ├── PaymentFilterBar.tsx         # chips de estado + búsqueda
     ├── PaymentRateCard.tsx          # tasa BCV del día y total en bolívares
     ├── PaySubscriptionModal.tsx     # modal de 3 pasos con planId y periodicidad
     ├── PaymentSteps.tsx / PaymentMethodSelector.tsx / PaymentAccountCard.tsx / PaymentSummary.tsx / ProofUpload.tsx
 ```
 
-El historial muestra **Suscripción** (nombre resuelto desde `payment.planId`, con `subscriptionId` como respaldo), **Mes pagado** (derivable de `paidAt`), referencia, fecha, método, banco, monto, estado y comprobante. El resumen se calcula solo con pagos reales; los filtros y la búsqueda son locales.
+El historial muestra **Suscripción** (nombre resuelto desde `payment.planId`, con `subscriptionId` como respaldo), **Mes pagado** (derivable de `paidAt`), referencia, fecha, método, banco, monto, estado y comprobante. No hay tarjeta de indicadores (pagos aprobados, total pagado ni último mes): solo la tabla con filtros y búsqueda locales.
 
 ### Contrato
 
