@@ -20,6 +20,19 @@ export function formatDate(value: string): string {
   return DATE_FORMATTER.format(date)
 }
 
+/** Montos en bolívares, con el formato que usa el usuario en Venezuela. */
+export function formatBolivares(value: number): string {
+  if (!Number.isFinite(value)) return '—'
+  return `Bs ${new Intl.NumberFormat('es-VE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value)}`
+}
+
+export function formatExchangeRate(value: number): string {
+  return new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)
+}
+
 export function toDateInputValue(value: Date = new Date()): string {
   const offset = value.getTimezoneOffset()
   const local = new Date(value.getTime() - offset * 60_000)

@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
+import { useExchangeRate } from '@/shared/hooks/useExchangeRate'
 import { IS_DEMO_AUTH } from '@/shared/lib/env'
 import { TextField } from '@/shared/ui/FormFields'
 import { MS } from '@/shared/ui/MS'
 import { banks, paymentAccounts } from '../data/subscription-data'
 import { usePaymentDraft } from '../hooks/usePaymentDraft'
 import { usePaymentSubmission } from '../hooks/usePaymentSubmission'
-import { formatMoney, toDateInputValue } from '../lib/formatters'
+import { formatBolivares, formatExchangeRate, formatMoney, toDateInputValue } from '../lib/formatters'
 import { hasErrors, validatePaymentDraft } from '../lib/paymentValidation'
 import type { PaymentFieldErrors, PaymentRecord, Plan, Subscription } from '../types'
 import { PaymentAccountCard } from './PaymentAccountCard'
 import { PaymentMethodSelector } from './PaymentMethodSelector'
+import { PaymentRateCard } from './PaymentRateCard'
 import { PaymentSteps } from './PaymentSteps'
 import { PaymentSummary } from './PaymentSummary'
 import { ProofUpload } from './ProofUpload'
@@ -27,6 +29,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
   const [stepErrors, setStepErrors] = useState<PaymentFieldErrors>({})
   const [submitted, setSubmitted] = useState<PaymentRecord | null>(null)
   const { draft, update, clear } = usePaymentDraft(subscription.id)
+  const { rate, isLoading: isRateLoading, error: rateError } = useExchangeRate()
   const { isSubmitting, fieldErrors, formError, submit, clearErrors } = usePaymentSubmission((payment) => {
     clear()
     onPaid(payment)
@@ -44,11 +47,11 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
   const errors = { ...stepErrors, ...fieldErrors }
   const account = draft.method ? paymentAccounts[draft.method] : null
   const isCurrentPlan = plan.id === subscription.planId
-  const amount = formatMoney(
-    isCurrentPlan ? subscription.amount || plan.price : plan.price,
-    isCurrentPlan ? subscription.currency || plan.currency : plan.currency,
-  )
+  const amountValue = isCurrentPlan ? subscription.amount || plan.price : plan.price
+  const amount = formatMoney(amountValue, isCurrentPlan ? subscription.currency || plan.currency : plan.currency)
   const intervalLabel = plan.interval === 'year' ? 'al año' : 'al mes'
+  const rateLabel = rate ? formatExchangeRate(rate.rate) : null
+  const totalLabel = rate ? formatBolivares(amountValue * rate.rate) : null
 
   const patch = (values: Parameters<typeof update>[0]) => {
     setStepErrors({})
@@ -159,9 +162,21 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                     </p>
                   </div>
                   <PaymentMethodSelector value={draft.method} error={errors.method} onChange={(method) => patch({ method })} />
-                  {account ? <PaymentAccountCard account={account} /> : (
+                  {account ? (
+                    <>
+                      <PaymentAccountCard account={account} />
+                      <PaymentRateCard
+                        rateLabel={rateLabel}
+                        totalLabel={totalLabel}
+                        usdLabel={amount}
+                        isDemo={IS_DEMO_AUTH}
+                        isLoading={isRateLoading}
+                        error={rateError}
+                      />
+                    </>
+                  ) : (
                     <div className="rounded-lg border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant">
-                      Elige un método para ver los datos de pago.
+                      Elige un método para ver los datos de pago y el monto en bolívares.
                     </div>
                   )}
                   {IS_DEMO_AUTH && (
@@ -235,6 +250,8 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                   draft={draft}
                   amount={amount}
                   intervalLabel={intervalLabel}
+                  rateLabel={rateLabel}
+                  totalLabel={totalLabel}
                   onEditMethod={() => setStep(1)}
                   onEditProof={() => setStep(2)}
                 />

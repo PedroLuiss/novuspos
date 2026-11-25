@@ -1,15 +1,17 @@
 import { MS } from '@/shared/ui/MS'
-import { formatMoney } from '../lib/formatters'
+import { formatDate, formatMoney } from '../lib/formatters'
 import type { Plan } from '../types'
 
 interface Props {
   plans: Plan[]
   currentPlanId: string
+  canSwitch: boolean
+  renewsAt: string
   onSelect: (plan: Plan) => void
 }
 
 /** Suscripciones disponibles; la lista la envía la API de Laravel. */
-export function PlanCatalog({ plans, currentPlanId, onSelect }: Props) {
+export function PlanCatalog({ plans, currentPlanId, canSwitch, renewsAt, onSelect }: Props) {
   return (
     <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm flex flex-col gap-space-md">
       <div className="flex items-center gap-space-xs">
@@ -21,6 +23,17 @@ export function PlanCatalog({ plans, currentPlanId, onSelect }: Props) {
           </span>
         </div>
       </div>
+
+      {!canSwitch && (
+        <div className="flex items-start gap-space-xs rounded-lg bg-surface-container p-space-sm">
+          <MS name="lock" className="text-primary text-[18px] shrink-0 mt-0.5" />
+          <p className="font-body-sm text-body-sm text-on-surface-variant">
+            Tu suscripción sigue activa. Podrás elegir otro plan cuando venza el {formatDate(renewsAt)}. Hasta entonces
+            puedes renovar el plan que ya tienes.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-md">
         {plans.map((plan) => {
           const current = plan.id === currentPlanId
@@ -63,10 +76,13 @@ export function PlanCatalog({ plans, currentPlanId, onSelect }: Props) {
               ) : (
                 <button
                   type="button"
+                  disabled={!canSwitch}
                   onClick={() => onSelect(plan)}
-                  className="mt-auto w-full py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5"
+                  title={canSwitch ? undefined : 'Tu suscripción aún no ha vencido'}
+                  className="mt-auto w-full py-2 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 disabled:bg-surface-container disabled:text-outline disabled:cursor-not-allowed"
                 >
-                  <MS name="payments" className="text-[16px]" /> Elegir este plan
+                  <MS name={canSwitch ? 'payments' : 'lock'} className="text-[16px]" />
+                  {canSwitch ? 'Elegir este plan' : 'Disponible al vencer'}
                 </button>
               )}
             </div>

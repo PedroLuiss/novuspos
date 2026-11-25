@@ -35,3 +35,8 @@ export const BACKUP_ENDPOINTS = {
 export const SUPPORT_ENDPOINTS = {
   submit: '/support/tickets',
 } as const
+
+/** Contrato de la tasa de cambio del día (BCV). */
+export const EXCHANGE_RATE_ENDPOINTS = {
+  today: '/billing/exchange-rate',
+} as const

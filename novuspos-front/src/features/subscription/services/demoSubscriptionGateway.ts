@@ -1,5 +1,6 @@
 import { ValidationError } from '@/shared/services/apiClient'
 import { demoPayments, demoSubscription, plans } from '../data/subscription-data'
+import { isSubscriptionExpired } from '../lib/subscriptionStatus'
 import type { PaymentRecord, SubmitPaymentRequest, Subscription } from '../types'
 import type { BillingOverview, PaymentReviewResult, SubscriptionGateway } from './subscriptionGateway'
 
@@ -59,6 +60,12 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
     )
     if (duplicate) {
       throw new ValidationError({ reference: ['Esa referencia ya fue registrada. Revisa tu comprobante.'] })
+    }
+
+    if (request.planId !== state.subscription.planId && !isSubscriptionExpired(state.subscription)) {
+      throw new ValidationError({
+        planId: ['Tu suscripción sigue activa. Podrás cambiar de plan cuando venza.'],
+      })
     }
 
     const plan = plans.find((item) => item.id === request.planId) ?? plans[0]

@@ -118,6 +118,8 @@ src/
 ├── features/subscription/              # Planes, pagos e historial
 ├── features/backups/                   # Única copia vigente de la cuenta
 ├── features/support/                   # Formulario de reportes de soporte
+├── shared/services/exchange-rate/     # tasa BCV del día: puerto + demo/API + factory + fachada
+├── shared/hooks/useExchangeRate.ts    # carga de la tasa del día
 ├── shared/ui/MS.tsx                    # icono Material Symbols (filled opcional)
 ├── shared/ui/FormFields.tsx            # FieldShell / TextField / PasswordField / SelectField reutilizables
 ├── features/auth/
@@ -558,7 +560,9 @@ El catálogo lo envía la API de Laravel en `GET /billing/subscription` (o `GET 
 - `novus-mensual` — **NovusPOS Mensual**, $4.99 USD / mes, primer mes gratis.
 - `novus-anual` — **NovusPOS Anual**, $59.99 USD / año, un solo pago al año sin mensualidades.
 
-No se afirma ahorro: doce mensualidades cuestan menos que el plan anual. El usuario elige el plan con *Elegir este plan* en el catálogo; el modal usa el precio del plan seleccionado (no el de la suscripción vigente) y envía `planId` en `POST /billing/payments`. Al aprobar el pago, la suscripción cambia de plan y `renewsAt` se calcula según `interval` (un mes o un año). La clave del panel se renueva con ese pago.
+No se afirma ahorro: doce mensualidades cuestan menos que el plan anual. **Solo se puede cambiar de plan cuando la suscripción actual está vencida** (`expired`, `cancelled` o `active` con `renewsAt` pasado). Con una suscripción activa o en revisión, el catálogo explica la fecha de vencimiento y muestra *Disponible al vencer* deshabilitado; el botón *Pagar suscripción* del plan actual sigue disponible para renovar. La regla vive en `lib/subscriptionStatus.ts` y también la aplica el adaptador demo; **Laravel debe enforzarla en el backend**. Cuando sí se permite, el modal usa el precio del plan elegido (no el de la suscripción vigente) y envía `planId` en `POST /billing/payments`. Al aprobar, cambian el plan, el monto y `renewsAt` según `interval` (un mes o un año); la clave del panel se renueva con ese pago.
+
+Al elegir pago móvil o transferencia se consulta la **tasa BCV del día** y se muestra el total en bolívares junto al monto en dólares: `monto USD × tasa`. El servicio vive en `shared/services/exchange-rate/` con puerto, adaptadores demo/API, factory y fachada, y se consume con `shared/hooks/useExchangeRate.ts`. En demo la tasa es de ejemplo; en producción la envía Laravel.
 
 ### Estructura
 
@@ -572,6 +576,7 @@ features/subscription/
 │   ├── paymentPresentation.ts       # plan del pago, mes, filtros y totales
 │   ├── paymentDraftStore.ts         # caché local del borrador por suscripción
 │   ├── paymentFormErrors.ts         # ValidationError → errores por campo
+│   ├── subscriptionStatus.ts        # solo permite cambiar de plan si está vencido
 │   └── proofImage.ts                # valida y comprime el comprobante
 ├── services/                        # puerto + demo/HTTP + factory + fachada
 ├── hooks/                           # useSubscriptionOverview, usePaymentDraft, usePaymentSubmission
@@ -582,6 +587,7 @@ features/subscription/
     ├── PaymentHistoryTable.tsx      # tabla con resumen, filtros y búsqueda
     ├── PaymentSummaryStrip.tsx      # aprobados, total pagado y último mes
     ├── PaymentFilterBar.tsx         # chips de estado + búsqueda
+    ├── PaymentRateCard.tsx          # tasa BCV del día y total en bolívares
     ├── PaySubscriptionModal.tsx     # modal de 3 pasos con planId y periodicidad
     ├── PaymentSteps.tsx / PaymentMethodSelector.tsx / PaymentAccountCard.tsx / PaymentSummary.tsx / ProofUpload.tsx
 ```
@@ -590,9 +596,9 @@ El historial muestra **Suscripción** (nombre resuelto desde `payment.planId`, c
 
 ### Contrato
 
-En `BILLING_ENDPOINTS`: `GET /billing/subscription` (con `plans`, `subscription` y `payments`; si faltan, completa con `GET /billing/plans` y `GET /billing/payments`), `POST /billing/payments` con `{ subscriptionId, planId, method, reference, paidAt, bank, proofName, proofDataUrl }` y `PATCH /billing/payments/{id}/review`. La recarga posterior al pago no desmonta el modal. RBAC lo decide el backend, no la UI.
+En `BILLING_ENDPOINTS`: `GET /billing/subscription` (con `plans`, `subscription` y `payments`; si faltan, completa con `GET /billing/plans` y `GET /billing/payments`), `POST /billing/payments` con `{ subscriptionId, planId, method, reference, paidAt, bank, proofName, proofDataUrl }` y `PATCH /billing/payments/{id}/review`. En `EXCHANGE_RATE_ENDPOINTS`: `GET /billing/exchange-rate` → `{ rate, currency: 'USD', date, source?: 'BCV' }` (acepta también `rate_data`, `data`, `value` o `tasa`). La recarga posterior al pago no desmonta el modal. RBAC y la regla de vencimiento los decide el backend, no la UI.
 
-> Verificado con CDP en demo y `api` (mock): dos planes visibles, elección del anual, monto $59.99 al año, envío con `"planId":"novus-anual"` en el cuerpo, aprobación → *ANUALIDAD* y plan anual en el panel general; sin errores de consola. `npm run build` y `npm run lint` limpios.
+> Verificado con CDP en demo y `api` (mock): suscripción activa bloquea el cambio (*Disponible al vencer* deshabilitado); suscripción vencida permite elegir el anual; al seleccionar transferencia aparece la tasa y el total en bolívares (demo `59.99 × 128.45 = Bs 7.705,72`; api `4.99 × 130.50 = Bs 651,20`). El log del mock confirmó `GET /billing/exchange-rate`. `npm run build` y `npm run lint` limpios.
 
 ## 23. Copias de Seguridad: una sola copia vigente
 

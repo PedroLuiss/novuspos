@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MS } from '@/shared/ui/MS'
 import { useSubscriptionOverview } from '../hooks/useSubscriptionOverview'
+import { canSwitchPlan } from '../lib/subscriptionStatus'
 import type { Plan } from '../types'
 import { PaymentHistoryTable } from './PaymentHistoryTable'
 import { PaySubscriptionModal } from './PaySubscriptionModal'
@@ -13,6 +14,8 @@ export function SubscriptionOverview() {
   const [isPayOpen, setIsPayOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
   const openPayment = (plan: Plan) => {
+    if (!overview) return
+    if (plan.id !== overview.subscription.planId && !canSwitchPlan(overview.subscription)) return
     setSelectedPlan(plan)
     setIsPayOpen(true)
   }
@@ -66,7 +69,13 @@ export function SubscriptionOverview() {
         </div>
       )}
 
-      <PlanCatalog plans={overview.plans} currentPlanId={overview.subscription.planId} onSelect={openPayment} />
+      <PlanCatalog
+        plans={overview.plans}
+        currentPlanId={overview.subscription.planId}
+        canSwitch={canSwitchPlan(overview.subscription)}
+        renewsAt={overview.subscription.renewsAt}
+        onSelect={openPayment}
+      />
       {plan && <SubscriptionCard subscription={overview.subscription} plan={plan} onPay={() => openPayment(plan)} />}
       <PaymentHistoryTable
         payments={overview.payments}

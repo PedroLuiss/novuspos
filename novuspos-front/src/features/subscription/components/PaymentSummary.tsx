@@ -7,12 +7,24 @@ interface Props {
   draft: PaymentDraft
   amount: string
   intervalLabel?: string
+  rateLabel?: string | null
+  totalLabel?: string | null
   onEditMethod: () => void
   onEditProof: () => void
 }
 
 /** Resumen del pago antes de enviarlo; aísla la vista del modal de 3 pasos. */
-export function PaymentSummary({ planName, account, draft, amount, intervalLabel, onEditMethod, onEditProof }: Props) {
+export function PaymentSummary({
+  planName,
+  account,
+  draft,
+  amount,
+  intervalLabel,
+  rateLabel,
+  totalLabel,
+  onEditMethod,
+  onEditProof,
+}: Props) {
   return (
     <>
       <div className="rounded-lg bg-surface-container-low p-space-md flex flex-col gap-space-xs">
@@ -47,6 +59,14 @@ export function PaymentSummary({ planName, account, draft, amount, intervalLabel
           </span>
           <span className="font-headline-sm text-headline-sm text-primary font-mono font-bold">{amount}</span>
         </div>
+        {totalLabel && rateLabel && (
+          <div className="flex items-center justify-between">
+            <span className="font-body-sm text-body-sm text-on-surface-variant">
+              Total en bolívares <span className="font-mono">(tasa {rateLabel})</span>
+            </span>
+            <span className="font-label-md text-label-md font-mono font-bold text-on-surface">{totalLabel}</span>
+          </div>
+        )}
       </div>
       <div className="flex items-start gap-space-xs rounded-lg bg-tertiary-fixed/50 p-space-sm">
         <MS name="schedule" className="text-tertiary text-[18px] shrink-0 mt-0.5" />
