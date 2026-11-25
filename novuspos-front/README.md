@@ -133,7 +133,7 @@ Contrato en `src/shared/services/endpoints.ts`: `GET /backups/latest` y `POST /b
 
 ## Panel general
 
-La ruta `/panel` ya no usa bloques estáticos: `src/features/dashboard/` obtiene un único resumen mediante gateway + adaptadores demo/API + factory + servicio fachada + hook contenedor, y compone `DashboardBanner`, `AccessCard`, `LastBackupCard` e `InstallerCard`. La clave se muestra completa y copiable (la renueva la API con cada pago), el estado lo decide la API (*Activa*, *Pago en revisión*, *Inactiva · pendiente de pago*, *Cancelada*) y solo aparece la fecha del último respaldo. No hay KPIs, equipo asignado ni historial de pagos en la portada.
+La ruta `/panel` ya no usa bloques estáticos: `src/features/dashboard/` obtiene un único resumen mediante gateway + adaptadores demo/API + factory + servicio fachada + hook contenedor, y compone `DashboardBanner`, `AccessCard` y `LastBackupCard`. La tarjeta del instalador se quitó: el banner ya tiene un solo botón de descarga. La clave se muestra completa y copiable (la renueva la API con cada pago), el estado lo decide la API (*Activa*, *Pago en revisión*, *Inactiva · pendiente de pago*, *Cancelada*) y solo aparece la fecha del último respaldo. No hay KPIs, equipo asignado ni historial de pagos en la portada.
 
 Contrato en `src/shared/services/endpoints.ts`: `GET /panel/overview` → `{ organizationName, planName, subscriptionStatus, dueAt, activationKey, activationKeyRenewsAt, lastBackupAt }`. El modo `demo` es el predeterminado; con `VITE_AUTH_MODE=api` se consumen los endpoints reales sin tocar la UI. Ver skill §24 y contexto 09 §5.17.
 

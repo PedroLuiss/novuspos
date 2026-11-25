@@ -2,7 +2,6 @@ import { MS } from '@/shared/ui/MS'
 import { useDashboard } from '../hooks/useDashboard'
 import { AccessCard } from './AccessCard'
 import { DashboardBanner } from './DashboardBanner'
-import { InstallerCard } from './InstallerCard'
 import { LastBackupCard } from './LastBackupCard'
 
 /** Compone el panel general a partir de una sola carga de datos. */
@@ -37,12 +36,11 @@ export function DashboardSection() {
     <div className="flex flex-col gap-space-lg">
       <DashboardBanner summary={summary} />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-stretch">
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-8">
           <AccessCard summary={summary} />
         </div>
-        <div className="lg:col-span-5 flex flex-col gap-space-md">
+        <div className="lg:col-span-4">
           <LastBackupCard lastBackupAt={summary.lastBackupAt} />
-          <InstallerCard />
         </div>
       </div>
       {error && (

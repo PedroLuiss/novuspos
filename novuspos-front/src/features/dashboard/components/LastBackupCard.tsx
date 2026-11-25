@@ -4,7 +4,7 @@ import { lastBackupLabel } from '../lib/dashboardFormatters'
 /** Recordatorio de la copia más reciente; el detalle vive en su módulo. */
 export function LastBackupCard({ lastBackupAt }: { lastBackupAt: string | null }) {
   return (
-    <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm flex flex-col gap-space-sm">
+    <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm flex flex-col gap-space-sm h-full">
       <div className="flex items-center gap-space-xs">
         <MS name="hard_drive" className="text-secondary text-[22px]" />
         <h2 className="font-headline-sm text-headline-sm text-on-surface font-bold">Tu último respaldo</h2>
@@ -20,7 +20,7 @@ export function LastBackupCard({ lastBackupAt }: { lastBackupAt: string | null }
       </p>
       <a
         href="/panel/respaldos"
-        className="self-start flex items-center gap-1 font-label-md text-label-md font-semibold text-primary hover:underline"
+        className="mt-auto self-start flex items-center gap-1 font-label-md text-label-md font-semibold text-primary hover:underline"
       >
         Ver detalle <MS name="arrow_forward" className="text-[16px]" />
       </a>

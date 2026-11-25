@@ -8,17 +8,6 @@ export const subscriptionStatusLabels = {
   cancelled: 'Cancelada',
 } as const
 
-/** Textos fijos del instalador: no dependen de la cuenta. */
-export const installerInfo = {
-  releaseLabel: 'Marzo 2026',
-  downloadHref: '/#descargar',
-  highlights: [
-    'Peso automático desde tu báscula al cobrar.',
-    'Etiquetas con código de barras en el tamaño que elijas.',
-    'Tus ventas e inventario al día al abrir el programa.',
-  ],
-} as const
-
 function daysAgo(days: number): string {
   const date = new Date()
   date.setDate(date.getDate() - days)

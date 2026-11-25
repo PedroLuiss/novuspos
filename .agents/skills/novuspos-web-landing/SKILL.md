@@ -660,13 +660,12 @@ features/dashboard/
     ├── DashboardSection.tsx      # loader, error y composición
     ├── DashboardBanner.tsx       # bienvenida y accesos
     ├── AccessCard.tsx            # plan + estado + clave + copiar
-    ├── LastBackupCard.tsx        # fecha del último respaldo
-    └── InstallerCard.tsx         # descarga del instalador (contenido fijo)
+    └── LastBackupCard.tsx        # fecha del último respaldo
 ```
 
-Se eliminaron `DashboardStats.tsx` y `LicenseCard.tsx`, y los endpoints `license` y `release-device`: no existe asignación de equipo ni botón de cambio. El menú lateral tampoco muestra *Cajas Registradoras* ni etiquetas de equipo.
+Se eliminaron `DashboardStats.tsx`, `LicenseCard.tsx` e `InstallerCard.tsx`, y los endpoints `license` y `release-device`: no hay KPIs, asignación de equipo ni botón de cambio. La tarjeta del instalador se retiró porque el banner ya tiene un único CTA de descarga: dos botones se veían redundantes. El menú lateral tampoco muestra *Cajas Registradoras* ni etiquetas de equipo.
 
-> Verificado con CDP en demo y `api` (mock): clave completa, estado activo, plan anual tras la aprobación, fecha de respaldo, sin pagos ni equipo asignado; sin errores de consola. El mock confirmó `GET /panel/overview`.
+> Verificado con CDP en demo y `api` (mock): clave completa, estado activo, plan anual tras la aprobación, fecha de respaldo, sin pagos ni equipo asignado; un solo botón de descarga y sin tarjeta de instalador; sin errores de consola. El mock confirmó `GET /panel/overview`.
 
 ## 25. Soporte Técnico
 
