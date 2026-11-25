@@ -118,7 +118,7 @@ src/
 ├── features/subscription/              # Planes, pagos e historial
 ├── features/backups/                   # Única copia vigente de la cuenta
 ├── features/support/                   # Formulario de reportes de soporte
-├── shared/services/exchange-rate/     # tasa BCV del día: puerto + demo/API + factory + fachada
+├── shared/services/exchange-rate/     # tasa BCV real: API pública + Laravel opcional + caché/respaldo
 ├── shared/hooks/useExchangeRate.ts    # carga de la tasa del día
 ├── shared/ui/MS.tsx                    # icono Material Symbols (filled opcional)
 ├── shared/ui/FormFields.tsx            # FieldShell / TextField / PasswordField / SelectField reutilizables
@@ -562,7 +562,7 @@ El catálogo lo envía la API de Laravel en `GET /billing/subscription` (o `GET 
 
 No se afirma ahorro: doce mensualidades cuestan menos que el plan anual. **Solo se puede cambiar de plan cuando la suscripción actual está vencida** (`expired`, `cancelled` o `active` con `renewsAt` pasado). Con una suscripción activa o en revisión, el catálogo explica la fecha de vencimiento y muestra *Disponible al vencer* deshabilitado; el botón *Pagar suscripción* del plan actual sigue disponible para renovar. La regla vive en `lib/subscriptionStatus.ts` y también la aplica el adaptador demo; **Laravel debe enforzarla en el backend**. Cuando sí se permite, el modal usa el precio del plan elegido (no el de la suscripción vigente) y envía `planId` en `POST /billing/payments`. Al aprobar, cambian el plan, el monto y `renewsAt` según `interval` (un mes o un año); la clave del panel se renueva con ese pago.
 
-Al elegir pago móvil o transferencia se consulta la **tasa BCV del día** y se muestra el total en bolívares junto al monto en dólares: `monto USD × tasa`. El servicio vive en `shared/services/exchange-rate/` con puerto, adaptadores demo/API, factory y fachada, y se consume con `shared/hooks/useExchangeRate.ts`. En demo la tasa es de ejemplo; en producción la envía Laravel.
+Al elegir pago móvil o transferencia se consulta la **tasa BCV real del día** y se muestra el total en bolívares junto al monto en dólares: `monto USD × tasa`. El servicio vive en `shared/services/exchange-rate/` con puerto, adaptadores (API pública del BCV, Laravel opcional y respaldo), factory, fachada con caché de 24 h y hook `useExchangeRate`. Por defecto se llama a `https://ve.dolarapi.com/v1/dolares/oficial` (fuente BCV, sin autenticación, CORS `*`, mismo adaptador que usa el escritorio): se toma `promedio` y la fecha de `fechaActualizacion`. Si falla, se usa la tasa guardada en `novuspos:exchange-rate` y, como último recurso, una tasa de referencia marcada con `fallback: true`; la UI lo avisa con *Tasa de referencia* en lugar de *Tasa BCV del día*. Definir `VITE_EXCHANGE_RATE_API_URL=/billing/exchange-rate` (ruta relativa a `VITE_API_URL`) cambia la fuente al endpoint de Laravel cuando ya esté publicado.
 
 ### Estructura
 
@@ -595,9 +595,9 @@ El historial muestra **Suscripción** (nombre resuelto desde `payment.planId`, c
 
 ### Contrato
 
-En `BILLING_ENDPOINTS`: `GET /billing/subscription` (con `plans`, `subscription` y `payments`; si faltan, completa con `GET /billing/plans` y `GET /billing/payments`), `POST /billing/payments` con `{ subscriptionId, planId, method, reference, paidAt, bank, proofName, proofDataUrl }` y `PATCH /billing/payments/{id}/review`. En `EXCHANGE_RATE_ENDPOINTS`: `GET /billing/exchange-rate` → `{ rate, currency: 'USD', date, source?: 'BCV' }` (acepta también `rate_data`, `data`, `value` o `tasa`). La recarga posterior al pago no desmonta el modal. RBAC y la regla de vencimiento los decide el backend, no la UI.
+En `BILLING_ENDPOINTS`: `GET /billing/subscription` (con `plans`, `subscription` y `payments`; si faltan, completa con `GET /billing/plans` y `GET /billing/payments`), `POST /billing/payments` con `{ subscriptionId, planId, method, reference, paidAt, bank, proofName, proofDataUrl }` y `PATCH /billing/payments/{id}/review`. En `EXCHANGE_RATE_ENDPOINTS`: `GET /billing/exchange-rate` → `{ rate, currency: 'USD', date, source?: 'BCV' }` (acepta también `rate_data`, `data`, `value` o `tasa`) solo si se define `VITE_EXCHANGE_RATE_API_URL`; sin esa variable se usa la API pública del BCV. La recarga posterior al pago no desmonta el modal. RBAC y la regla de vencimiento los decide el backend, no la UI.
 
-> Verificado con CDP en demo y `api` (mock): suscripción activa bloquea el cambio (*Disponible al vencer* deshabilitado); suscripción vencida permite elegir el anual; al seleccionar transferencia aparece la tasa y el total en bolívares (demo `59.99 × 128.45 = Bs 7.705,72`; api `4.99 × 130.50 = Bs 651,20`). El log del mock confirmó `GET /billing/exchange-rate`. `npm run build` y `npm run lint` limpios.
+> Verificado con CDP: suscripción activa bloquea el cambio (*Disponible al vencer* deshabilitado) y la vencida permite elegir el anual. La tasa real del día se consultó en línea (25/11/2026: 922,56 → `4.99 × 922.56 = Bs 4.603,59`), se guardó en caché y, al bloquear la API, apareció *Tasa de referencia* con el aviso de respaldo. Con `VITE_EXCHANGE_RATE_API_URL=/billing/exchange-rate` el mock de Laravel entregó 130,50 → `Bs 651,20`. `npm run build` y `npm run lint` limpios.
 
 ## 23. Copias de Seguridad: una sola copia vigente
 

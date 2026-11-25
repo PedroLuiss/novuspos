@@ -6,7 +6,7 @@ import { MS } from '@/shared/ui/MS'
 import { banks, paymentAccounts } from '../data/subscription-data'
 import { usePaymentDraft } from '../hooks/usePaymentDraft'
 import { usePaymentSubmission } from '../hooks/usePaymentSubmission'
-import { formatBolivares, formatExchangeRate, formatMoney, toDateInputValue } from '../lib/formatters'
+import { formatBolivares, formatDate, formatExchangeRate, formatMoney, toDateInputValue } from '../lib/formatters'
 import { hasErrors, validatePaymentDraft } from '../lib/paymentValidation'
 import type { PaymentFieldErrors, PaymentRecord, Plan, Subscription } from '../types'
 import { PaymentAccountCard } from './PaymentAccountCard'
@@ -52,6 +52,8 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
   const intervalLabel = plan.interval === 'year' ? 'al año' : 'al mes'
   const rateLabel = rate ? formatExchangeRate(rate.rate) : null
   const totalLabel = rate ? formatBolivares(amountValue * rate.rate) : null
+  const sourceLabel = rate?.fallback ? 'Tasa de referencia' : 'Tasa BCV del día'
+  const dateLabel = rate?.date ? formatDate(rate.date) : undefined
 
   const patch = (values: Parameters<typeof update>[0]) => {
     setStepErrors({})
@@ -169,7 +171,9 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                         rateLabel={rateLabel}
                         totalLabel={totalLabel}
                         usdLabel={amount}
-                        isDemo={IS_DEMO_AUTH}
+                        sourceLabel={sourceLabel}
+                        dateLabel={dateLabel}
+                        isFallback={Boolean(rate?.fallback)}
                         isLoading={isRateLoading}
                         error={rateError}
                       />

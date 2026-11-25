@@ -25,9 +25,10 @@ function normalize(payload: unknown): ExchangeRate {
   }
 }
 
-/** Adaptador real: consume la tasa publicada por Laravel. */
+/** Adaptador opcional: usa el endpoint de Laravel cuando esté publicado. */
 export const httpExchangeRateGateway: ExchangeRateGateway = {
   async getToday(): Promise<ExchangeRate> {
-    return normalize(await apiClient.get<unknown>(EXCHANGE_RATE_ENDPOINTS.today))
+    const path = import.meta.env.VITE_EXCHANGE_RATE_API_URL?.trim() || EXCHANGE_RATE_ENDPOINTS.today
+    return normalize(await apiClient.get<unknown>(path))
   },
 }

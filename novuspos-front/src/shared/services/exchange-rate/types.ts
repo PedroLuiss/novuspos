@@ -1,4 +1,4 @@
-/** Tasa de cambio del día, tal como la expone la API de Laravel. */
+/** Tasa de cambio del día: BCV real o, si falla, una tasa de referencia. */
 export interface ExchangeRate {
   /** Bolívares por cada dólar estadounidense. */
   rate: number
@@ -7,4 +7,6 @@ export interface ExchangeRate {
   date: string
   /** Etiqueta de origen, por ejemplo BCV. */
   source?: string
+  /** Verdadero cuando no se pudo consultar la fuente en línea. */
+  fallback?: boolean
 }

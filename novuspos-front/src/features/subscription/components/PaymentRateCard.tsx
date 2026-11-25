@@ -4,13 +4,24 @@ interface Props {
   rateLabel: string | null
   totalLabel: string | null
   usdLabel: string
-  isDemo: boolean
+  sourceLabel: string
+  dateLabel?: string
+  isFallback: boolean
   isLoading: boolean
   error: string | null
 }
 
-/** Tasa del día y total en bolívares, visibles al elegir el método de pago. */
-export function PaymentRateCard({ rateLabel, totalLabel, usdLabel, isDemo, isLoading, error }: Props) {
+/** Tasa real del día y total en bolívares, visibles al elegir el método de pago. */
+export function PaymentRateCard({
+  rateLabel,
+  totalLabel,
+  usdLabel,
+  sourceLabel,
+  dateLabel,
+  isFallback,
+  isLoading,
+  error,
+}: Props) {
   return (
     <div className="rounded-lg bg-surface-container-low p-space-sm flex flex-col gap-space-xs">
       <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">
@@ -27,15 +38,20 @@ export function PaymentRateCard({ rateLabel, totalLabel, usdLabel, isDemo, isLoa
             <span className="font-headline-sm text-headline-sm text-primary font-mono font-bold">{totalLabel}</span>
           </div>
           <div className="flex items-center justify-between font-body-sm text-body-sm text-on-surface-variant">
-            <span>Tasa BCV del día</span>
+            <span>{sourceLabel}</span>
             <span className="font-mono">1 USD = Bs {rateLabel}</span>
           </div>
+          {dateLabel && (
+            <span className="font-label-sm text-label-sm text-outline">Tasa del {dateLabel}</span>
+          )}
           <div className="flex items-center justify-between font-body-sm text-body-sm text-on-surface-variant">
             <span>Monto en dólares</span>
             <span className="font-mono">{usdLabel}</span>
           </div>
-          {isDemo && (
-            <span className="font-label-sm text-label-sm text-outline">Tasa de ejemplo para probar el flujo.</span>
+          {isFallback && (
+            <span className="font-label-sm text-label-sm text-outline">
+              No pudimos consultar la tasa en línea. Es una referencia; confirma el monto con tu banco antes de pagar.
+            </span>
           )}
         </>
       ) : (

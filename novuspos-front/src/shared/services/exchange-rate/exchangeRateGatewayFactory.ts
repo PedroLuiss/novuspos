@@ -1,9 +1,12 @@
-import { AUTH_BACKEND } from '@/shared/lib/env'
-import { demoExchangeRateGateway } from './demoExchangeRateGateway'
+import { bcvExchangeRateGateway } from './bcvExchangeRateGateway'
 import { httpExchangeRateGateway } from './httpExchangeRateGateway'
 import type { ExchangeRateGateway } from './exchangeRateGateway'
 
-/** VITE_AUTH_MODE elige demo o API también para la tasa del día. */
+/**
+ * Por defecto se consulta la API pública del BCV, que funciona sin backend.
+ * Si Laravel define su propio endpoint, basta con VITE_EXCHANGE_RATE_API_URL
+ * (ruta relativa a VITE_API_URL) para usarlo en su lugar.
+ */
 export function resolveExchangeRateGateway(): ExchangeRateGateway {
-  return AUTH_BACKEND === 'demo' ? demoExchangeRateGateway : httpExchangeRateGateway
+  return import.meta.env.VITE_EXCHANGE_RATE_API_URL?.trim() ? httpExchangeRateGateway : bcvExchangeRateGateway
 }

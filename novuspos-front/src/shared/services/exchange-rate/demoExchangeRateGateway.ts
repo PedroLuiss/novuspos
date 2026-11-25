@@ -17,6 +17,6 @@ function wait(): Promise<void> {
 export const demoExchangeRateGateway: ExchangeRateGateway = {
   async getToday(): Promise<ExchangeRate> {
     await wait()
-    return { rate: DEMO_EXCHANGE_RATE, currency: 'USD', date: today(), source: 'BCV' }
+    return { rate: DEMO_EXCHANGE_RATE, currency: 'USD', date: today(), source: 'BCV', fallback: true }
   },
 }
