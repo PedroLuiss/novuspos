@@ -91,7 +91,8 @@ export interface AdminPayment {
   userName: string
   planId: string
   planName: string
-  method: 'mobile' | 'transfer'
+  /** Clave del catálogo de cobro configurado por el dueño. */
+  method: string
   reference: string
   bank: string
   paidAt: string

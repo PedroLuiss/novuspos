@@ -6,6 +6,7 @@ import { normalizeLoginPath } from '../lib/adminSettings'
 import { adminPrimaryButton } from '../lib/adminStyles'
 import type { AdminSettings } from '../types'
 import { AdminAlert, AdminCard, AdminPageHeader } from './ui/AdminUi'
+import { PaymentMethodsSection } from './PaymentMethodsSection'
 
 /** Datos de la empresa y ruta secreta del login maestro. */
 export function SettingsPage() {
@@ -21,7 +22,7 @@ export function SettingsPage() {
       <AdminPageHeader
         eyebrow="Configuración"
         title="Ajustes del dueño"
-        description="Datos de la empresa y enlace privado de acceso al panel maestro."
+        description="Datos de la empresa, enlace privado de acceso y cuentas para cobrar la suscripción."
       />
 
       {error && <AdminAlert>{error}</AdminAlert>}
@@ -79,6 +80,8 @@ export function SettingsPage() {
           </div>
         </AdminCard>
       </form>
+
+      <PaymentMethodsSection />
     </div>
   )
 }

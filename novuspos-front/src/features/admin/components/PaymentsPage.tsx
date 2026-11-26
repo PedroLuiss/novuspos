@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { usePaymentMethods } from '@/shared/hooks/usePaymentMethods'
+import { paymentMethodLabel, paymentMethodLabels } from '@/shared/services/payment-methods/paymentMethodLabels'
 import { MS } from '@/shared/ui/MS'
 import { PAYMENT_PAGE_SIZES, useAdminPayments } from '../hooks/useAdminPayments'
 import { formatAdminDate, formatUsd, paymentTone, statusLabels } from '../lib/adminFormatters'
@@ -36,6 +38,8 @@ export function PaymentsPage() {
   } = useAdminPayments()
   const [searchDraft, setSearchDraft] = useState(query.search)
   const [selected, setSelected] = useState<AdminPayment | null>(null)
+  const { methods } = usePaymentMethods()
+  const methodLabels = useMemo(() => paymentMethodLabels(methods), [methods])
 
   useEffect(() => {
     if (searchDraft === query.search) return
@@ -208,6 +212,7 @@ export function PaymentsPage() {
       {selected && (
         <PaymentReviewModal
           payment={selected}
+          methodLabel={paymentMethodLabel(selected.method, methodLabels)}
           busy={busyId === selected.id}
           onClose={() => setSelected(null)}
           onReview={async (approved, note) => {

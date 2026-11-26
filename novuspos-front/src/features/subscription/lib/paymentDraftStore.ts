@@ -21,7 +21,7 @@ export function loadDraft(subscriptionId: string): PaymentDraft {
     if (!raw) return createEmptyDraft()
     const parsed = JSON.parse(raw) as Partial<PaymentDraft>
     return {
-      method: parsed.method === 'mobile' || parsed.method === 'transfer' ? parsed.method : null,
+      method: typeof parsed.method === 'string' && parsed.method.trim() ? parsed.method : null,
       reference: typeof parsed.reference === 'string' ? parsed.reference : '',
       paidAt: typeof parsed.paidAt === 'string' ? parsed.paidAt : toDateInputValue(),
       bank: typeof parsed.bank === 'string' ? parsed.bank : '',

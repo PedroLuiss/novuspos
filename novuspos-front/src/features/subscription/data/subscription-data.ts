@@ -1,4 +1,4 @@
-import type { PaymentAccount, PaymentRecord, Plan, Subscription } from '../types'
+import type { PaymentRecord, Plan, Subscription } from '../types'
 
 /** Catálogo de planes. La API de Laravel puede enviar más; la UI se adapta sola. */
 export const plans: Plan[] = [
@@ -92,38 +92,7 @@ export const demoPayments: PaymentRecord[] = [
   },
 ]
 
-/**
- * Datos de cobro de Novus. Valores de demostración: reemplazar aquí cuando el
- * equipo defina las cuentas reales. La UI sigue siendo igual.
- */
-export const paymentAccounts: Record<'mobile' | 'transfer', PaymentAccount> = {
-  mobile: {
-    method: 'mobile',
-    label: 'Pago móvil',
-    description: 'Transfiere desde tu banca móvil a este número.',
-    icon: 'smartphone',
-    rows: [
-      { label: 'Banco', value: 'Banco de demostración' },
-      { label: 'Número de teléfono', value: '0424-0000000', mono: true },
-      { label: 'Titular', value: 'NovusPOS (Demo)' },
-      { label: 'Identificación', value: 'J-00000000-0', mono: true },
-    ],
-  },
-  transfer: {
-    method: 'transfer',
-    label: 'Transferencia',
-    description: 'Transfiere a la cuenta bancaria de NovusPOS.',
-    icon: 'account_balance',
-    rows: [
-      { label: 'Banco', value: 'Banco de demostración' },
-      { label: 'Tipo de cuenta', value: 'Corriente' },
-      { label: 'Número de cuenta', value: '0000-0000-00-0000000000', mono: true },
-      { label: 'Titular', value: 'NovusPOS (Demo)' },
-      { label: 'Identificación', value: 'J-00000000-0', mono: true },
-    ],
-  },
-}
-
+/** Bancos sugeridos al reportar desde qué institución se pagó. */
 export const banks = [
   'Banesco',
   'Banco de Venezuela',

@@ -1,3 +1,4 @@
+import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import type {
   AdminEmail,
   AdminNotification,
@@ -37,4 +38,6 @@ export interface AdminGateway {
   createEmail(input: Omit<AdminEmail, 'id' | 'createdAt'>): Promise<AdminEmail>
   getSettings(): Promise<AdminSettings>
   saveSettings(settings: AdminSettings): Promise<AdminSettings>
+  /** Reemplaza el catálogo completo de cuentas y métodos que ve el usuario al pagar. */
+  savePaymentMethods(methods: PaymentMethodOption[]): Promise<PaymentMethodOption[]>
 }

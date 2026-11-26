@@ -1,4 +1,6 @@
 import { ValidationError } from '@/shared/services/apiClient'
+import { paymentMethodsStore } from '@/shared/services/payment-methods/paymentMethodsStore'
+import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import { htmlToText } from '../lib/emailHtml'
 import {
   demoEmails,
@@ -312,5 +314,10 @@ export const demoAdminGateway: AdminGateway = {
     await wait()
     write('settings', settings)
     return settings
+  },
+
+  async savePaymentMethods(methods: PaymentMethodOption[]): Promise<PaymentMethodOption[]> {
+    await wait()
+    return paymentMethodsStore.write(methods)
   },
 }

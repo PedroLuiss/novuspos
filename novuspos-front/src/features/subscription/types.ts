@@ -1,4 +1,5 @@
 /** Tipos públicos del módulo de suscripción. */
+import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 
 export type PlanId = string
 
@@ -25,7 +26,8 @@ export interface Subscription {
   currency: string
 }
 
-export type PaymentMethod = 'mobile' | 'transfer'
+/** Clave del catálogo que configura el dueño; los iniciales son `mobile` y `transfer`. */
+export type PaymentMethod = string
 export type PaymentStatus = 'pending_review' | 'approved' | 'rejected'
 
 export interface PaymentRecord {
@@ -69,13 +71,8 @@ export interface SubmitPaymentRequest {
   proofDataUrl?: string
 }
 
-export interface PaymentAccount {
-  method: PaymentMethod
-  label: string
-  description: string
-  icon: string
-  rows: { label: string; value: string; mono?: boolean }[]
-}
+/** Los datos de cobro viven en el catálogo compartido; aquí solo se reexportan. */
+export type PaymentAccount = PaymentMethodOption
 
 export interface PaymentFieldErrors {
   reference?: string

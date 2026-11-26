@@ -1,5 +1,6 @@
 import { apiClient } from '@/shared/services/apiClient'
 import { ADMIN_ENDPOINTS } from '@/shared/services/endpoints'
+import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import { adminSessionStore } from '../lib/adminSession'
 import type {
   AdminEmail,
@@ -56,4 +57,6 @@ export const httpAdminGateway: AdminGateway = {
   createEmail: (input) => apiClient.post<AdminEmail>(ADMIN_ENDPOINTS.emails, input, { headers: authHeaders() }),
   getSettings: () => apiClient.get<AdminSettings>(ADMIN_ENDPOINTS.settings, { headers: authHeaders() }),
   saveSettings: (settings) => apiClient.put<AdminSettings>(ADMIN_ENDPOINTS.settings, settings, { headers: authHeaders() }),
+  savePaymentMethods: (methods) =>
+    apiClient.put<PaymentMethodOption[]>(ADMIN_ENDPOINTS.paymentMethods, { methods }, { headers: authHeaders() }),
 }

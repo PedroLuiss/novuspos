@@ -13,6 +13,8 @@ export const BILLING_ENDPOINTS = {
   plans: '/billing/plans',
   subscription: '/billing/subscription',
   payments: '/billing/payments',
+  /** Cuentas y métodos que ve el usuario al pagar; el dueño los administra en `/admin/payment-methods`. */
+  paymentMethods: '/billing/payment-methods',
   reviewPayment: (paymentId: string) => `/billing/payments/${paymentId}/review`,
 } as const
 
@@ -119,4 +121,6 @@ export const ADMIN_ENDPOINTS = {
     return `/admin/emails?${query.toString()}`
   },
   settings: '/admin/settings',
+  /** PUT reemplaza el catálogo completo de métodos y cuentas de cobro. */
+  paymentMethods: '/admin/payment-methods',
 } as const

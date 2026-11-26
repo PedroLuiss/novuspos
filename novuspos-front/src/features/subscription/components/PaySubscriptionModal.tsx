@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useExchangeRate } from '@/shared/hooks/useExchangeRate'
+import { usePaymentMethods } from '@/shared/hooks/usePaymentMethods'
 import { IS_DEMO_AUTH } from '@/shared/lib/env'
 import { TextField } from '@/shared/ui/FormFields'
 import { MS } from '@/shared/ui/MS'
-import { banks, paymentAccounts } from '../data/subscription-data'
+import { banks } from '../data/subscription-data'
 import { usePaymentDraft } from '../hooks/usePaymentDraft'
 import { usePaymentSubmission } from '../hooks/usePaymentSubmission'
 import { formatBolivares, formatDate, formatExchangeRate, formatMoney, toDateInputValue } from '../lib/formatters'
@@ -29,6 +30,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
   const [stepErrors, setStepErrors] = useState<PaymentFieldErrors>({})
   const [submitted, setSubmitted] = useState<PaymentRecord | null>(null)
   const { draft, update, clear } = usePaymentDraft(subscription.id)
+  const { activeMethods, isLoading: isMethodsLoading } = usePaymentMethods()
   const { rate, isLoading: isRateLoading, error: rateError } = useExchangeRate()
   const { isSubmitting, fieldErrors, formError, submit, clearErrors } = usePaymentSubmission((payment) => {
     clear()
@@ -45,7 +47,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
   }, [onClose])
 
   const errors = { ...stepErrors, ...fieldErrors }
-  const account = draft.method ? paymentAccounts[draft.method] : null
+  const account = activeMethods.find((item) => item.id === draft.method) ?? null
   const isCurrentPlan = plan.id === subscription.planId
   const amountValue = isCurrentPlan ? subscription.amount || plan.price : plan.price
   const amount = formatMoney(amountValue, isCurrentPlan ? subscription.currency || plan.currency : plan.currency)
@@ -62,12 +64,14 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
   }
 
   const goNext = () => {
+    if (step === 1 && !account && isMethodsLoading) return
     const found = validatePaymentDraft(draft)
     const fields = step === 1 ? (['method'] as const) : (['reference', 'paidAt', 'bank', 'proof'] as const)
     const relevant: PaymentFieldErrors = {}
     for (const field of fields) {
       if (found[field]) relevant[field] = found[field]
     }
+    if (step === 1 && !account) relevant.method = 'Elige un método de pago disponible.'
     setStepErrors(relevant)
     if (Object.keys(relevant).length === 0) setStep(step + 1)
   }
@@ -79,7 +83,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
       setStep(!draft.method ? 1 : 2)
       return
     }
-    if (!draft.method || !draft.proofDataUrl) return
+    if (!draft.method || !draft.proofDataUrl || !account) return
     void submit({
       subscriptionId: subscription.id,
       planId: plan.id,
@@ -163,7 +167,17 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                       reportarlo.
                     </p>
                   </div>
-                  <PaymentMethodSelector value={draft.method} error={errors.method} onChange={(method) => patch({ method })} />
+                  <PaymentMethodSelector
+                    options={activeMethods}
+                    value={draft.method}
+                    error={errors.method}
+                    onChange={(method) => patch({ method })}
+                  />
+                  {!isMethodsLoading && activeMethods.length === 0 && (
+                    <p className="rounded-lg bg-error-container px-space-sm py-space-xs font-body-sm text-body-sm text-on-error-container">
+                      Todavía no hay métodos de pago disponibles. Vuelve a intentarlo en unos minutos.
+                    </p>
+                  )}
                   {account ? (
                     <>
                       <PaymentAccountCard account={account} />
@@ -180,7 +194,9 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                     </>
                   ) : (
                     <div className="rounded-lg border border-dashed border-outline-variant p-space-lg text-center font-body-sm text-body-sm text-on-surface-variant">
-                      Elige un método para ver los datos de pago y el monto en bolívares.
+                      {draft.method && !isMethodsLoading
+                        ? 'Ese método ya no está disponible. Elige otro para continuar.'
+                        : 'Elige un método para ver los datos de pago y el monto en bolívares.'}
                     </div>
                   )}
                   {IS_DEMO_AUTH && (
@@ -285,7 +301,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
               <button
                 type="button"
                 onClick={send}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !account}
                 className="px-space-lg py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold flex items-center gap-1.5 disabled:opacity-60"
               >
                 {isSubmitting ? 'Enviando…' : 'Enviar pago'}

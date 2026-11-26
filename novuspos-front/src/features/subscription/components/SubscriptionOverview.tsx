@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { usePaymentMethods } from '@/shared/hooks/usePaymentMethods'
+import { paymentMethodLabels } from '@/shared/services/payment-methods/paymentMethodLabels'
 import { MS } from '@/shared/ui/MS'
 import { useSubscriptionOverview } from '../hooks/useSubscriptionOverview'
 import { canSwitchPlan } from '../lib/subscriptionStatus'
@@ -11,6 +13,8 @@ import { SubscriptionCard } from './SubscriptionCard'
 /** Contenedor del módulo: obtiene datos y coordina el modal con el historial. */
 export function SubscriptionOverview() {
   const { overview, isLoading, error, reviewingId, refresh, reviewPayment } = useSubscriptionOverview()
+  const { methods } = usePaymentMethods()
+  const methodLabels = useMemo(() => paymentMethodLabels(methods), [methods])
   const [isPayOpen, setIsPayOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null)
   const openPayment = (plan: Plan) => {
@@ -81,6 +85,7 @@ export function SubscriptionOverview() {
         payments={overview.payments}
         plans={overview.plans}
         subscription={overview.subscription}
+        methodLabels={methodLabels}
         reviewingId={reviewingId}
         onReview={(id, approved) => void reviewPayment(id, approved)}
       />

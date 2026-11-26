@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { paymentMethodLabel } from '@/shared/services/payment-methods/paymentMethodLabels'
 import { IS_DEMO_AUTH } from '@/shared/lib/env'
 import { MS } from '@/shared/ui/MS'
 import { paymentStatusLabels } from '../data/subscription-data'
@@ -11,6 +12,7 @@ interface Props {
   payments: PaymentRecord[]
   plans: Plan[]
   subscription: Subscription
+  methodLabels: Record<string, string>
   reviewingId: string | null
   onReview: (paymentId: string, approved: boolean) => void
 }
@@ -22,7 +24,7 @@ const STATUS_STYLE: Record<PaymentRecord['status'], string> = {
 }
 
 /** Historial de pagos: a qué suscripción corresponden y en qué estado están. */
-export function PaymentHistoryTable({ payments, plans, subscription, reviewingId, onReview }: Props) {
+export function PaymentHistoryTable({ payments, plans, subscription, methodLabels, reviewingId, onReview }: Props) {
   const [status, setStatus] = useState<PaymentFilter>('all')
   const [query, setQuery] = useState('')
   const visible = filterPayments(payments, status, query)
@@ -81,7 +83,7 @@ export function PaymentHistoryTable({ payments, plans, subscription, reviewingId
                   <td className="py-space-md px-space-md font-mono font-semibold text-on-surface">{payment.reference}</td>
                   <td className="py-space-md px-space-md font-mono text-on-surface-variant">{formatDate(payment.paidAt)}</td>
                   <td className="py-space-md px-space-md text-on-surface-variant">
-                    {payment.method === 'mobile' ? 'Pago móvil' : 'Transferencia'}
+                    {paymentMethodLabel(payment.method, methodLabels)}
                   </td>
                   <td className="py-space-md px-space-md text-on-surface-variant">{payment.bank}</td>
                   <td className="py-space-md px-space-md font-mono font-bold text-on-surface">

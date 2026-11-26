@@ -7,13 +7,14 @@ import { AdminBadge, AdminModal } from './ui/AdminUi'
 
 interface Props {
   payment: AdminPayment
+  methodLabel: string
   busy: boolean
   onClose: () => void
   onReview: (approved: boolean, note?: string) => void
 }
 
 /** Evaluación manual: comprobante, datos del pago y decisión del dueño. */
-export function PaymentReviewModal({ payment, busy, onClose, onReview }: Props) {
+export function PaymentReviewModal({ payment, methodLabel, busy, onClose, onReview }: Props) {
   const [note, setNote] = useState(payment.reviewNote ?? '')
   const rows = [
     ['Usuario', payment.userName],
@@ -21,7 +22,7 @@ export function PaymentReviewModal({ payment, busy, onClose, onReview }: Props) 
     ['Referencia', payment.reference],
     ['Banco', payment.bank],
     ['Fecha del pago', formatAdminDate(payment.paidAt)],
-    ['Método', payment.method === 'mobile' ? 'Pago móvil' : 'Transferencia'],
+    ['Método', methodLabel],
   ]
 
   return (
