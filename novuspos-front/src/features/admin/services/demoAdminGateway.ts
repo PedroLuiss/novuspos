@@ -15,9 +15,10 @@ import type {
   AdminReport,
   AdminSettings,
   AdminUser,
+  EmailPage,
+  EmailQuery,
   NotificationPage,
   NotificationQuery,
-  NotificationPageSize,
   UserPatch,
 } from '../types'
 import type { AdminGateway } from './adminGateway'
@@ -59,7 +60,7 @@ function now(): string {
   return new Date().toISOString()
 }
 
-const PAGE_SIZES: NotificationPageSize[] = [20, 50, 100]
+const PAGE_SIZES: Array<20 | 50 | 100> = [20, 50, 100]
 
 export const demoAdminGateway: AdminGateway = {
   async login(email, password) {
@@ -180,9 +181,23 @@ export const demoAdminGateway: AdminGateway = {
     return notification
   },
 
-  async listEmails(): Promise<AdminEmail[]> {
+  async listEmails(query: EmailQuery): Promise<EmailPage> {
     await wait()
-    return [...read('emails', demoEmails)].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    const needle = query.search.trim().toLowerCase()
+    const filtered = read('emails', demoEmails)
+      .filter((item) => !query.audience || item.audience === query.audience)
+      .filter((item) => !needle || [item.subject, item.body, item.audienceLabel].join(' ').toLowerCase().includes(needle))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
+
+    const pageSize = PAGE_SIZES.includes(query.pageSize) ? query.pageSize : 20
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+    const page = Math.min(Math.max(1, query.page), totalPages)
+    return {
+      items: filtered.slice((page - 1) * pageSize, page * pageSize),
+      total: filtered.length,
+      page,
+      pageSize,
+    }
   },
 
   async createEmail(input): Promise<AdminEmail> {

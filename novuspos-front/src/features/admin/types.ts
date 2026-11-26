@@ -24,6 +24,23 @@ export interface NotificationPage {
   pageSize: NotificationPageSize
 }
 
+export type EmailPageSize = 20 | 50 | 100
+
+/** Filtros del historial de correos. `audience: ''` = todos; `'all'` = correos globales; cualquier otro id = ese comercio. */
+export interface EmailQuery {
+  page: number
+  pageSize: EmailPageSize
+  search: string
+  audience: string
+}
+
+export interface EmailPage {
+  items: AdminEmail[]
+  total: number
+  page: number
+  pageSize: EmailPageSize
+}
+
 export interface AdminUser {
   id: string
   name: string

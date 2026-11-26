@@ -2,6 +2,8 @@ import type {
   AdminEmail,
   AdminNotification,
   AdminOverview,
+  EmailPage,
+  EmailQuery,
   NotificationPage,
   NotificationQuery,
   AdminPayment,
@@ -24,7 +26,7 @@ export interface AdminGateway {
   listReports(): Promise<AdminReport[]>
   listNotifications(query: NotificationQuery): Promise<NotificationPage>
   createNotification(input: Omit<AdminNotification, 'id' | 'createdAt'>): Promise<AdminNotification>
-  listEmails(): Promise<AdminEmail[]>
+  listEmails(query: EmailQuery): Promise<EmailPage>
   createEmail(input: Omit<AdminEmail, 'id' | 'createdAt'>): Promise<AdminEmail>
   getSettings(): Promise<AdminSettings>
   saveSettings(settings: AdminSettings): Promise<AdminSettings>

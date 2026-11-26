@@ -67,5 +67,17 @@ export const ADMIN_ENDPOINTS = {
     return `/admin/notifications?${query.toString()}`
   },
   emails: '/admin/emails',
+  /** GET paginado y filtrado; POST sigue en `emails`. */
+  emailHistory: (params: {
+    page: number
+    pageSize: number
+    search?: string
+    audience?: string
+  }) => {
+    const query = new URLSearchParams({ page: String(params.page), pageSize: String(params.pageSize) })
+    if (params.search?.trim()) query.set('search', params.search.trim())
+    if (params.audience) query.set('audience', params.audience)
+    return `/admin/emails?${query.toString()}`
+  },
   settings: '/admin/settings',
 } as const

@@ -10,6 +10,8 @@ import type {
   AdminSession,
   AdminSettings,
   AdminUser,
+  EmailPage,
+  EmailQuery,
   NotificationPage,
   NotificationQuery,
   UserPatch,
@@ -42,7 +44,8 @@ export const httpAdminGateway: AdminGateway = {
 
   createNotification: (input) =>
     apiClient.post<AdminNotification>(ADMIN_ENDPOINTS.notifications, input, { headers: authHeaders() }),
-  listEmails: () => apiClient.get<AdminEmail[]>(ADMIN_ENDPOINTS.emails, { headers: authHeaders() }),
+  listEmails: (query: EmailQuery) =>
+    apiClient.get<EmailPage>(ADMIN_ENDPOINTS.emailHistory(query), { headers: authHeaders() }),
   createEmail: (input) => apiClient.post<AdminEmail>(ADMIN_ENDPOINTS.emails, input, { headers: authHeaders() }),
   getSettings: () => apiClient.get<AdminSettings>(ADMIN_ENDPOINTS.settings, { headers: authHeaders() }),
   saveSettings: (settings) => apiClient.put<AdminSettings>(ADMIN_ENDPOINTS.settings, settings, { headers: authHeaders() }),
