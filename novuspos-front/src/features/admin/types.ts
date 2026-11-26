@@ -4,6 +4,25 @@ export type AdminSubscriptionStatus = 'active' | 'pending' | 'expired' | 'cancel
 export type AdminPaymentStatus = 'pending' | 'approved' | 'rejected'
 export type AdminReportStatus = 'open' | 'resolved'
 export type AdminNoticeType = 'info' | 'success' | 'warning'
+export type AdminNoticeTypeFilter = AdminNoticeType | 'all'
+export type NotificationPageSize = 20 | 50 | 100
+
+/** Filtros del historial. `audience: ''` = todos; `'all'` = avisos globales; cualquier otro id = ese comercio. */
+export interface NotificationQuery {
+  page: number
+  pageSize: NotificationPageSize
+  search: string
+  type: AdminNoticeTypeFilter
+  audience: string
+}
+
+/** Respuesta paginada: Laravel debe filtrar y cortar en servidor, no enviar miles de filas. */
+export interface NotificationPage {
+  items: AdminNotification[]
+  total: number
+  page: number
+  pageSize: NotificationPageSize
+}
 
 export interface AdminUser {
   id: string

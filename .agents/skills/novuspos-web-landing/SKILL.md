@@ -728,7 +728,8 @@ src/features/admin/
     ├── PlanDonut.tsx / PlanDonutLegend.tsx
     ├── PaymentsPage.tsx / PaymentReviewModal.tsx
     ├── UsersPage.tsx / UserEditModal.tsx
-    ├── ReportsPage.tsx / NotificationsPage.tsx / EmailsPage.tsx / SettingsPage.tsx
+    ├── NotificationsPage.tsx / NotificationHistory.tsx  # formulario + historial paginado
+    ├── ReportsPage.tsx / EmailsPage.tsx / SettingsPage.tsx
     └── ui/AdminUi.tsx              # AdminPageHeader, AdminCard, AdminBadge, AdminAvatar, AdminModal…
 ```
 
@@ -750,11 +751,11 @@ Se repite el patrón del resto del front: puerto + adaptadores demo/API + factor
 - **Pagos:** filtros por usuario y estado (por aprobar / aprobados / rechazados / todos). El modal de evaluación muestra el comprobante, referencia, banco, monto y plan; el dueño aprueba o rechaza manualmente tras consultar su banco. Aprobar activa la suscripción del usuario y aplica el plan del pago.
 - **Usuarios:** búsqueda, paginación de 5, edición de datos, asignación de plan mensual/anual y activación o desactivación de la suscripción.
 - **Reportes:** tabla de reportes del portal y del escritorio, filtros por origen y estado, detalle del mensaje.
-- **Notificaciones y correos:** formularios personalizables con título/asunto, descripción/cuerpo, enlace o icono, tipo y destinatario (todos o un usuario). El historial queda en el panel.
+- **Notificaciones y correos:** formularios personalizables con título/asunto, descripción/cuerpo, enlace o icono, tipo y destinatario (todos o un usuario). El historial de notificaciones tiene búsqueda (300 ms de debounce), filtros por tipo y destinatario, selector de 20/50/100 registros por página y paginación anterior/siguiente; el gateway filtra y corta en servidor, así que la UI solo renderiza la página actual (ni miles de filas en memoria ni miles de nodos en el DOM). Laravel debe aplicar el mismo corte en SQL con `ORDER BY created_at DESC`.
 - **Ajustes:** datos de la empresa (nombre, correo, teléfono, dirección) y ruta secreta del login, con validación de path.
 
 ### Contrato
 
-`ADMIN_ENDPOINTS` en `shared/services/endpoints.ts`: `POST /admin/login`, `GET /admin/overview`, `GET /admin/payments`, `PATCH /admin/payments/{id}/review`, `GET /admin/users`, `PATCH /admin/users/{id}`, `PATCH /admin/users/{id}/subscription`, `GET /admin/reports`, `GET/POST /admin/notifications`, `GET/POST /admin/emails` y `GET/PUT /admin/settings`. Los adaptadores HTTP envían el token maestro por cabecera `Authorization`, separado del token del cliente.
+`ADMIN_ENDPOINTS` en `shared/services/endpoints.ts`: `POST /admin/login`, `GET /admin/overview`, `GET /admin/payments`, `PATCH /admin/payments/{id}/review`, `GET /admin/users`, `PATCH /admin/users/{id}`, `PATCH /admin/users/{id}/subscription`, `GET /admin/reports`, `GET/POST /admin/notifications`, `GET/POST /admin/emails` y `GET/PUT /admin/settings`. El GET de notificaciones usa `notificationHistory({ page, pageSize, search, type, audience })` → `/admin/notifications?page=1&pageSize=20&search=&type=&audience=` y responde `{ items, total, page, pageSize }`; los parámetros vacíos se omiten. `audience=''` = todos los destinatarios y `audience='all'` = solo avisos globales. Los adaptadores HTTP envían el token maestro por cabecera `Authorization`, separado del token del cliente.
 
-> Verificado con CDP en demo tras el rediseño: login maestro con branding, resumen con dona y tarjeta de atención, búsqueda y aprobación de pago con nota, búsqueda/paginación de usuarios, vistas previas de notificación y correo, reportes del escritorio, guardado de la ruta personalizada y redirección del guardián a esa ruta; sin errores de consola. `npm run build` y `npm run lint` limpios.
+> Verificado con CDP en demo tras el rediseño: login maestro con branding, resumen con dona y tarjeta de atención, búsqueda y aprobación de pago con nota, búsqueda/paginación de usuarios, vistas previas de notificación y correo, reportes del escritorio, guardado de la ruta personalizada y redirección del guardián a esa ruta; sin errores de consola. Historial de notificaciones verificado con 137 registros sembrados: paginación 20/50/100, anterior/siguiente, filtros por tipo y destinatario, búsqueda con debounce y actualización del total al publicar; 20/50/100 filas renderizadas por página, sin errores de consola. `npm run build` y `npm run lint` limpios.

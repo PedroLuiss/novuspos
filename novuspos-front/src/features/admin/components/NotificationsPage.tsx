@@ -3,9 +3,10 @@ import { SelectField, TextAreaField, TextField } from '@/shared/ui/FormFields'
 import { MS } from '@/shared/ui/MS'
 import { useAdminNotifications } from '../hooks/useAdminNotifications'
 import { useAdminUsers } from '../hooks/useAdminUsers'
-import { formatAdminDate, noticeTone, statusLabels } from '../lib/adminFormatters'
+import { noticeTone, statusLabels } from '../lib/adminFormatters'
 import { adminPrimaryButton } from '../lib/adminStyles'
-import { AdminAlert, AdminBadge, AdminCard, AdminPageHeader, AdminState } from './ui/AdminUi'
+import { NotificationHistory } from './NotificationHistory'
+import { AdminAlert, AdminBadge, AdminCard, AdminPageHeader } from './ui/AdminUi'
 
 const icons = [
   { value: 'campaign', label: 'Anuncio' },
@@ -21,7 +22,24 @@ const types = [
 
 /** Notificaciones globales o dirigidas a un usuario, personalizadas por el dueño. */
 export function NotificationsPage() {
-  const { notifications, isLoading, isSubmitting, error, create } = useAdminNotifications()
+  const {
+    notifications,
+    total,
+    page,
+    pageSize,
+    totalPages,
+    query,
+    isLoading,
+    isSubmitting,
+    error,
+    setSearch,
+    setType: setHistoryType,
+    setAudience: setHistoryAudience,
+    setPageSize,
+    setPage,
+    resetFilters,
+    create,
+  } = useAdminNotifications()
   const { users } = useAdminUsers()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -91,53 +109,42 @@ export function NotificationsPage() {
           </form>
         </AdminCard>
 
-        <div className="flex flex-col gap-space-md lg:col-span-5">
-          <AdminCard icon="visibility" title="Vista previa" description="Así verán el aviso tus usuarios">
-            <div className="rounded-xl border border-outline-variant/50 bg-surface-container-low p-space-sm flex items-start gap-space-sm">
-              <span className="w-10 h-10 shrink-0 rounded-xl bg-primary-fixed/60 text-primary flex items-center justify-center">
-                <MS name={icon} className="text-[20px]" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-space-xs">
-                  <span className="font-label-md text-label-md font-semibold text-on-surface">{title || 'Título de la notificación'}</span>
-                  <AdminBadge tone={noticeTone(type)}>{statusLabels[type as 'info' | 'success' | 'warning']}</AdminBadge>
-                </div>
-                <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
-                  {description || 'La descripción aparecerá aquí.'}
-                </p>
-                {link && <span className="mt-1 block truncate font-label-sm text-label-sm text-primary">{link}</span>}
-                <span className="mt-space-xs block font-label-sm text-label-sm text-outline">Para: {audienceLabel}</span>
+        <AdminCard className="lg:col-span-5" icon="visibility" title="Vista previa" description="Así verán el aviso tus usuarios">
+          <div className="rounded-xl border border-outline-variant/50 bg-surface-container-low p-space-sm flex items-start gap-space-sm">
+            <span className="w-10 h-10 shrink-0 rounded-xl bg-primary-fixed/60 text-primary flex items-center justify-center">
+              <MS name={icon} className="text-[20px]" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-space-xs">
+                <span className="font-label-md text-label-md font-semibold text-on-surface">{title || 'Título de la notificación'}</span>
+                <AdminBadge tone={noticeTone(type)}>{statusLabels[type as 'info' | 'success' | 'warning']}</AdminBadge>
               </div>
+              <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+                {description || 'La descripción aparecerá aquí.'}
+              </p>
+              {link && <span className="mt-1 block truncate font-label-sm text-label-sm text-primary">{link}</span>}
+              <span className="mt-space-xs block font-label-sm text-label-sm text-outline">Para: {audienceLabel}</span>
             </div>
-          </AdminCard>
-
-          <AdminCard icon="history" title="Historial" description="Avisos ya publicados">
-            {isLoading && notifications.length === 0 ? (
-              <AdminState label="Cargando…" loading />
-            ) : notifications.length === 0 ? (
-              <AdminState label="Aún no hay notificaciones." />
-            ) : (
-              <div className="flex flex-col divide-y divide-outline-variant/50">
-                {notifications.map((item) => (
-                  <div key={item.id} className="flex items-start gap-space-xs py-space-xs first:pt-0 last:pb-0">
-                    <span className="w-8 h-8 shrink-0 rounded-lg bg-primary-fixed/50 text-primary flex items-center justify-center">
-                      <MS name={item.icon} className="text-[17px]" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-space-xs">
-                        <span className="truncate font-label-md text-label-md font-semibold text-on-surface">{item.title}</span>
-                        <AdminBadge tone={noticeTone(item.type)}>{statusLabels[item.type]}</AdminBadge>
-                      </div>
-                      <span className="block truncate font-body-sm text-body-sm text-on-surface-variant">{item.audienceLabel}</span>
-                      <span className="block font-label-sm text-label-sm text-outline font-mono">{formatAdminDate(item.createdAt)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </AdminCard>
-        </div>
+          </div>
+        </AdminCard>
       </div>
+
+      <NotificationHistory
+        notifications={notifications}
+        total={total}
+        page={page}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        isLoading={isLoading}
+        query={query}
+        users={users}
+        onSearch={setSearch}
+        onType={setHistoryType}
+        onAudience={setHistoryAudience}
+        onPageSize={setPageSize}
+        onPage={setPage}
+        onReset={resetFilters}
+      />
     </div>
   )
 }

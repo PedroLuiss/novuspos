@@ -10,6 +10,8 @@ import type {
   AdminSession,
   AdminSettings,
   AdminUser,
+  NotificationPage,
+  NotificationQuery,
   UserPatch,
 } from '../types'
 import type { AdminGateway } from './adminGateway'
@@ -35,7 +37,9 @@ export const httpAdminGateway: AdminGateway = {
   setSubscription: (userId, planId, active) =>
     apiClient.patch<AdminUser>(ADMIN_ENDPOINTS.setSubscription(userId), { planId, active }, { headers: authHeaders() }),
   listReports: () => apiClient.get<AdminReport[]>(ADMIN_ENDPOINTS.reports, { headers: authHeaders() }),
-  listNotifications: () => apiClient.get<AdminNotification[]>(ADMIN_ENDPOINTS.notifications, { headers: authHeaders() }),
+  listNotifications: (query: NotificationQuery) =>
+    apiClient.get<NotificationPage>(ADMIN_ENDPOINTS.notificationHistory(query), { headers: authHeaders() }),
+
   createNotification: (input) =>
     apiClient.post<AdminNotification>(ADMIN_ENDPOINTS.notifications, input, { headers: authHeaders() }),
   listEmails: () => apiClient.get<AdminEmail[]>(ADMIN_ENDPOINTS.emails, { headers: authHeaders() }),

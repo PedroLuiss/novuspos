@@ -52,6 +52,20 @@ export const ADMIN_ENDPOINTS = {
   setSubscription: (userId: string) => `/admin/users/${userId}/subscription`,
   reports: '/admin/reports',
   notifications: '/admin/notifications',
+  /** GET paginado y filtrado; POST sigue en `notifications`. */
+  notificationHistory: (params: {
+    page: number
+    pageSize: number
+    search?: string
+    type?: string
+    audience?: string
+  }) => {
+    const query = new URLSearchParams({ page: String(params.page), pageSize: String(params.pageSize) })
+    if (params.search?.trim()) query.set('search', params.search.trim())
+    if (params.type && params.type !== 'all') query.set('type', params.type)
+    if (params.audience) query.set('audience', params.audience)
+    return `/admin/notifications?${query.toString()}`
+  },
   emails: '/admin/emails',
   settings: '/admin/settings',
 } as const

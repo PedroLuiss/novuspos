@@ -14,6 +14,9 @@ export const adminPrimaryButton =
 export const adminSecondaryButton =
   'inline-flex items-center justify-center gap-space-xs rounded-xl border border-outline-variant/70 bg-surface-container-lowest px-space-md py-2.5 font-label-md text-label-md font-semibold text-on-surface-variant transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-50'
 
+export const adminCompactButton =
+  'inline-flex items-center justify-center gap-1 rounded-lg border border-outline-variant/70 bg-surface-container-lowest px-space-sm py-1.5 font-label-sm text-label-sm font-semibold text-on-surface-variant transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-50'
+
 export const adminEyebrow =
   'font-label-sm text-label-sm uppercase tracking-[0.18em] text-primary font-semibold font-mono'
 

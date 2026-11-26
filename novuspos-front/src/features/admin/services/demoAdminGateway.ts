@@ -15,6 +15,9 @@ import type {
   AdminReport,
   AdminSettings,
   AdminUser,
+  NotificationPage,
+  NotificationQuery,
+  NotificationPageSize,
   UserPatch,
 } from '../types'
 import type { AdminGateway } from './adminGateway'
@@ -55,6 +58,8 @@ function payments(): AdminPayment[] {
 function now(): string {
   return new Date().toISOString()
 }
+
+const PAGE_SIZES: NotificationPageSize[] = [20, 50, 100]
 
 export const demoAdminGateway: AdminGateway = {
   async login(email, password) {
@@ -148,9 +153,24 @@ export const demoAdminGateway: AdminGateway = {
     return [...read('reports', demoReports)].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
   },
 
-  async listNotifications(): Promise<AdminNotification[]> {
+  async listNotifications(query: NotificationQuery): Promise<NotificationPage> {
     await wait()
-    return [...read('notifications', demoNotifications)].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    const needle = query.search.trim().toLowerCase()
+    const filtered = read('notifications', demoNotifications)
+      .filter((item) => query.type === 'all' || item.type === query.type)
+      .filter((item) => !query.audience || item.audience === query.audience)
+      .filter((item) => !needle || [item.title, item.description, item.audienceLabel, item.link].join(' ').toLowerCase().includes(needle))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
+
+    const pageSize = PAGE_SIZES.includes(query.pageSize) ? query.pageSize : 20
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+    const page = Math.min(Math.max(1, query.page), totalPages)
+    return {
+      items: filtered.slice((page - 1) * pageSize, page * pageSize),
+      total: filtered.length,
+      page,
+      pageSize,
+    }
   },
 
   async createNotification(input): Promise<AdminNotification> {

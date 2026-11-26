@@ -2,6 +2,8 @@ import type {
   AdminEmail,
   AdminNotification,
   AdminOverview,
+  NotificationPage,
+  NotificationQuery,
   AdminPayment,
   AdminReport,
   AdminSession,
@@ -20,7 +22,7 @@ export interface AdminGateway {
   updateUser(userId: string, patch: UserPatch): Promise<AdminUser>
   setSubscription(userId: string, planId: string, active: boolean): Promise<AdminUser>
   listReports(): Promise<AdminReport[]>
-  listNotifications(): Promise<AdminNotification[]>
+  listNotifications(query: NotificationQuery): Promise<NotificationPage>
   createNotification(input: Omit<AdminNotification, 'id' | 'createdAt'>): Promise<AdminNotification>
   listEmails(): Promise<AdminEmail[]>
   createEmail(input: Omit<AdminEmail, 'id' | 'createdAt'>): Promise<AdminEmail>
