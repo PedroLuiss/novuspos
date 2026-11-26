@@ -10,7 +10,7 @@ import { AdminAlert, AdminBadge, AdminCard, AdminPageHeader } from './ui/AdminUi
 
 const icons = [
   { value: 'campaign', label: 'Anuncio' },
-  { value: 'event_warning', label: 'Recordatorio' },
+  { value: 'schedule', label: 'Recordatorio' },
   { value: 'new_releases', label: 'Novedad' },
   { value: 'lock', label: 'Seguridad' },
 ]
