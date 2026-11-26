@@ -112,7 +112,7 @@ export function LandingBuilderPage() {
         </AdminCard>
 
         <AdminCard
-          icon="desktop_preview"
+          icon="preview"
           title="Vista previa en vivo"
           description="Se actualiza mientras editas. El ancho equivale a una pantalla de computadora."
           action={<span className="font-label-sm text-label-sm text-on-surface-variant">/?preview=1</span>}

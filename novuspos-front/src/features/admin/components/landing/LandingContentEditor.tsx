@@ -15,7 +15,7 @@ const panels: { key: ContentPanel; label: string; icon: string }[] = [
   { key: 'precios', label: 'Precios', icon: 'price_change' },
   { key: 'preguntas', label: 'Preguntas', icon: 'help' },
   { key: 'cierre', label: 'Cierre', icon: 'download' },
-  { key: 'pie', label: 'Pie', icon: 'layout_bottom' },
+  { key: 'pie', label: 'Pie', icon: 'space_bar' },
 ]
 
 /** Editor de textos por sección, con el mismo orden que el visitante ve en la landing. */
