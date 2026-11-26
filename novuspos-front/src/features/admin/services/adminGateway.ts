@@ -13,7 +13,10 @@ import type {
   AdminSession,
   AdminSettings,
   AdminUser,
+  UserOption,
+  UserPage,
   UserPatch,
+  UserQuery,
 } from '../types'
 
 /** Contrato único del super panel: demo y API cumplen la misma interfaz. */
@@ -22,7 +25,8 @@ export interface AdminGateway {
   getOverview(): Promise<AdminOverview>
   listPayments(query: PaymentQuery): Promise<PaymentPage>
   reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<AdminPayment>
-  listUsers(): Promise<AdminUser[]>
+  listUsers(query: UserQuery): Promise<UserPage>
+  listUserOptions(): Promise<UserOption[]>
   updateUser(userId: string, patch: UserPatch): Promise<AdminUser>
   setSubscription(userId: string, planId: string, active: boolean): Promise<AdminUser>
   listReports(): Promise<AdminReport[]>

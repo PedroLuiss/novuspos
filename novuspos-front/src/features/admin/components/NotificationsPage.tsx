@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { SelectField, TextAreaField, TextField } from '@/shared/ui/FormFields'
 import { MS } from '@/shared/ui/MS'
 import { useAdminNotifications } from '../hooks/useAdminNotifications'
-import { useAdminUsers } from '../hooks/useAdminUsers'
+import { useAdminUserOptions } from '../hooks/useAdminUserOptions'
 import { noticeTone, statusLabels } from '../lib/adminFormatters'
 import { adminPrimaryButton } from '../lib/adminStyles'
 import { NotificationHistory } from './NotificationHistory'
@@ -40,7 +40,7 @@ export function NotificationsPage() {
     resetFilters,
     create,
   } = useAdminNotifications()
-  const { users } = useAdminUsers()
+  const { options: users } = useAdminUserOptions()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [link, setLink] = useState('')

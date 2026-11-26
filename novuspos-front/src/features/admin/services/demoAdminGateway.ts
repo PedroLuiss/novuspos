@@ -23,7 +23,11 @@ import type {
   PaymentPage,
   PaymentQuery,
   PaymentSummary,
+  UserOption,
+  UserPage,
   UserPatch,
+  UserQuery,
+  UserSummary,
 } from '../types'
 import type { AdminGateway } from './adminGateway'
 
@@ -70,6 +74,16 @@ function paymentSummary(all: AdminPayment[]): PaymentSummary {
     pending: all.filter((item) => item.status === 'pending').length,
     approved: all.filter((item) => item.status === 'approved').length,
     rejected: all.filter((item) => item.status === 'rejected').length,
+    total: all.length,
+  }
+}
+
+/** Conteos globales de comercios para las tarjetas del directorio. */
+function userSummary(all: AdminUser[]): UserSummary {
+  return {
+    active: all.filter((item) => item.subscriptionStatus === 'active').length,
+    pending: all.filter((item) => item.subscriptionStatus === 'pending').length,
+    inactive: all.filter((item) => ['expired', 'cancelled'].includes(item.subscriptionStatus)).length,
     total: all.length,
   }
 }
@@ -151,9 +165,30 @@ export const demoAdminGateway: AdminGateway = {
     return { ...payment }
   },
 
-  async listUsers(): Promise<AdminUser[]> {
+  async listUsers(query: UserQuery): Promise<UserPage> {
     await wait()
-    return users()
+    const all = users()
+    const needle = query.search.trim().toLowerCase()
+    const filtered = all
+      .filter((item) => query.status === 'all' || item.subscriptionStatus === query.status)
+      .filter((item) => !needle || [item.name, item.email, item.businessName, item.businessType].join(' ').toLowerCase().includes(needle))
+      .sort((a, b) => b.joinedAt.localeCompare(a.joinedAt) || b.id.localeCompare(a.id))
+
+    const pageSize = PAGE_SIZES.includes(query.pageSize) ? query.pageSize : 20
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+    const page = Math.min(Math.max(1, query.page), totalPages)
+    return {
+      items: filtered.slice((page - 1) * pageSize, page * pageSize),
+      total: filtered.length,
+      page,
+      pageSize,
+      summary: userSummary(all),
+    }
+  },
+
+  async listUserOptions(): Promise<UserOption[]> {
+    await wait()
+    return users().map(({ id, businessName }) => ({ id, businessName }))
   },
 
   async updateUser(userId, patch: UserPatch): Promise<AdminUser> {

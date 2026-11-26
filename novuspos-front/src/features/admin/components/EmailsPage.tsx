@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAdminEmails } from '../hooks/useAdminEmails'
-import { useAdminUsers } from '../hooks/useAdminUsers'
+import { useAdminUserOptions } from '../hooks/useAdminUserOptions'
 import type { EmailDraft } from '../types'
 import { EmailComposer } from './EmailComposer'
 import { EmailHistory } from './EmailHistory'
@@ -26,7 +26,7 @@ export function EmailsPage() {
     resetFilters,
     send,
   } = useAdminEmails()
-  const { users } = useAdminUsers()
+  const { options: users } = useAdminUserOptions()
   const [draft, setDraft] = useState<EmailDraft>({ subject: '', html: '', audience: 'all' })
   const [notice, setNotice] = useState<string | null>(null)
 

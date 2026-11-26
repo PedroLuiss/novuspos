@@ -4,12 +4,12 @@ import { MS } from '@/shared/ui/MS'
 import type { EmailInput } from '../hooks/useAdminEmails'
 import { adminPrimaryButton } from '../lib/adminStyles'
 import { htmlToText, sanitizeEmailHtml } from '../lib/emailHtml'
-import type { AdminUser, EmailDraft } from '../types'
+import type { EmailDraft, UserOption } from '../types'
 import { EmailEditor } from './EmailEditor'
 import { AdminAlert, AdminBadge, AdminCard } from './ui/AdminUi'
 
 interface Props {
-  users: AdminUser[]
+  users: UserOption[]
   isSubmitting: boolean
   onDraftChange: (draft: EmailDraft) => void
   onSubmit: (input: EmailInput) => Promise<boolean>

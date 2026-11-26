@@ -5,9 +5,9 @@ import { adminCompactButton, adminInput } from '../lib/adminStyles'
 import type {
   AdminNoticeTypeFilter,
   AdminNotification,
-  AdminUser,
   NotificationPageSize,
   NotificationQuery,
+  UserOption,
 } from '../types'
 import { AdminBadge, AdminCard, AdminState } from './ui/AdminUi'
 
@@ -19,7 +19,7 @@ interface Props {
   totalPages: number
   isLoading: boolean
   query: NotificationQuery
-  users: AdminUser[]
+  users: UserOption[]
   onSearch: (value: string) => void
   onType: (value: AdminNoticeTypeFilter) => void
   onAudience: (value: string) => void

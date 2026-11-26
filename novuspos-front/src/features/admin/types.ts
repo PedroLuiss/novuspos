@@ -55,6 +55,36 @@ export interface AdminUser {
   openReports: number
 }
 
+export type UserStatusFilter = AdminSubscriptionStatus | 'all'
+export type UserPageSize = 20 | 50 | 100
+
+/** Filtros del directorio. `status: 'all'` = todos; cualquier otro = ese estado. */
+export interface UserQuery {
+  page: number
+  pageSize: UserPageSize
+  search: string
+  status: UserStatusFilter
+}
+
+/** Conteos globales para las tarjetas, sin importar filtros ni página. */
+export interface UserSummary {
+  active: number
+  pending: number
+  inactive: number
+  total: number
+}
+
+export interface UserPage {
+  items: AdminUser[]
+  total: number
+  page: number
+  pageSize: UserPageSize
+  summary: UserSummary
+}
+
+/** Lista ligera para los selectores de destinatarios de avisos y correos. */
+export type UserOption = Pick<AdminUser, 'id' | 'businessName'>
+
 export interface AdminPayment {
   id: string
   userId: string

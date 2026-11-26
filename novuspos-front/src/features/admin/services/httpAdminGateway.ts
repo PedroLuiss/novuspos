@@ -11,6 +11,9 @@ import type {
   AdminSettings,
   AdminUser,
   EmailPage,
+  UserOption,
+  UserPage,
+  UserQuery,
   EmailQuery,
   NotificationPage,
   NotificationQuery,
@@ -35,7 +38,8 @@ export const httpAdminGateway: AdminGateway = {
   listPayments: (query: PaymentQuery) => apiClient.get<PaymentPage>(ADMIN_ENDPOINTS.paymentHistory(query), { headers: authHeaders() }),
   reviewPayment: (paymentId, approved, note) =>
     apiClient.patch<AdminPayment>(ADMIN_ENDPOINTS.reviewPayment(paymentId), { approved, note }, { headers: authHeaders() }),
-  listUsers: () => apiClient.get<AdminUser[]>(ADMIN_ENDPOINTS.users, { headers: authHeaders() }),
+  listUsers: (query: UserQuery) => apiClient.get<UserPage>(ADMIN_ENDPOINTS.userDirectory(query), { headers: authHeaders() }),
+  listUserOptions: () => apiClient.get<UserOption[]>(ADMIN_ENDPOINTS.userOptions, { headers: authHeaders() }),
   updateUser: (userId, patch: UserPatch) =>
     apiClient.patch<AdminUser>(ADMIN_ENDPOINTS.updateUser(userId), patch, { headers: authHeaders() }),
   setSubscription: (userId, planId, active) =>

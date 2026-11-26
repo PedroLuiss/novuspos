@@ -3,7 +3,7 @@ import { MS } from '@/shared/ui/MS'
 import { formatAdminDate } from '../lib/adminFormatters'
 import { adminCompactButton, adminInput } from '../lib/adminStyles'
 import { htmlToText } from '../lib/emailHtml'
-import type { AdminEmail, AdminUser, EmailPageSize, EmailQuery } from '../types'
+import type { AdminEmail, EmailPageSize, EmailQuery, UserOption } from '../types'
 import { AdminBadge, AdminCard, AdminState } from './ui/AdminUi'
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
   totalPages: number
   isLoading: boolean
   query: EmailQuery
-  users: AdminUser[]
+  users: UserOption[]
   onSearch: (value: string) => void
   onAudience: (value: string) => void
   onPageSize: (value: EmailPageSize) => void
