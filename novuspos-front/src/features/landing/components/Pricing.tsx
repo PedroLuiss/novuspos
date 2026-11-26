@@ -1,3 +1,6 @@
+import { usePlans } from '@/shared/hooks/usePlans'
+import { plansService } from '@/shared/services/plans/plansService'
+import type { PlanOption } from '@/shared/services/plans/types'
 import { pricingBenefits } from '../data/landing-data'
 import { MS } from './HeroHeader'
 
@@ -63,8 +66,19 @@ function PlanPriceCard({ name, price, period, note, ribbon, onSale }: PlanPriceP
   )
 }
 
-/** Sección de precios: plan mensual y plan anual. */
+function priceLabel(plan: PlanOption): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: plan.currency || 'USD',
+    minimumFractionDigits: 2,
+  }).format(plan.price)
+}
+
+/** Sección de precios con los planes que configura el dueño en el panel maestro. */
 export function Pricing() {
+  const { plans } = usePlans()
+  const visiblePlans = plans.length > 0 ? plans : plansService.readCached()
+
   return (
     <section id="precios" className="w-full bg-surface-container-low py-space-xl">
       <div className="px-margin max-w-6xl mx-auto flex flex-col items-center">
@@ -82,20 +96,20 @@ export function Pricing() {
         </div>
 
         <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-space-md items-stretch">
-          <PlanPriceCard
-            name="NovusPOS Mensual"
-            price="$4.99"
-            period="mes"
-            note="¡30 días de prueba gratuita completa!"
-            ribbon="PRIMER MES $0"
-            onSale
-          />
-          <PlanPriceCard
-            name="NovusPOS Anual"
-            price="$59.99"
-            period="año"
-            note="Un solo pago al año, sin mensualidades"
-          />
+          {visiblePlans.map((plan) => {
+            const monthly = plan.interval === 'month'
+            return (
+              <PlanPriceCard
+                key={plan.id}
+                name={plan.name}
+                price={priceLabel(plan)}
+                period={monthly ? 'mes' : 'año'}
+                note={monthly && plan.highlighted ? '¡30 días de prueba gratuita completa!' : monthly ? plan.description : 'Un solo pago al año, sin mensualidades'}
+                ribbon={monthly && plan.highlighted ? 'PRIMER MES $0' : undefined}
+                onSale={plan.highlighted === true}
+              />
+            )
+          })}
         </div>
 
         <p className="font-body-sm text-body-sm text-on-surface-variant text-center mt-space-md">

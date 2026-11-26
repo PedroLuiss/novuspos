@@ -1,6 +1,8 @@
 import { apiClient } from '@/shared/services/apiClient'
 import { ADMIN_ENDPOINTS } from '@/shared/services/endpoints'
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
+import { normalizePlans } from '@/shared/services/plans/plansStore'
+import type { PlanOption } from '@/shared/services/plans/types'
 import { adminSessionStore } from '../lib/adminSession'
 import type {
   AdminEmail,
@@ -57,6 +59,16 @@ export const httpAdminGateway: AdminGateway = {
   createEmail: (input) => apiClient.post<AdminEmail>(ADMIN_ENDPOINTS.emails, input, { headers: authHeaders() }),
   getSettings: () => apiClient.get<AdminSettings>(ADMIN_ENDPOINTS.settings, { headers: authHeaders() }),
   saveSettings: (settings) => apiClient.put<AdminSettings>(ADMIN_ENDPOINTS.settings, settings, { headers: authHeaders() }),
+  async listPlans(): Promise<PlanOption[]> {
+    const payload = await apiClient.get<unknown>(ADMIN_ENDPOINTS.plans, { headers: authHeaders() })
+    const list = Array.isArray(payload)
+      ? payload
+      : payload && typeof payload === 'object'
+        ? (payload as Record<string, unknown>).plans ?? (payload as Record<string, unknown>).items ?? []
+        : []
+    return normalizePlans(list) ?? []
+  },
+  savePlans: (plans) => apiClient.put<PlanOption[]>(ADMIN_ENDPOINTS.plans, { plans }, { headers: authHeaders() }),
   savePaymentMethods: (methods) =>
     apiClient.put<PaymentMethodOption[]>(ADMIN_ENDPOINTS.paymentMethods, { methods }, { headers: authHeaders() }),
 }

@@ -10,6 +10,7 @@ export const AUTH_ENDPOINTS = {
 
 /** Contrato de rutas de facturación y suscripciones. */
 export const BILLING_ENDPOINTS = {
+  /** Catálogo público de suscripciones que ve el cliente. */
   plans: '/billing/plans',
   subscription: '/billing/subscription',
   payments: '/billing/payments',
@@ -121,6 +122,8 @@ export const ADMIN_ENDPOINTS = {
     return `/admin/emails?${query.toString()}`
   },
   settings: '/admin/settings',
+  /** GET/PUT del catálogo de suscripciones que ofrece NovusPOS Desktop. */
+  plans: '/admin/plans',
   /** PUT reemplaza el catálogo completo de métodos y cuentas de cobro. */
   paymentMethods: '/admin/payment-methods',
 } as const

@@ -8,6 +8,7 @@ const groups: { label: string; items: { key: AdminSection; label: string; icon: 
     label: 'Operación',
     items: [
       { key: 'overview', label: 'Resumen', icon: 'dashboard', href: '/administracion' },
+      { key: 'plans', label: 'Suscripciones', icon: 'workspace_premium', href: '/administracion/suscripciones' },
       { key: 'payments', label: 'Pagos', icon: 'payments', href: '/administracion/pagos' },
       { key: 'users', label: 'Usuarios', icon: 'group', href: '/administracion/usuarios' },
       { key: 'reports', label: 'Reportes', icon: 'report_problem', href: '/administracion/reportes' },

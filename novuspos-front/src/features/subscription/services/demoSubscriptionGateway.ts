@@ -1,5 +1,6 @@
 import { ValidationError } from '@/shared/services/apiClient'
-import { demoPayments, demoSubscription, plans } from '../data/subscription-data'
+import { plansStore } from '@/shared/services/plans/plansStore'
+import { demoPayments, demoSubscription } from '../data/subscription-data'
 import { isSubscriptionExpired } from '../lib/subscriptionStatus'
 import type { PaymentRecord, SubmitPaymentRequest, Subscription } from '../types'
 import type { BillingOverview, PaymentReviewResult, SubscriptionGateway } from './subscriptionGateway'
@@ -49,7 +50,7 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
   async getOverview(): Promise<BillingOverview> {
     await wait()
     const state = readState()
-    return { plans: plans.map((plan) => ({ ...plan })), subscription: state.subscription, payments: state.payments }
+    return { plans: plansStore.readActive(), subscription: state.subscription, payments: state.payments }
   },
 
   async submitPayment(request: SubmitPaymentRequest): Promise<PaymentRecord> {
@@ -68,7 +69,9 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
       })
     }
 
-    const plan = plans.find((item) => item.id === request.planId) ?? plans[0]
+    const catalog = plansStore.read()
+    const plan = catalog.find((item) => item.id === request.planId) ?? catalog[0]
+    if (!plan) throw new Error('No hay suscripciones configuradas.')
     const payment: PaymentRecord = {
       id: `pay-${Date.now()}`,
       subscriptionId: request.subscriptionId,
@@ -100,7 +103,9 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
     payment.status = approved ? 'approved' : 'rejected'
     payment.reviewNote = note
     if (approved) {
-      const plan = plans.find((item) => item.id === payment.planId) ?? plans[0]
+      const catalog = plansStore.read()
+      const plan = catalog.find((item) => item.id === payment.planId) ?? catalog[0]
+      if (!plan) throw new Error('No hay suscripciones configuradas.')
       const start = new Date(payment.paidAt)
       if (Number.isNaN(start.getTime())) start.setTime(Date.now())
       const renews = new Date(start)

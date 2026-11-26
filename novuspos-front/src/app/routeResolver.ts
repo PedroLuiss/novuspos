@@ -13,6 +13,7 @@ export type AppRoute =
   | { view: 'landing' }
 
 function resolveAdminSection(pathname: string): AdminSection {
+  if (pathname.startsWith('/administracion/suscripciones')) return 'plans'
   if (pathname.startsWith('/administracion/pagos')) return 'payments'
   if (pathname.startsWith('/administracion/usuarios')) return 'users'
   if (pathname.startsWith('/administracion/reportes')) return 'reports'

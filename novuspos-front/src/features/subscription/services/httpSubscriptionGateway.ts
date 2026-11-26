@@ -46,7 +46,7 @@ export const httpSubscriptionGateway: SubscriptionGateway = {
       if (paymentsResponse !== null) payments = unwrapList<PaymentRecord>(paymentsResponse, 'payments')
     }
 
-    return { plans, subscription, payments }
+    return { plans: plans.filter((plan) => plan.active !== false), subscription, payments }
   },
 
   submitPayment(request: SubmitPaymentRequest): Promise<PaymentRecord> {

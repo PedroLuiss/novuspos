@@ -1,18 +1,11 @@
 /** Tipos públicos del módulo de suscripción. */
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
+import type { PlanOption } from '@/shared/services/plans/types'
 
 export type PlanId = string
 
-export interface Plan {
-  id: PlanId
-  name: string
-  description: string
-  price: number
-  currency: string
-  interval: 'month' | 'year'
-  features: string[]
-  highlighted?: boolean
-}
+/** Los planes los configura el dueño; aquí solo se reexportan para el módulo. */
+export type Plan = PlanOption
 
 export type SubscriptionStatus = 'active' | 'pending_review' | 'expired' | 'cancelled'
 

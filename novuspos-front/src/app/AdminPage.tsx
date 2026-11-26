@@ -3,17 +3,20 @@ import { AdminOverview } from '@/features/admin/components/AdminOverview'
 import { EmailsPage } from '@/features/admin/components/EmailsPage'
 import { NotificationsPage } from '@/features/admin/components/NotificationsPage'
 import { PaymentsPage } from '@/features/admin/components/PaymentsPage'
+import { PlansPage } from '@/features/admin/components/PlansPage'
 import { ReportsPage } from '@/features/admin/components/ReportsPage'
 import { SettingsPage } from '@/features/admin/components/SettingsPage'
 import { UsersPage } from '@/features/admin/components/UsersPage'
 
-export type AdminSection = 'overview' | 'payments' | 'users' | 'reports' | 'notifications' | 'emails' | 'settings'
+export type AdminSection = 'overview' | 'plans' | 'payments' | 'users' | 'reports' | 'notifications' | 'emails' | 'settings'
 
 /** Panel del dueño: compone el layout maestro y el módulo solicitado. */
 export function AdminPage({ section }: { section: AdminSection }) {
   return (
     <AdminLayout section={section}>
-      {section === 'payments' ? (
+      {section === 'plans' ? (
+        <PlansPage />
+      ) : section === 'payments' ? (
         <PaymentsPage />
       ) : section === 'users' ? (
         <UsersPage />

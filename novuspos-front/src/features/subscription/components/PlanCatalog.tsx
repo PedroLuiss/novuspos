@@ -44,8 +44,13 @@ export function PlanCatalog({ plans, currentPlanId, canSwitch, renewsAt, onSelec
                 current ? 'border-primary bg-primary-fixed/40' : 'border-outline-variant bg-surface-container-low'
               }`}
             >
-              <div className="flex items-center justify-between gap-space-xs">
+              <div className="flex flex-wrap items-center justify-between gap-space-xs">
                 <span className="font-headline-sm text-headline-sm text-on-surface font-bold">{plan.name}</span>
+                {plan.highlighted && (
+                  <span className="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">
+                    Recomendada
+                  </span>
+                )}
                 {current && (
                   <span className="px-2 py-0.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm font-bold">
                     Tu plan actual

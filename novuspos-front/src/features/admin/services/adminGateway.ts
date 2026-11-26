@@ -1,3 +1,4 @@
+import type { PlanOption } from '@/shared/services/plans/types'
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import type {
   AdminEmail,
@@ -38,6 +39,9 @@ export interface AdminGateway {
   createEmail(input: Omit<AdminEmail, 'id' | 'createdAt'>): Promise<AdminEmail>
   getSettings(): Promise<AdminSettings>
   saveSettings(settings: AdminSettings): Promise<AdminSettings>
+  /** Catálogo completo de suscripciones, incluidas las ocultas. */
+  listPlans(): Promise<PlanOption[]>
+  savePlans(plans: PlanOption[]): Promise<PlanOption[]>
   /** Reemplaza el catálogo completo de cuentas y métodos que ve el usuario al pagar. */
   savePaymentMethods(methods: PaymentMethodOption[]): Promise<PaymentMethodOption[]>
 }

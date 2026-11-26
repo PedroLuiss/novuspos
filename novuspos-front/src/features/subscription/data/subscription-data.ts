@@ -1,38 +1,4 @@
-import type { PaymentRecord, Plan, Subscription } from '../types'
-
-/** Catálogo de planes. La API de Laravel puede enviar más; la UI se adapta sola. */
-export const plans: Plan[] = [
-  {
-    id: 'novus-mensual',
-    name: 'NovusPOS Mensual',
-    description: 'Todo el sistema para un comercio, en una computadora.',
-    price: 4.99,
-    currency: 'USD',
-    interval: 'month',
-    highlighted: true,
-    features: [
-      'Ventas, inventario y caja en el mismo equipo',
-      'Clientes y cuentas corrientes',
-      'Respaldos de tu información',
-      'Actualizaciones y soporte',
-    ],
-  },
-  {
-    id: 'novus-anual',
-    name: 'NovusPOS Anual',
-    description: 'El mismo sistema, pagando una sola vez al año.',
-    price: 59.99,
-    currency: 'USD',
-    interval: 'year',
-    features: [
-      'Ventas, inventario y caja en el mismo equipo',
-      'Clientes y cuentas corrientes',
-      'Respaldos de tu información',
-      'Actualizaciones y soporte',
-      'Un solo pago al año, sin mensualidades',
-    ],
-  },
-]
+import type { PaymentRecord, Subscription } from '../types'
 
 export const DEMO_SUBSCRIPTION_ID = 'sub-demo-1'
 
