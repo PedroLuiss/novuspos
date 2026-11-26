@@ -5,17 +5,20 @@ import { useAdminSettings } from '../hooks/useAdminSettings'
 import { normalizeLoginPath } from '../lib/adminSettings'
 import { adminPrimaryButton } from '../lib/adminStyles'
 import type { AdminSettings } from '../types'
+import { SettingsSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminCard, AdminPageHeader } from './ui/AdminUi'
 import { PaymentMethodsSection } from './PaymentMethodsSection'
 
 /** Datos de la empresa y ruta secreta del login maestro. */
 export function SettingsPage() {
-  const { settings, isSaving, saved, error, save } = useAdminSettings()
+  const { settings, isLoading, isSaving, saved, error, save } = useAdminSettings()
   const [form, setForm] = useState<AdminSettings>(settings)
   const [pathError, setPathError] = useState<string | null>(null)
 
   const patch = (key: keyof AdminSettings, value: string) => setForm((current) => ({ ...current, [key]: value }))
   const normalizedPath = normalizeLoginPath(form.loginPath) ?? settings.loginPath
+
+  if (isLoading) return <SettingsSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">

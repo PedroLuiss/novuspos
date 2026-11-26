@@ -1,3 +1,4 @@
+import { navigate } from '@/shared/router/navigation'
 import { MS } from '@/shared/ui/MS'
 import type { AdminSection } from '../../../app/AdminPage'
 import { getAdminLoginPath } from '../lib/adminSettings'
@@ -33,7 +34,7 @@ export function AdminSidebar({ section, onNavigate }: { section: AdminSection; o
   const session = adminSessionStore.read()
   const logout = () => {
     adminSessionStore.clear()
-    window.location.replace('/auth/login')
+    navigate('/auth/login', { replace: true })
   }
 
   return (

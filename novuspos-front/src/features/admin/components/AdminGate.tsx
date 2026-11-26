@@ -1,24 +1,18 @@
 import { useEffect, type ReactNode } from 'react'
-import { MS } from '@/shared/ui/MS'
+import { navigate } from '@/shared/router/navigation'
 import { getAdminLoginPath } from '../lib/adminSettings'
 import { adminSessionStore } from '../lib/adminSession'
+import { AdminGateSkeleton } from './ui/AdminModuleSkeletons'
 
 /** Guardián independiente: exige la sesión del dueño, nunca la del cliente. */
 export function AdminGate({ children }: { children: ReactNode }) {
   const session = adminSessionStore.read()
 
   useEffect(() => {
-    if (!session) window.location.replace(getAdminLoginPath())
+    if (!session) navigate(getAdminLoginPath(), { replace: true })
   }, [session])
 
-  if (!session) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-space-md bg-surface">
-        <MS name="progress_activity" className="animate-spin text-primary text-3xl" />
-        <span className="font-body-md text-body-md text-on-surface-variant">Abriendo el panel del dueño…</span>
-      </div>
-    )
-  }
+  if (!session) return <AdminGateSkeleton />
 
   return <>{children}</>
 }

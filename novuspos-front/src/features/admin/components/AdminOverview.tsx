@@ -2,6 +2,7 @@ import { MS } from '@/shared/ui/MS'
 import { useAdminOverview } from '../hooks/useAdminOverview'
 import { formatAdminDate, formatUsd, paymentTone } from '../lib/adminFormatters'
 import { adminCard, adminEyebrow, adminPrimaryButton, adminSecondaryButton } from '../lib/adminStyles'
+import { OverviewSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAvatar, AdminBadge, AdminCard, AdminPageHeader, AdminState } from './ui/AdminUi'
 import { planDonutLegend } from './PlanDonutLegend'
 import { PlanDonut } from './PlanDonut'
@@ -17,7 +18,7 @@ const metrics = [
 export function AdminOverview() {
   const { overview, isLoading, error, refresh } = useAdminOverview()
 
-  if (isLoading && !overview) return <AdminState label="Cargando el resumen…" loading />
+  if (isLoading && !overview) return <OverviewSkeleton />
   if (!overview) {
     return (
       <AdminCard title="No pudimos cargar el resumen" icon="cloud_off">

@@ -5,6 +5,7 @@ import { MS } from '@/shared/ui/MS'
 import { usePlansEditor } from '../hooks/usePlansEditor'
 import { formatUsd } from '../lib/adminFormatters'
 import { adminCompactButton, adminPrimaryButton, adminSecondaryButton } from '../lib/adminStyles'
+import { PlansSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminBadge, AdminCard, AdminPageHeader, AdminState } from './ui/AdminUi'
 import { PlanEditor } from './PlanEditor'
 
@@ -15,6 +16,8 @@ export function PlansPage() {
   const [pendingDelete, setPendingDelete] = useState<PlanOption | null>(null)
 
   const closeEditor = () => setEditor({ open: false, plan: null })
+
+  if (isLoading) return <PlansSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -43,9 +46,7 @@ export function PlansPage() {
         {error && <AdminAlert>{error}</AdminAlert>}
         {saved && <AdminAlert tone="success">Suscripciones actualizadas. Ya están disponibles para tus clientes.</AdminAlert>}
 
-        {isLoading ? (
-          <AdminState label="Cargando suscripciones…" loading />
-        ) : draft.length === 0 ? (
+        {draft.length === 0 ? (
           <AdminState label="Todavía no hay suscripciones. Crea un plan para empezar." />
         ) : (
           <div className="grid grid-cols-1 gap-space-sm xl:grid-cols-2">

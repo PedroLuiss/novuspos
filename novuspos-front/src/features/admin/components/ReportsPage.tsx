@@ -4,6 +4,7 @@ import { REPORT_PAGE_SIZES, useAdminReports } from '../hooks/useAdminReports'
 import { formatAdminDate, reportTone } from '../lib/adminFormatters'
 import { adminCompactButton, adminInput, adminTd, adminTh } from '../lib/adminStyles'
 import type { AdminReport, ReportPageSize, ReportSourceFilter, ReportStatusFilter } from '../types'
+import { ReportsSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminAvatar, AdminBadge, AdminCard, AdminFilterChip, AdminModal, AdminPageHeader, AdminState } from './ui/AdminUi'
 
 const sourceOptions: { value: ReportSourceFilter; label: string }[] = [
@@ -53,6 +54,8 @@ export function ReportsPage() {
   const first = total > 0 ? (page - 1) * pageSize + 1 : 0
   const last = total > 0 ? Math.min(page * pageSize, total) : 0
   const hasFilters = Boolean(query.search || query.source !== 'all' || query.status !== 'all')
+
+  if (isLoading && reports.length === 0) return <ReportsSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -122,9 +125,7 @@ export function ReportsPage() {
           <span className="font-label-sm text-label-sm font-mono text-outline">Página {page} de {totalPages}</span>
         </div>
 
-        {isLoading && reports.length === 0 ? (
-          <AdminState label="Cargando reportes…" loading />
-        ) : reports.length === 0 ? (
+        {reports.length === 0 ? (
           <AdminState label="No hay reportes con estos filtros." />
         ) : (
           <div className={`overflow-x-auto transition ${isLoading ? 'opacity-60' : ''}`}>

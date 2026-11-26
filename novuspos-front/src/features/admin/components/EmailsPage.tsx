@@ -5,6 +5,7 @@ import type { EmailDraft } from '../types'
 import { EmailComposer } from './EmailComposer'
 import { EmailHistory } from './EmailHistory'
 import { EmailPreview } from './EmailPreview'
+import { EmailsSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminCard, AdminPageHeader } from './ui/AdminUi'
 
 /** Correos personalizados que el dueño envía a todos o a un usuario. */
@@ -31,6 +32,8 @@ export function EmailsPage() {
   const [notice, setNotice] = useState<string | null>(null)
 
   const audienceLabel = users.find((item) => item.id === draft.audience)?.businessName ?? 'Todos los usuarios'
+
+  if (isLoading && emails.length === 0) return <EmailsSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">

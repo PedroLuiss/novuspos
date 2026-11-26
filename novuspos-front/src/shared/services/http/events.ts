@@ -1,4 +1,5 @@
 import { sessionStore } from '@/shared/lib/auth-storage'
+import { navigate } from '@/shared/router/navigation'
 
 /** Bus de eventos HTTP: desacopla transporte, sesión y UI (Observer). */
 
@@ -12,7 +13,7 @@ let pendingRequests = 0
 function defaultUnauthorizedHandler(): void {
   sessionStore.clear()
   if (typeof window !== 'undefined' && window.location.pathname !== '/auth/login') {
-    window.location.replace('/auth/login')
+    navigate('/auth/login', { replace: true })
   }
 }
 

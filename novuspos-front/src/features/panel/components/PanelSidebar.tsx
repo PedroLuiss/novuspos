@@ -1,10 +1,12 @@
 import { panelNavItems } from '@/features/panel/data/panel-data'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { usePathname } from '@/shared/router/useRouter'
 import { MS } from '@/shared/ui/MS'
 
 /** Barra lateral y cabecera fija del panel (réplica de Stitch). */
 export function PanelSidebar() {
   const { user, logout } = useAuth()
+  const pathname = usePathname()
 
   return (
     <>
@@ -21,8 +23,8 @@ export function PanelSidebar() {
             {panelNavItems.map((item) => {
               const isActive =
                 item.href === '/panel'
-                  ? Boolean(item.active) && window.location.pathname === '/panel'
-                  : window.location.pathname.startsWith(item.href)
+                  ? Boolean(item.active) && pathname === '/panel'
+                  : pathname.startsWith(item.href)
               return (
                 <a
                   key={item.label}

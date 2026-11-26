@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { navigate } from '@/shared/router/navigation'
 import { MS } from '@/shared/ui/MS'
 
 /** Skeleton MD3 mostrado mientras se resuelve la sesión o se redirige. */
@@ -23,7 +24,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      window.location.replace('/auth/login')
+      navigate('/auth/login', { replace: true })
     }
   }, [isLoading, isAuthenticated])
 

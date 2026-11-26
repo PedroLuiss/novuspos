@@ -4,6 +4,7 @@ import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
 import { MS } from '@/shared/ui/MS'
 import { usePaymentMethodsEditor } from '../hooks/usePaymentMethodsEditor'
 import { adminCompactButton, adminPrimaryButton, adminSecondaryButton } from '../lib/adminStyles'
+import { PaymentMethodsSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminBadge, AdminCard, AdminState } from './ui/AdminUi'
 import { PaymentMethodEditor } from './PaymentMethodEditor'
 
@@ -15,6 +16,8 @@ export function PaymentMethodsSection() {
   const [pendingDelete, setPendingDelete] = useState<PaymentMethodOption | null>(null)
 
   const closeEditor = () => setEditor({ open: false, method: null })
+
+  if (isLoading) return <PaymentMethodsSkeleton />
 
   return (
     <AdminCard

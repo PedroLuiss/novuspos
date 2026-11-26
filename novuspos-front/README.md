@@ -167,6 +167,12 @@ Consola independiente del portal de clientes en `/administracion`, con login pro
 
 El diseño es MD3 con navegación agrupada en azul profundo (`--color-admin-ink`, `--color-admin-ink-soft`), sidebar responsive en cajón móvil, cabecera contextual con fecha y avatar, banner ejecutivo, tarjetas con acento semántico, tablas con filtros y estados, y acceso dividido con marca. Las clases repetidas están en `src/features/admin/lib/adminStyles.ts` y las primitivas en `src/features/admin/components/ui/AdminUi.tsx`; no se añadió CSS externo ni CDN. Los contratos están en `ADMIN_ENDPOINTS` y usan un token Bearer maestro separado, incluidos `GET/PUT /admin/plans` con `{ plans }`, `PUT /admin/payment-methods` con `{ methods }` y `GET/PUT /admin/landing` con `{ config }`. Ver skill §26/§28 y contexto 09 §5.20–§5.23.
 
+## Navegación SPA y skeletons del panel maestro
+
+La navegación interna **no recarga la página**. `src/shared/router/navigation.ts` implementa un router mínimo sobre History API (`navigate`, `popstate` e interceptor global de `<a>` internos) y `src/shared/router/useRouter.ts` expone `usePathname()`/`useSearch()`; `App.tsx` vuelve a resolver la ruta en cada cambio sin depender de `react-router`. El interceptor respeta enlaces externos, `target="_blank"`, `download`, clics con modificadores y anclas `#` de la misma página. Las redirecciones de sesión y del bus HTTP también usan `navigate(..., { replace: true })`, y `PanelSidebar` resalta el item activo con `usePathname()`.
+
+Todos los módulos del panel maestro muestran skeletons MD3 mientras cargan: resumen, suscripciones, landing, pagos, usuarios, reportes, notificaciones, correos, ajustes, métodos de pago y el guardián de acceso. Las primitivas viven en `src/features/admin/components/ui/AdminSkeleton.tsx` y las variantes por módulo en `AdminModuleSkeletons.tsx`; `useAdminSettings` también expone `isLoading`. Ver skill §29 y contexto 09 §5.24.
+
 ## Copy de la landing
 
 Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.

@@ -3,7 +3,8 @@ import { MS } from '@/shared/ui/MS'
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
 import { useLandingEditor } from '../../hooks/useLandingEditor'
 import { adminPrimaryButton, adminSecondaryButton } from '../../lib/adminStyles'
-import { AdminAlert, AdminCard, AdminPageHeader, AdminState } from '../ui/AdminUi'
+import { LandingSkeleton } from '../ui/AdminModuleSkeletons'
+import { AdminAlert, AdminCard, AdminPageHeader } from '../ui/AdminUi'
 import { LandingAppearanceEditor } from './LandingAppearanceEditor'
 import { LandingContentEditor } from './LandingContentEditor'
 import { LandingLogosEditor } from './LandingLogosEditor'
@@ -31,6 +32,8 @@ export function LandingBuilderPage() {
     editor.restoreDefaults()
     setPendingRestore(false)
   }
+
+  if (editor.isLoading) return <LandingSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -80,9 +83,7 @@ export function LandingBuilderPage() {
           </div>
 
           <div className="max-h-[calc(100vh-300px)] min-h-[520px] overflow-y-auto pr-1">
-            {editor.isLoading ? (
-              <AdminState label="Cargando la landing…" loading />
-            ) : tab === 'content' ? (
+            {tab === 'content' ? (
               <LandingContentEditor copy={editor.draft.copy} patch={editor.patch} />
             ) : tab === 'sections' ? (
               <LandingSectionsEditor

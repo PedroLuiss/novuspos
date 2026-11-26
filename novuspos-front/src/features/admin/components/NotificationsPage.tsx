@@ -6,6 +6,7 @@ import { useAdminUserOptions } from '../hooks/useAdminUserOptions'
 import { noticeTone, statusLabels } from '../lib/adminFormatters'
 import { adminPrimaryButton } from '../lib/adminStyles'
 import { NotificationHistory } from './NotificationHistory'
+import { NotificationsSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminBadge, AdminCard, AdminPageHeader } from './ui/AdminUi'
 
 const icons = [
@@ -53,6 +54,8 @@ export function NotificationsPage() {
     setTitle(''); setDescription(''); setLink(''); setIcon('campaign'); setType('info'); setAudience('all')
   }
   const audienceLabel = users.find((item) => item.id === audience)?.businessName ?? 'Todos los usuarios'
+
+  if (isLoading && notifications.length === 0) return <NotificationsSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">

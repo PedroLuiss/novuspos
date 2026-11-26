@@ -6,6 +6,7 @@ import { PAYMENT_PAGE_SIZES, useAdminPayments } from '../hooks/useAdminPayments'
 import { formatAdminDate, formatUsd, paymentTone, statusLabels } from '../lib/adminFormatters'
 import { adminCompactButton, adminInput, adminSecondaryButton, adminTd, adminTh } from '../lib/adminStyles'
 import type { AdminPayment, PaymentPageSize, PaymentStatusFilter } from '../types'
+import { PaymentsSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminAvatar, AdminBadge, AdminCard, AdminFilterChip, AdminPageHeader, AdminState } from './ui/AdminUi'
 import { PaymentReviewModal } from './PaymentReviewModal'
 
@@ -55,6 +56,8 @@ export function PaymentsPage() {
   const first = total > 0 ? (page - 1) * pageSize + 1 : 0
   const last = total > 0 ? Math.min(page * pageSize, total) : 0
   const hasFilters = Boolean(query.search || query.status !== 'pending')
+
+  if (isLoading && payments.length === 0) return <PaymentsSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -135,9 +138,7 @@ export function PaymentsPage() {
           <span className="font-label-sm text-label-sm font-mono text-outline">Página {page} de {totalPages}</span>
         </div>
 
-        {isLoading && payments.length === 0 ? (
-          <AdminState label="Cargando pagos…" loading />
-        ) : payments.length === 0 ? (
+        {payments.length === 0 ? (
           <AdminState label="No hay pagos con estos filtros." />
         ) : (
           <div className={`overflow-x-auto transition ${isLoading ? 'opacity-60' : ''}`}>

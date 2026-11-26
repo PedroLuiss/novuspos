@@ -5,11 +5,13 @@ import type { AdminSettings } from '../types'
 
 export function useAdminSettings() {
   const [settings, setSettings] = useState<AdminSettings>(() => adminSettingsStore.read())
+  const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(() => {
+    setIsLoading(true)
     return adminService
       .getSettings()
       .then((next) => {
@@ -17,6 +19,7 @@ export function useAdminSettings() {
         adminSettingsStore.save(next)
       })
       .catch(() => setError('No pudimos cargar los ajustes. Usamos los valores guardados.'))
+      .finally(() => setIsLoading(false))
   }, [])
 
   useEffect(() => {
@@ -41,5 +44,5 @@ export function useAdminSettings() {
     }
   }, [])
 
-  return { settings, isSaving, saved, error, save }
+  return { settings, isLoading, isSaving, saved, error, save }
 }

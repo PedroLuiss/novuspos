@@ -4,6 +4,7 @@ import { USER_PAGE_SIZES, useAdminUsers } from '../hooks/useAdminUsers'
 import { formatAdminDate, statusLabels, subscriptionTone } from '../lib/adminFormatters'
 import { adminCompactButton, adminInput, adminSecondaryButton, adminTd, adminTh } from '../lib/adminStyles'
 import type { AdminUser, UserPageSize, UserPatch, UserStatusFilter } from '../types'
+import { UsersSkeleton } from './ui/AdminModuleSkeletons'
 import { AdminAlert, AdminAvatar, AdminBadge, AdminCard, AdminPageHeader, AdminState } from './ui/AdminUi'
 import { UserEditModal } from './UserEditModal'
 
@@ -54,6 +55,8 @@ export function UsersPage() {
   const first = total > 0 ? (page - 1) * pageSize + 1 : 0
   const last = total > 0 ? Math.min(page * pageSize, total) : 0
   const hasFilters = Boolean(query.search || query.status !== 'all')
+
+  if (isLoading && users.length === 0) return <UsersSkeleton />
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -128,9 +131,7 @@ export function UsersPage() {
           <span className="font-label-sm text-label-sm font-mono text-outline">Página {page} de {totalPages}</span>
         </div>
 
-        {isLoading && users.length === 0 ? (
-          <AdminState label="Cargando usuarios…" loading />
-        ) : users.length === 0 ? (
+        {users.length === 0 ? (
           <AdminState label="No hay usuarios con estos filtros." />
         ) : (
           <div className={`overflow-x-auto transition ${isLoading ? 'opacity-60' : ''}`}>

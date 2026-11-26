@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { navigate } from '@/shared/router/navigation'
 import { emptyFormErrors, toFormError, type FormErrorState } from '../lib/formErrors'
 import { loginUseCase } from '../services/authService'
 import type { LoginCredentials } from '../types'
@@ -24,7 +25,7 @@ export function useLogin() {
         .then((session) => {
           login(session.token, session.user)
           setState(initialState)
-          window.location.assign('/panel')
+          navigate('/panel', { replace: true })
         })
         .catch((error: unknown) => {
           setState({
