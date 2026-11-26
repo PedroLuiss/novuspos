@@ -11,6 +11,8 @@ export interface PrepareImageOptions {
   maxEdge?: number
   quality?: number
   maxBytes?: number
+  /** Conserva el formato original al comprimir para no perder transparencia en logos. */
+  preserveFormat?: boolean
 }
 
 export interface PreparedImage {
@@ -43,13 +45,17 @@ export async function prepareImage(file: File, options: PrepareImageOptions = {}
   canvas.height = Math.round(image.height * scale)
   const context = canvas.getContext('2d')
   if (!context) throw new Error('No se pudo preparar la imagen. Intenta con otra captura.')
-  context.fillStyle = '#ffffff'
-  context.fillRect(0, 0, canvas.width, canvas.height)
+  const keepTransparency = options.preserveFormat === true && file.type !== 'image/jpeg'
+  if (!keepTransparency) {
+    context.fillStyle = '#ffffff'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+  }
   context.drawImage(image, 0, 0, canvas.width, canvas.height)
 
+  const outputType = keepTransparency ? file.type : 'image/jpeg'
   return {
-    dataUrl: canvas.toDataURL('image/jpeg', options.quality ?? DEFAULT_QUALITY),
-    name: `${file.name.replace(/\.[^.]+$/, '')}.jpg`,
+    dataUrl: canvas.toDataURL(outputType, options.quality ?? DEFAULT_QUALITY),
+    name: keepTransparency ? file.name : `${file.name.replace(/\.[^.]+$/, '')}.jpg`,
   }
 }
 

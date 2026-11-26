@@ -3,9 +3,11 @@ import { LANDING_DEFAULTS, SECTION_ORDER } from './defaults'
 import type {
   LandingComparisonRow,
   LandingConfig,
+  LandingBranding,
   LandingFeature,
   LandingFaq,
   LandingLinkColumn,
+  LandingLogo,
   LandingProductCapability,
   LandingProductGroup,
   LandingProductVariety,
@@ -89,6 +91,23 @@ function screenshotsOf(value: unknown): LandingScreenshot[] {
       fit: row.fit === 'cover' ? 'cover' : 'contain',
     }
   })
+}
+
+function logoOf(value: unknown, fallback: LandingLogo): LandingLogo {
+  const row = record(value)
+  return {
+    src: screenshotSrc(text(row.src, fallback.src).trim(), fallback.src),
+    name: text(row.name, fallback.name ?? '') || undefined,
+    alt: text(row.alt, fallback.alt),
+  }
+}
+
+function logosOf(value: unknown): LandingBranding {
+  const source = record(value)
+  return {
+    header: logoOf(source.header, LANDING_DEFAULTS.logos.header),
+    footer: logoOf(source.footer, LANDING_DEFAULTS.logos.footer),
+  }
 }
 
 function featureOf(item: unknown, index: number): LandingFeature {
@@ -185,6 +204,7 @@ export function normalizeLandingConfig(value: unknown): LandingConfig {
     theme: themeOf(source.theme),
     sections: sectionsOf(source.sections),
     screenshots: screenshotsOf(source.screenshots),
+    logos: logosOf(source.logos),
     updatedAt: typeof source.updatedAt === 'string' ? source.updatedAt : undefined,
     copy: {
       header: {

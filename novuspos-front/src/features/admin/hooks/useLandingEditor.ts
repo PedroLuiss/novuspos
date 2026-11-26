@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { LANDING_DEFAULTS } from '@/shared/services/landing/defaults'
 import { landingStore, normalizeLandingConfig } from '@/shared/services/landing/landingStore'
 import type {
+  LandingBranding,
   LandingConfig,
   LandingCopy,
   LandingScreenshot,
@@ -86,6 +87,10 @@ export function useLandingEditor() {
     mutate((current) => ({ ...current, screenshots }))
   }, [mutate])
 
+  const setLogos = useCallback((logos: LandingBranding) => {
+    mutate((current) => ({ ...current, logos }))
+  }, [mutate])
+
   const restoreDefaults = useCallback(() => {
     mutate(() => normalizeLandingConfig(LANDING_DEFAULTS))
   }, [mutate])
@@ -132,6 +137,7 @@ export function useLandingEditor() {
     toggleSection,
     moveSection,
     setScreenshots,
+    setLogos,
     restoreDefaults,
     save,
     reset,

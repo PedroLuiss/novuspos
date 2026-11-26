@@ -38,7 +38,7 @@ src/
 │   │   └── product/ProductCard.tsx  # ProductCard + CartRow (sin uso tras el carrusel)
 │   └── data/landing-data.tsx     # re-exports de compatibilidad + atajos y mocks
 ├── features/admin/
-│   ├── components/landing/       # constructor visual (pestañas, listas, colores, capturas, preview)
+│   ├── components/landing/       # constructor visual (pestañas, textos, secciones, colores, capturas, logos, preview)
 │   └── hooks/useLandingEditor.ts # borrador, dirty, publicación y restauración
 └── index.css                     # @font-face Material Symbols + @theme MD3 + shimmer
 ```
@@ -173,7 +173,7 @@ Todo el texto está escrito para quien va a usar el sistema: beneficios claros y
 
 ## Constructor visual de la landing
 
-En **Panel maestro → Landing** (`/administracion/landing`) el dueño edita textos, colores, visibilidad/orden de secciones y capturas, con un iframe de `/?preview=1` que se actualiza en vivo. Las capturas se cargan con un selector de archivos desde la computadora del dueño (JPG/PNG/WEBP, varias a la vez), sin escribir rutas ni URLs; se reducen y se guardan como data URL mediante `src/shared/lib/imageUpload.ts`. Nada se publica hasta **Publicar cambios**; **Descartar cambios** vuelve al último guardado y **Restaurar original** recupera el diseño inicial.
+En **Panel maestro → Landing** (`/administracion/landing`) el dueño edita textos, colores, visibilidad/orden de secciones, capturas y logos, con un iframe de `/?preview=1` que se actualiza en vivo. Las capturas y los logos se cargan con un selector de archivos desde la computadora del dueño (JPG/PNG/WEBP, sin escribir rutas ni URLs); se reducen y se guardan como data URL mediante `src/shared/lib/imageUpload.ts`. En la pestaña **Logo** se sube una imagen distinta para el encabezado y otra para el pie, con opción de **Usar el original** en cada zona; `preserveFormat` conserva la transparencia de PNG/WEBP. Nada se publica hasta **Publicar cambios**; **Descartar cambios** vuelve al último guardado y **Restaurar original** recupera el diseño inicial.
 
 La configuración vive en `src/shared/services/landing/` y usa `novuspos:landing` en demo. `defaults.ts` es la única fuente del copy original; `landing-data.tsx` solo re-exporta por compatibilidad. La vista previa viaja por `postMessage` + `sessionStorage`, y `themeToStyle()` aplica únicamente los tokens que cambiaron. En API: `GET /admin/landing`, `PUT /admin/landing` con `{ config }` (token maestro) y `GET /landing/config` (público). Los nombres de icono deben ser ligaduras de `public/MaterialSymbolsOutlined.ttf`; si no existen, se ven como texto literal. Ver skill §28 y contexto 09 §5.23.
 

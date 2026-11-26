@@ -66,6 +66,20 @@ export interface LandingScreenshot {
   fit: 'contain' | 'cover'
 }
 
+export interface LandingLogo {
+  /** Ruta local, URL absoluta o data URL del logo subido por el dueño. */
+  src: string
+  /** Nombre del archivo subido; se usa solo en el editor. */
+  name?: string
+  alt: string
+}
+
+/** El encabezado y el pie pueden mostrar logos distintos. */
+export interface LandingBranding {
+  header: LandingLogo
+  footer: LandingLogo
+}
+
 export interface LandingLinkColumn {
   title: string
   links: string[]
@@ -130,6 +144,7 @@ export interface LandingConfig {
   theme: LandingTheme
   sections: LandingSectionState[]
   screenshots: LandingScreenshot[]
+  logos: LandingBranding
   copy: LandingCopy
   updatedAt?: string
 }

@@ -6,17 +6,19 @@ import { adminPrimaryButton, adminSecondaryButton } from '../../lib/adminStyles'
 import { AdminAlert, AdminCard, AdminPageHeader, AdminState } from '../ui/AdminUi'
 import { LandingAppearanceEditor } from './LandingAppearanceEditor'
 import { LandingContentEditor } from './LandingContentEditor'
+import { LandingLogosEditor } from './LandingLogosEditor'
 import { LandingPreview } from './LandingPreview'
 import { LandingScreenshotsEditor } from './LandingScreenshotsEditor'
 import { LandingSectionsEditor } from './LandingSectionsEditor'
 
-type EditorTab = 'content' | 'sections' | 'appearance' | 'screenshots'
+type EditorTab = 'content' | 'sections' | 'appearance' | 'screenshots' | 'logos'
 
 const tabs: { key: EditorTab; label: string; icon: string }[] = [
   { key: 'content', label: 'Textos', icon: 'edit_note' },
   { key: 'sections', label: 'Secciones', icon: 'view_list' },
   { key: 'appearance', label: 'Colores', icon: 'palette' },
   { key: 'screenshots', label: 'Capturas', icon: 'photo_library' },
+  { key: 'logos', label: 'Logo', icon: 'image' },
 ]
 
 /** Constructor visual de la landing: edición a la izquierda, vista previa en vivo a la derecha. */
@@ -35,7 +37,7 @@ export function LandingBuilderPage() {
       <AdminPageHeader
         eyebrow="Sitio público"
         title="Constructor de la landing"
-        description="Personaliza los textos, los colores, el orden de las secciones y las capturas. Mira cada cambio en la vista previa y publica cuando todo esté listo."
+        description="Personaliza los textos, los colores, el orden de las secciones, las capturas y los logos. Mira cada cambio en la vista previa y publica cuando todo esté listo."
         actions={
           <>
             <a href="/?preview=1" target="_blank" rel="noreferrer" className={adminSecondaryButton}>
@@ -61,7 +63,7 @@ export function LandingBuilderPage() {
           description="Elige qué quieres cambiar; los cambios se aplican al guardar."
           action={<MS name="bolt" className="text-[20px] text-primary" />}
         >
-          <div className="grid grid-cols-4 gap-1 rounded-xl bg-surface-container p-1">
+          <div className="grid grid-cols-5 gap-1 rounded-xl bg-surface-container p-1">
             {tabs.map((item) => (
               <button
                 key={item.key}
@@ -91,8 +93,10 @@ export function LandingBuilderPage() {
               />
             ) : tab === 'appearance' ? (
               <LandingAppearanceEditor theme={editor.draft.theme} onChange={editor.setTheme} />
-            ) : (
+            ) : tab === 'screenshots' ? (
               <LandingScreenshotsEditor screenshots={editor.draft.screenshots} onChange={editor.setScreenshots} />
+            ) : (
+              <LandingLogosEditor logos={editor.draft.logos} onChange={editor.setLogos} />
             )}
           </div>
 
@@ -124,7 +128,7 @@ export function LandingBuilderPage() {
       {pendingRestore && (
         <ConfirmDialog
           title="Restaurar la landing original"
-          message="Los textos, colores, secciones y capturas volverán al diseño inicial. Guarda los cambios para aplicarlo."
+          message="Los textos, colores, secciones, capturas y logos volverán al diseño inicial. Guarda los cambios para aplicarlo."
           confirmLabel="Restaurar"
           onConfirm={restore}
           onClose={() => setPendingRestore(false)}

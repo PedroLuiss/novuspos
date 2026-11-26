@@ -1,5 +1,6 @@
 /** Copy original de la landing (auditado contra novus-post/docs/context/). Fuente de los valores iniciales. */
 import type {
+  LandingBranding,
   LandingComparisonRow,
   LandingConfig,
   LandingFeature,
@@ -246,6 +247,11 @@ const defaultScreenshots: LandingScreenshot[] = [
   },
 ]
 
+const defaultLogos: LandingBranding = {
+  header: { src: '/novuspos-logo.png', alt: 'NovusPOS Logo' },
+  footer: { src: '/novuspos-logo.png', alt: 'NovusPOS Logo' },
+}
+
 /** Estado inicial completo; es inmutable y sirve para restaurar la landing original. */
 export const LANDING_DEFAULTS: LandingConfig = {
   theme: {
@@ -257,6 +263,7 @@ export const LANDING_DEFAULTS: LandingConfig = {
   },
   sections: defaultSections,
   screenshots: defaultScreenshots,
+  logos: defaultLogos,
   copy: {
     header: {
       features: 'Características',

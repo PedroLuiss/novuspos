@@ -1,11 +1,13 @@
-import type { LandingCopy, LandingSectionId } from '@/shared/services/landing/types'
+import type { LandingCopy, LandingLogo, LandingSectionId } from '@/shared/services/landing/types'
 
-/** Header fijo del sitio; los enlaces siguen a las secciones que el dueño dejó visibles. */
+/** Header fijo del sitio; el logo y los enlaces los configura el dueño. */
 export function SiteHeader({
   header,
+  logo,
   visibleSections,
 }: {
   header: LandingCopy['header']
+  logo: LandingLogo
   visibleSections: LandingSectionId[]
 }) {
   const linkClass =
@@ -16,7 +18,7 @@ export function SiteHeader({
     <header className="fixed top-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
       <div className="h-20 w-full px-margin flex items-center justify-between">
         <a href="#inicio" className="flex items-center">
-          <img alt="NovusPOS Logo" className="h-9 w-auto object-contain" src="/novuspos-logo.png" />
+          <img alt={logo.alt} className="h-9 w-auto max-w-[180px] object-contain" src={logo.src} />
         </a>
         <nav className="hidden xl:flex items-center gap-space-lg">
           {visible('features') && <a className={linkClass} href="#caracteristicas">{header.features}</a>}

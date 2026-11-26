@@ -36,14 +36,14 @@ export function LandingPage() {
 
   return (
     <div className="w-full bg-surface" style={themeToStyle(config.theme)}>
-      <SiteHeader header={config.copy.header} visibleSections={visible.map((section) => section.id)} />
+      <SiteHeader header={config.copy.header} logo={config.logos.header} visibleSections={visible.map((section) => section.id)} />
       <main className="w-full pt-20 bg-surface">
         <Hero hero={config.copy.hero} screenshots={config.screenshots} />
         {visible.map((section) => (
           <Fragment key={section.id}>{renderSection(section.id, config)}</Fragment>
         ))}
       </main>
-      <Footer footer={config.copy.footer} />
+      <Footer footer={config.copy.footer} logo={config.logos.footer} />
     </div>
   )
 }
