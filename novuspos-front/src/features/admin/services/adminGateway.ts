@@ -7,6 +7,8 @@ import type {
   NotificationPage,
   NotificationQuery,
   AdminPayment,
+  PaymentPage,
+  PaymentQuery,
   AdminReport,
   AdminSession,
   AdminSettings,
@@ -18,7 +20,7 @@ import type {
 export interface AdminGateway {
   login(email: string, password: string): Promise<AdminSession>
   getOverview(): Promise<AdminOverview>
-  listPayments(): Promise<AdminPayment[]>
+  listPayments(query: PaymentQuery): Promise<PaymentPage>
   reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<AdminPayment>
   listUsers(): Promise<AdminUser[]>
   updateUser(userId: string, patch: UserPatch): Promise<AdminUser>

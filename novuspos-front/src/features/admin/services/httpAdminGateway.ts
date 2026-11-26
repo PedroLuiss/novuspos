@@ -14,6 +14,8 @@ import type {
   EmailQuery,
   NotificationPage,
   NotificationQuery,
+  PaymentPage,
+  PaymentQuery,
   UserPatch,
 } from '../types'
 import type { AdminGateway } from './adminGateway'
@@ -30,7 +32,7 @@ export const httpAdminGateway: AdminGateway = {
   },
 
   getOverview: () => apiClient.get<AdminOverview>(ADMIN_ENDPOINTS.overview, { headers: authHeaders() }),
-  listPayments: () => apiClient.get<AdminPayment[]>(ADMIN_ENDPOINTS.payments, { headers: authHeaders() }),
+  listPayments: (query: PaymentQuery) => apiClient.get<PaymentPage>(ADMIN_ENDPOINTS.paymentHistory(query), { headers: authHeaders() }),
   reviewPayment: (paymentId, approved, note) =>
     apiClient.patch<AdminPayment>(ADMIN_ENDPOINTS.reviewPayment(paymentId), { approved, note }, { headers: authHeaders() }),
   listUsers: () => apiClient.get<AdminUser[]>(ADMIN_ENDPOINTS.users, { headers: authHeaders() }),

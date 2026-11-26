@@ -20,6 +20,9 @@ import type {
   EmailQuery,
   NotificationPage,
   NotificationQuery,
+  PaymentPage,
+  PaymentQuery,
+  PaymentSummary,
   UserPatch,
 } from '../types'
 import type { AdminGateway } from './adminGateway'
@@ -61,6 +64,16 @@ function now(): string {
   return new Date().toISOString()
 }
 
+/** Conteos de todos los pagos, no de la página ni de los filtros activos. */
+function paymentSummary(all: AdminPayment[]): PaymentSummary {
+  return {
+    pending: all.filter((item) => item.status === 'pending').length,
+    approved: all.filter((item) => item.status === 'approved').length,
+    rejected: all.filter((item) => item.status === 'rejected').length,
+    total: all.length,
+  }
+}
+
 const PAGE_SIZES: Array<20 | 50 | 100> = [20, 50, 100]
 
 export const demoAdminGateway: AdminGateway = {
@@ -95,9 +108,25 @@ export const demoAdminGateway: AdminGateway = {
     }
   },
 
-  async listPayments(): Promise<AdminPayment[]> {
+  async listPayments(query: PaymentQuery): Promise<PaymentPage> {
     await wait()
-    return [...payments()].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    const all = payments()
+    const needle = query.search.trim().toLowerCase()
+    const filtered = all
+      .filter((item) => query.status === 'all' || item.status === query.status)
+      .filter((item) => !needle || [item.userName, item.reference, item.bank, item.planName].join(' ').toLowerCase().includes(needle))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
+
+    const pageSize = PAGE_SIZES.includes(query.pageSize) ? query.pageSize : 20
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+    const page = Math.min(Math.max(1, query.page), totalPages)
+    return {
+      items: filtered.slice((page - 1) * pageSize, page * pageSize),
+      total: filtered.length,
+      page,
+      pageSize,
+      summary: paymentSummary(all),
+    }
   },
 
   async reviewPayment(paymentId, approved, note) {

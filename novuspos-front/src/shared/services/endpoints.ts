@@ -46,6 +46,18 @@ export const ADMIN_ENDPOINTS = {
   login: '/admin/login',
   overview: '/admin/overview',
   payments: '/admin/payments',
+  /** GET paginado y filtrado; la revisión sigue en `reviewPayment`. */
+  paymentHistory: (params: {
+    page: number
+    pageSize: number
+    search?: string
+    status?: string
+  }) => {
+    const query = new URLSearchParams({ page: String(params.page), pageSize: String(params.pageSize) })
+    if (params.search?.trim()) query.set('search', params.search.trim())
+    if (params.status && params.status !== 'all') query.set('status', params.status)
+    return `/admin/payments?${query.toString()}`
+  },
   reviewPayment: (paymentId: string) => `/admin/payments/${paymentId}/review`,
   users: '/admin/users',
   updateUser: (userId: string) => `/admin/users/${userId}`,

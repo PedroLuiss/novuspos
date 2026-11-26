@@ -73,6 +73,33 @@ export interface AdminPayment {
   createdAt: string
 }
 
+export type PaymentStatusFilter = AdminPaymentStatus | 'all'
+export type PaymentPageSize = 20 | 50 | 100
+
+/** Filtros del historial de pagos. `status: 'all'` = todos; cualquier otro = ese estado. */
+export interface PaymentQuery {
+  page: number
+  pageSize: PaymentPageSize
+  search: string
+  status: PaymentStatusFilter
+}
+
+/** Conteos globales, sin importar filtros ni página. Alimentan las tarjetas del resumen. */
+export interface PaymentSummary {
+  pending: number
+  approved: number
+  rejected: number
+  total: number
+}
+
+export interface PaymentPage {
+  items: AdminPayment[]
+  total: number
+  page: number
+  pageSize: PaymentPageSize
+  summary: PaymentSummary
+}
+
 export interface AdminReport {
   id: string
   userId: string
