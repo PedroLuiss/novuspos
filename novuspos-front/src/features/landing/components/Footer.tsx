@@ -1,44 +1,21 @@
-/** Pie de página — idéntico a Stitch. */
-export function Footer() {
-  const logoUrl = '/novuspos-logo.png'
+import type { LandingCopy } from '@/shared/services/landing/types'
 
-  const columns = [
-    {
-      title: 'Producto',
-      links: ['Punto de Venta', 'Básculas y periféricos', 'Cobro rápido', 'Planes y precios'],
-    },
-    {
-      title: 'Ayuda',
-      links: ['Guía de uso', 'Centro de ayuda', 'Novedades', 'Preguntas frecuentes'],
-    },
-    {
-      title: 'Legal',
-      links: ['Política de Privacidad', 'Términos del Servicio', 'Licencia de uso', 'Protección de datos'],
-    },
-  ]
-
+/** Pie de página: textos y columnas editables por el dueño. */
+export function Footer({ footer }: { footer: LandingCopy['footer'] }) {
   return (
     <footer className="w-full bg-surface-container-low shadow-[0_-1px_8px_rgba(0,0,0,0.03)] py-space-xl">
       <div className="w-full px-margin">
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-space-lg pb-space-xl">
           <div className="lg:col-span-2 flex flex-col gap-space-sm">
-            <div className="flex items-center gap-space-sm">
-              <img alt="NovusPOS Logo" className="h-8 w-auto object-contain" src={logoUrl} />
-            </div>
-            <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-              Diseñado para crecer contigo. Software de punto de venta para comercios que quieren vender, controlar su
-              inventario y cerrar el día con confianza.
-            </p>
-            {/* <div className="flex items-center gap-space-sm mt-space-xs">
-              <img alt="NovusPOS Logo" className="h-8 w-auto object-contain" src={logoUrl} />
-            </div> */}
+            <img alt="NovusPOS Logo" className="h-8 w-auto object-contain" src="/novuspos-logo.png" />
+            <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">{footer.description}</p>
           </div>
-          {columns.map((col) => (
-            <div key={col.title} className="flex flex-col gap-space-xs">
+          {footer.columns.map((column, index) => (
+            <div key={`${column.title}-${index}`} className="flex flex-col gap-space-xs">
               <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold mb-space-xs">
-                {col.title}
+                {column.title}
               </span>
-              {col.links.map((label) => (
+              {column.links.map((label) => (
                 <a
                   key={label}
                   href="#inicio"
@@ -51,15 +28,13 @@ export function Footer() {
           ))}
         </div>
         <div className="pt-space-lg flex flex-col sm:flex-row items-center justify-between gap-space-md">
-          <span className="font-body-sm text-body-sm text-on-surface-variant">
-            © 2026 NovusPOS Technologies Ltd. Todos los derechos reservados.
-          </span>
+          <span className="font-body-sm text-body-sm text-on-surface-variant">{footer.legal}</span>
           <div className="flex items-center gap-space-md font-body-sm text-body-sm text-on-surface-variant">
             <span className="inline-flex items-center gap-space-xs">
               <span className="w-2 h-2 rounded-full bg-secondary" />
-              Tu negocio, siempre disponible
+              {footer.status}
             </span>
-            <span>Moneda: USD ($4.99/mes)</span>
+            <span>{footer.currency}</span>
           </div>
         </div>
       </div>

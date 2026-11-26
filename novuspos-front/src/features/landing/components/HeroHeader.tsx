@@ -1,58 +1,28 @@
 import type { ReactNode } from 'react'
+import { TRUST_BADGE_ICONS } from '@/shared/services/landing/defaults'
+import type { LandingCopy } from '@/shared/services/landing/types'
 import { MS } from '@/shared/ui/MS'
 
 export { MS }
 
-/** Píldora con el beneficio principal del hero (sin número de versión). */
-export function HighlightPill() {
-  return (
-    <div className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-high shadow-sm mb-space-lg">
-      <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-      <span className="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">
-        ⚡ TRABAJA SIN DEPENDER DE INTERNET
-      </span>
-    </div>
-  )
-}
-
-/** Sellos de confianza en lenguaje de negocio: beneficios, no detalles técnicos. */
-const trustBadges = [
-  { icon: 'terminal', tone: 'text-primary', label: 'Instalador para Windows' },
-  { icon: 'storage', tone: 'text-secondary', label: 'Tu información siempre disponible' },
-  { icon: 'wifi_off', tone: 'text-primary', label: 'Trabaja sin internet' },
-  { icon: 'verified', tone: 'text-secondary', label: 'Primer mes $0 USD' },
-]
-
-/**
- * Cabecera del Hero en dos columnas (desktop): propuesta de valor a la
- * izquierda y carrusel de capturas arriba a la derecha. En móvil se apila,
- * con las capturas debajo del texto.
- */
-export function HeroHeader({ children }: { children: ReactNode }) {
+/** Cabecera del Hero en dos columnas: texto configurable a la izquierda y capturas a la derecha. */
+export function HeroHeader({ hero, children }: { hero: LandingCopy['hero']; children: ReactNode }) {
   return (
     <section className="relative w-full px-margin pt-space-xl pb-space-xl max-w-7xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-space-xl">
-        {/* Columna izquierda: copy, CTAs y sellos de confianza */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-          {/* <HighlightPill /> */}
-
           <h1 className="font-display text-display text-on-surface max-w-4xl tracking-tight leading-none mb-space-md">
-            El punto de venta para Windows que tu negocio necesita:{' '}
-            <span className="text-primary">rápido, confiable</span> y siempre disponible
+            {hero.headlineLead}
+            <span className="text-primary">{hero.headlineAccent}</span>
+            {hero.headlineTail}
           </h1>
 
           <div className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-lg bg-surface-container mb-space-md">
-            <span className="font-label-md text-label-md text-on-surface-variant font-medium">Lema oficial:</span>
-            <span className="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">
-              NovusPOS — Diseñado para crecer contigo
-            </span>
+            <span className="font-label-md text-label-md text-on-surface-variant font-medium">{hero.sloganLabel}</span>
+            <span className="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">{hero.slogan}</span>
           </div>
 
-          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mb-space-xl">
-            Cobra, controla tu inventario y cierra tu caja desde una sola aplicación. Todo queda registrado al momento
-            y sigue disponible cuando vuelves a abrir el programa, incluso sin conexión. Además: básculas conectadas,
-            tickets listos para imprimir o descargar y productos que encuentras al instante.
-          </p>
+          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mb-space-xl">{hero.description}</p>
 
           <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-space-md w-full max-w-md mb-space-lg">
             <a
@@ -61,10 +31,8 @@ export function HeroHeader({ children }: { children: ReactNode }) {
             >
               <MS name="download" className="text-[24px] cta-download-icon transition-transform" />
               <span className="flex flex-col text-left">
-                <span>Descargar para Windows</span>
-                <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">
-                  30 días gratis • sin tarjeta
-                </span>
+                <span>{hero.primaryCta}</span>
+                <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">{hero.primaryCtaNote}</span>
               </span>
             </a>
             <a
@@ -72,24 +40,23 @@ export function HeroHeader({ children }: { children: ReactNode }) {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-space-xs px-space-lg py-space-md rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-container-highest transition-colors"
             >
               <MS name="play_circle" className="text-[20px]" />
-              <span>Ver capturas del sistema</span>
+              <span>{hero.secondaryCta}</span>
             </a>
           </div>
 
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-space-md text-on-surface-variant pt-space-xs">
-            {trustBadges.map((badge) => (
+            {hero.trustBadges.map((label, index) => (
               <div
-                key={badge.label}
+                key={`${label}-${index}`}
                 className="inline-flex items-center gap-space-xs font-label-md text-label-md bg-surface-container-low px-space-md py-space-xs rounded-full"
               >
-                <MS name={badge.icon} className={`${badge.tone} text-[18px]`} />
-                <span>{badge.label}</span>
+                <MS name={TRUST_BADGE_ICONS[index] ?? 'verified'} className={`${index % 2 === 0 ? 'text-primary' : 'text-secondary'} text-[18px]`} />
+                <span>{label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Columna derecha: capturas reales del sistema */}
         <div className="flex w-full justify-center lg:justify-end">{children}</div>
       </div>
     </section>

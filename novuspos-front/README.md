@@ -17,13 +17,15 @@ npm run preview  # servir el build
 ```text
 src/
 ├── App.tsx                       # pathname: /auth… → AuthPage; /panel | /panel/suscripcion → PanelPage
-├── app/LandingPage.tsx           # SiteHeader + <main class="pt-20"> + secciones + Footer
+├── app/LandingPage.tsx           # SiteHeader + Hero + secciones visibles/ordenadas + Footer
 ├── app/AuthPage.tsx              # split 5/7 de Iniciar Sesión / Registro
 ├── app/PanelPage.tsx             # Panel de Control de Clientes (sidebar + bento grid)
 ├── features/panel/               # PanelSidebar, PanelOverview, PanelLicense, PanelBackups
 ├── features/subscription/        # Suscripción: gateway, hooks, tarjeta, historial y modal de pago
 ├── shared/services/plans/        # catálogo de suscripciones compartido (store + gateways + factory + fachada)
+├── shared/services/landing/      # configuración de la landing (defaults, store, gateways, preview, token)
 ├── shared/hooks/usePlans.ts      # suscripciones activas para portal y landing
+├── shared/hooks/useLandingConfig.ts # config pública o borrador en /?preview=1
 ├── shared/ui/MS.tsx              # icono Material Symbols (filled opcional)
 ├── features/auth/                # AuthBrandPanel, AuthFormPanel, formularios y datos
 ├── features/landing/
@@ -33,7 +35,10 @@ src/
 │   │   │                         # ScreenshotCarousel (carrusel del hero)
 │   │   ├── HeroMockup.tsx           # wrapper que renderiza el carrusel
 │   │   └── product/ProductCard.tsx  # ProductCard + CartRow (sin uso tras el carrusel)
-│   └── data/landing-data.tsx     # Contenido tipado extraído de Stitch (JSX inline, mocks, tonos)
+│   └── data/landing-data.tsx     # re-exports de compatibilidad + atajos y mocks
+├── features/admin/
+│   ├── components/landing/       # constructor visual (pestañas, listas, colores, capturas, preview)
+│   └── hooks/useLandingEditor.ts # borrador, dirty, publicación y restauración
 └── index.css                     # @font-face Material Symbols + @theme MD3 + shimmer
 ```
 
@@ -97,7 +102,7 @@ Viewport de referencia: 1280px. Altura actual ≈4780px (hero de dos columnas; a
 
 El carrusel se muestra en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`): el texto queda a la izquierda y las capturas se suben desde el fondo hasta la parte superior derecha. En móvil se apilan (texto arriba, capturas abajo).
 
-El relevo ya está activo con cinco capturas, en orden de módulo: `novusposventa.png`, `novuspos_producto.png`, `novuspos_kardex.png`, `novus_caja.png` y `novus_cliente.png`. Las cuatro primeras usan `object-contain`; `novus_caja.png` es 1280×1384 (más alta que el contenedor 5:4) y lleva `fit: 'cover'` para mostrarse con `object-cover object-top`, sin bandas laterales. Para agregar más, coloca el PNG en `public/imagen/` y añade una entrada `{ src, alt }` al array `screenshots` en `src/features/landing/data/landing-data.tsx` (usa `fit: 'cover'` si la imagen es alta).
+El relevo ya está activo con cinco capturas, en orden de módulo: `novusposventa.png`, `novuspos_producto.png`, `novuspos_kardex.png`, `novus_caja.png` y `novus_cliente.png`. Las cuatro primeras usan `object-contain`; `novus_caja.png` es 1280×1384 (más alta que el contenedor 5:4) y lleva `fit: 'cover'` para mostrarse con `object-cover object-top`, sin bandas laterales. Para agregar más, coloca el PNG en `public/imagen/` y edítalo en **Panel maestro → Landing → Capturas** (ruta, texto alternativo, ajuste y orden). Los valores iniciales viven en `shared/services/landing/defaults.ts`; `landing-data.tsx` solo re-exporta por compatibilidad.
 
 ## Sección de productos (`#productos`)
 
@@ -159,10 +164,16 @@ Consola independiente del portal de clientes en `/administracion`, con login pro
 
 `src/features/admin/` sigue el patrón de capas del resto del front (puerto + adaptadores demo/API + factory + fachada + hooks + componentes). Incluye resumen ejecutivo con KPIs, gráfica de dona y atención pendiente, gestión manual de pagos con comprobante y nota de revisión (al aprobar activa la suscripción), usuarios con paginación 20/50/100, búsqueda con debounce, filtro por estado, tarjetas globales y control de plan, reportes del portal y del escritorio con paginación 20/50/100, búsqueda con debounce, chips de origen/estado y tarjetas globales, notificaciones y correos con vista previa (globales o por usuario), ajustes de empresa, enlace de acceso, catálogo de métodos de pago y catálogo de suscripciones (`/administracion/suscripciones`). La tabla de pagos está paginada (20/50/100 registros por página con navegación anterior/siguiente), con chips de estado, búsqueda con debounce y sin filtro por usuario; `GET /admin/payments?page=&pageSize=&search=&status=` → `{ items, total, page, pageSize, summary }`, donde `summary` (`pending`, `approved`, `rejected`, `total`) son conteos globales para las tarjetas aunque la tabla esté filtrada. El directorio de usuarios aplica el mismo patrón: `GET /admin/users?page=&pageSize=&search=&status=` → `{ items, total, page, pageSize, summary }`, con `summary` global (`active`, `pending`, `inactive`, `total`), búsqueda con debounce, filtro por estado y 20/50/100 filas por página; `GET /admin/users/options` → `UserOption[]` (`{ id, businessName }`) mantiene los selectores de notificaciones y correos con todos los comercios. El historial de reportes sigue el mismo patrón: `GET /admin/reports?page=&pageSize=&search=&source=&status=` → `{ items, total, page, pageSize, summary }`, con `summary` global (`total`, `open`, `resolved`, `web`, `desktop`), búsqueda con debounce, chips de origen/estado y 20/50/100 filas por página. El historial de notificaciones tiene búsqueda con debounce, filtros por tipo y destinatario, selector de 20/50/100 registros por página y navegación anterior/siguiente; el gateway filtra y pagina en servidor (`GET /admin/notifications?page=&pageSize=&search=&type=&audience=` → `{ items, total, page, pageSize }`), así que la UI solo renderiza la página actual. El historial de correos tiene las mismas capacidades (búsqueda con debounce, filtro por destinatario, selector de 20/50/100 y navegación anterior/siguiente) mediante `GET /admin/emails?page=&pageSize=&search=&audience=` → `{ items, total, page, pageSize }`. El compose permite redactar con títulos, negrita, cursiva, subrayado, listas, enlaces e imágenes por URL, con vista previa en vivo; `lib/emailHtml.ts` sanea el HTML antes de guardarlo o mostrarlo y genera `bodyText` plano. `POST /admin/emails` envía `{ subject, body, bodyText, audience, audienceLabel }`, con `body` en HTML saneado. Pagos, usuarios y reportes fueron verificados en modo demo con 137 registros sembrados en cada módulo: 20/50/100 filas por página (7/3/2 páginas), navegación anterior/siguiente, filtros, tarjetas globales y actualizaciones al aprobar, activar una suscripción o abrir el detalle de un reporte; sin errores de consola.
 
-El diseño es MD3 con navegación agrupada en azul profundo (`--color-admin-ink`, `--color-admin-ink-soft`), sidebar responsive en cajón móvil, cabecera contextual con fecha y avatar, banner ejecutivo, tarjetas con acento semántico, tablas con filtros y estados, y acceso dividido con marca. Las clases repetidas están en `src/features/admin/lib/adminStyles.ts` y las primitivas en `src/features/admin/components/ui/AdminUi.tsx`; no se añadió CSS externo ni CDN. Los contratos están en `ADMIN_ENDPOINTS` y usan un token Bearer maestro separado, incluidos `GET/PUT /admin/plans` con `{ plans }` y `PUT /admin/payment-methods` con `{ methods }`. Ver skill §26 y contexto 09 §5.20–§5.21.
+El diseño es MD3 con navegación agrupada en azul profundo (`--color-admin-ink`, `--color-admin-ink-soft`), sidebar responsive en cajón móvil, cabecera contextual con fecha y avatar, banner ejecutivo, tarjetas con acento semántico, tablas con filtros y estados, y acceso dividido con marca. Las clases repetidas están en `src/features/admin/lib/adminStyles.ts` y las primitivas en `src/features/admin/components/ui/AdminUi.tsx`; no se añadió CSS externo ni CDN. Los contratos están en `ADMIN_ENDPOINTS` y usan un token Bearer maestro separado, incluidos `GET/PUT /admin/plans` con `{ plans }`, `PUT /admin/payment-methods` con `{ methods }` y `GET/PUT /admin/landing` con `{ config }`. Ver skill §26/§28 y contexto 09 §5.20–§5.23.
 
 ## Copy de la landing
 
 Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.
+
+## Constructor visual de la landing
+
+En **Panel maestro → Landing** (`/administracion/landing`) el dueño edita textos, colores, visibilidad/orden de secciones y capturas, con un iframe de `/?preview=1` que se actualiza en vivo. Nada se publica hasta **Publicar cambios**; **Descartar cambios** vuelve al último guardado y **Restaurar original** recupera el diseño inicial.
+
+La configuración vive en `src/shared/services/landing/` y usa `novuspos:landing` en demo. `defaults.ts` es la única fuente del copy original; `landing-data.tsx` solo re-exporta por compatibilidad. La vista previa viaja por `postMessage` + `sessionStorage`, y `themeToStyle()` aplica únicamente los tokens que cambiaron. En API: `GET /admin/landing`, `PUT /admin/landing` con `{ config }` (token maestro) y `GET /landing/config` (público). Ver skill §28 y contexto 09 §5.23.
 
 > Antes de modificar, lee `.agents/skills/novuspos-web-landing/SKILL.md` y `novus-post/docs/context/09-LANDING-WEB.md`.

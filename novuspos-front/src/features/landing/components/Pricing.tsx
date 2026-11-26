@@ -1,8 +1,10 @@
 import { usePlans } from '@/shared/hooks/usePlans'
 import { plansService } from '@/shared/services/plans/plansService'
 import type { PlanOption } from '@/shared/services/plans/types'
-import { pricingBenefits } from '../data/landing-data'
+import type { LandingCopy } from '@/shared/services/landing/types'
 import { MS } from './HeroHeader'
+
+type PlanBenefits = LandingCopy['pricing']['benefits']
 
 interface PlanPriceProps {
   name: string
@@ -11,10 +13,14 @@ interface PlanPriceProps {
   note: string
   ribbon?: string
   onSale?: boolean
+  compatibility: string
+  benefits: PlanBenefits
+  cta: string
+  ctaNote: string
 }
 
-/** Tarjeta de precio reutilizable para el plan mensual y el anual. */
-function PlanPriceCard({ name, price, period, note, ribbon, onSale }: PlanPriceProps) {
+/** Tarjeta de precio reutilizable; los planes vienen del catálogo del dueño. */
+function PlanPriceCard({ name, price, period, note, ribbon, onSale, compatibility, benefits, cta, ctaNote }: PlanPriceProps) {
   return (
     <article
       className={`w-full rounded-2xl bg-surface-container-lowest p-space-xl shadow-xl relative overflow-hidden flex flex-col ${
@@ -29,7 +35,7 @@ function PlanPriceCard({ name, price, period, note, ribbon, onSale }: PlanPriceP
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-space-sm mb-space-md">
         <div>
           <span className="font-headline-sm text-headline-sm text-on-surface font-bold block">{name}</span>
-          <span className="font-body-sm text-body-sm text-on-surface-variant">Para Windows 10 o Windows 11</span>
+          <span className="font-body-sm text-body-sm text-on-surface-variant">{compatibility}</span>
         </div>
         <div className="text-left sm:text-right">
           <div className="flex items-baseline gap-1">
@@ -41,8 +47,8 @@ function PlanPriceCard({ name, price, period, note, ribbon, onSale }: PlanPriceP
       </div>
 
       <div className="flex flex-col gap-space-sm mb-space-lg">
-        {pricingBenefits.map((item) => (
-          <div key={item.strong} className="flex items-start gap-space-sm">
+        {benefits.map((item, index) => (
+          <div key={`${item.strong}-${index}`} className="flex items-start gap-space-sm">
             <MS name="check_circle" className="text-secondary text-[20px] shrink-0 mt-0.5" />
             <span className="font-body-md text-body-md text-on-surface">
               <strong>{item.strong}</strong>
@@ -58,8 +64,8 @@ function PlanPriceCard({ name, price, period, note, ribbon, onSale }: PlanPriceP
       >
         <MS name="download" className="text-[24px] cta-download-icon transition-transform" />
         <span className="flex flex-col text-left">
-          <span>Descargar para Windows</span>
-          <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">30 días gratis • sin tarjeta</span>
+          <span>{cta}</span>
+          <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">{ctaNote}</span>
         </span>
       </a>
     </article>
@@ -74,8 +80,8 @@ function priceLabel(plan: PlanOption): string {
   }).format(plan.price)
 }
 
-/** Sección de precios con los planes que configura el dueño en el panel maestro. */
-export function Pricing() {
+/** Sección de precios con los planes y textos que configura el dueño. */
+export function Pricing({ section }: { section: LandingCopy['pricing'] }) {
   const { plans } = usePlans()
   const visiblePlans = plans.length > 0 ? plans : plansService.readCached()
 
@@ -84,15 +90,10 @@ export function Pricing() {
       <div className="px-margin max-w-6xl mx-auto flex flex-col items-center">
         <div className="text-center max-w-2xl mb-space-xl">
           <span className="font-label-sm text-label-sm text-secondary uppercase font-bold tracking-widest block mb-space-xs">
-            PRECIO TRANSPARENTE • CERO SORPRESAS
+            {section.eyebrow}
           </span>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight mb-space-xs">
-            Elige cómo quieres pagar
-          </h2>
-          <p className="font-body-md text-body-md text-on-surface-variant">
-            Mes a mes si prefieres empezar con calma, o un solo pago al año si ya sabes que NovusPOS es para ti. Sin
-            límites de artículos, costos ocultos ni comisiones sobre tus ventas.
-          </p>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight mb-space-xs">{section.title}</h2>
+          <p className="font-body-md text-body-md text-on-surface-variant">{section.description}</p>
         </div>
 
         <div className="grid w-full grid-cols-1 md:grid-cols-2 gap-space-md items-stretch">
@@ -107,14 +108,16 @@ export function Pricing() {
                 note={monthly && plan.highlighted ? '¡30 días de prueba gratuita completa!' : monthly ? plan.description : 'Un solo pago al año, sin mensualidades'}
                 ribbon={monthly && plan.highlighted ? 'PRIMER MES $0' : undefined}
                 onSale={plan.highlighted === true}
+                compatibility={section.compatibility}
+                benefits={section.benefits}
+                cta={section.cta}
+                ctaNote={section.ctaNote}
               />
             )
           })}
         </div>
 
-        <p className="font-body-sm text-body-sm text-on-surface-variant text-center mt-space-md">
-          No requerimos tarjeta de crédito para iniciar tu período de prueba en Windows.
-        </p>
+        <p className="font-body-sm text-body-sm text-on-surface-variant text-center mt-space-md">{section.footnote}</p>
       </div>
     </section>
   )

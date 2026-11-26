@@ -15,6 +15,7 @@ const TODAY = formatAdminDate(new Date().toISOString())
 const sectionLabels: Record<AdminSection, string> = {
   overview: 'Resumen',
   plans: 'Suscripciones',
+  landing: 'Constructor de landing',
   payments: 'Pagos',
   users: 'Usuarios',
   reports: 'Reportes',

@@ -24,6 +24,11 @@ export const PANEL_ENDPOINTS = {
   overview: '/panel/overview',
 } as const
 
+/** Contrato de la landing pública que promociona NovusPOS Desktop. */
+export const LANDING_ENDPOINTS = {
+  config: '/landing/config',
+} as const
+
 /**
  * Contrato de rutas de copias de seguridad.
  * Solo se guarda la copia más reciente: `POST` reemplaza a la anterior.
@@ -122,6 +127,8 @@ export const ADMIN_ENDPOINTS = {
     return `/admin/emails?${query.toString()}`
   },
   settings: '/admin/settings',
+  /** GET/PUT de la landing que el dueño personaliza en el constructor visual. */
+  landing: '/admin/landing',
   /** GET/PUT del catálogo de suscripciones que ofrece NovusPOS Desktop. */
   plans: '/admin/plans',
   /** PUT reemplaza el catálogo completo de métodos y cuentas de cobro. */

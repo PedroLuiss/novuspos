@@ -1,4 +1,6 @@
 import { ValidationError } from '@/shared/services/apiClient'
+import { landingStore } from '@/shared/services/landing/landingStore'
+import type { LandingConfig } from '@/shared/services/landing/types'
 import { paymentMethodsStore } from '@/shared/services/payment-methods/paymentMethodsStore'
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import { plansStore } from '@/shared/services/plans/plansStore'
@@ -316,6 +318,16 @@ export const demoAdminGateway: AdminGateway = {
     await wait()
     write('settings', settings)
     return settings
+  },
+
+  async getLanding(): Promise<LandingConfig> {
+    await wait()
+    return landingStore.read()
+  },
+
+  async saveLanding(config: LandingConfig): Promise<LandingConfig> {
+    await wait()
+    return landingStore.write(config)
   },
 
   async listPlans(): Promise<PlanOption[]> {
