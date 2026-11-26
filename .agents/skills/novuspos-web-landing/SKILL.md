@@ -693,3 +693,68 @@ features/support/
 `TextAreaField` se agregó a `shared/ui/FormFields.tsx` con el mismo icono, foco y error que el login. El correo se precarga de la sesión; el tema es un `SelectField`. En `api` se envía `{ email, topic, subject, description, source: 'web' }` a `POST /support/tickets`; la respuesta `{ id, reference, message }` alimenta la confirmación. En demo responde sin red con referencia `TK-…`.
 
 > Verificado con CDP en demo y `api` (mock): validación por campo, envío y alerta «¡Reporte enviado!» con número de reporte; sin errores de consola. `npm run build` y `npm run lint` limpios.
+
+## 26. Panel maestro del dueño de NovusPOS
+
+Panel separado del portal de clientes, con acceso propio y ruta configurable. Es la consola operativa del dueño: pagos, usuarios, reportes, notificaciones, correos y ajustes de seguridad.
+
+### Acceso y rutas
+
+- Ruta de login configurable desde **Ajustes → Enlace de acceso maestro**; por defecto `/acceso-maestro`. Se guarda en `novuspos:admin-settings` y `getAdminLoginPath()` la usa desde el `routeResolver`, así que cambiar el ajuste cambia la URL real de entrada.
+- Login propio en `AdminLoginPage` con `novuspos:admin-session` independiente de `sessionStore`. `AdminGate` redirige a la ruta configurada si no hay sesión maestra; nunca usa el `AuthContext` del cliente.
+- Rutas fijas: `/administracion` (resumen), `/pagos`, `/usuarios`, `/reportes`, `/notificaciones`, `/correos` y `/ajustes`, todas bajo `/administracion`.
+
+### Arquitectura
+
+```
+src/features/admin/
+├── types.ts                       # AdminUser, AdminPayment, AdminReport, AdminNotification, AdminEmail, AdminSettings
+├── data/admin-data.ts             # datos demo (8 usuarios, 6 pagos, reportes, avisos) y comprobante SVG
+├── lib/
+│   ├── adminSession.ts            # sesión aislada del dueño
+│   ├── adminSettings.ts           # datos de empresa + ruta de login, normalización y lectura segura
+│   └── adminFormatters.ts         # montos USD, fechas y etiquetas
+├── services/
+│   ├── adminGateway.ts            # puerto único (login, overview, pagos, usuarios, reportes, avisos, correos, ajustes)
+│   ├── demoAdminGateway.ts        # demo sin red, persiste cada colección en localStorage
+│   ├── httpAdminGateway.ts        # endpoints reales con token Bearer maestro
+│   ├── adminGatewayFactory.ts     # VITE_AUTH_MODE
+│   └── adminService.ts            # fachada
+├── hooks/                         # useAdminSession, useAdminOverview, useAdminPayments, useAdminUsers,
+│                                   # useAdminReports, useAdminNotifications, useAdminEmails, useAdminSettings
+└── components/
+    ├── AdminGate.tsx / AdminLoginPage.tsx / AdminLayout.tsx / AdminSidebar.tsx
+    ├── AdminOverview.tsx           # banner ejecutivo, KPIs, dona SVG, actividad y atención
+    ├── PlanDonut.tsx / PlanDonutLegend.tsx
+    ├── PaymentsPage.tsx / PaymentReviewModal.tsx
+    ├── UsersPage.tsx / UserEditModal.tsx
+    ├── ReportsPage.tsx / NotificationsPage.tsx / EmailsPage.tsx / SettingsPage.tsx
+    └── ui/AdminUi.tsx              # AdminPageHeader, AdminCard, AdminBadge, AdminAvatar, AdminModal…
+```
+
+### Diseño profesional (pedido explícito)
+
+Se mantiene MD3 (azul `#003ec7`, superficies claras, Plus Jakarta Sans y JetBrains Mono) con dos tokens nuevos en `index.css`: `--color-admin-ink` (`#0a1734`) y `--color-admin-ink-soft` (`#13295e`), usados solo en la navegación y el acceso maestro. Las clases repetidas viven en `lib/adminStyles.ts` (tarjetas, botones, inputs, celdas, avatares); no se inventan CSS ni CDN.
+
+- **Sidebar:** navegación agrupada en Operación / Comunicación / Sistema, acento verde en el item activo, logo local `novuspos-icon.png`, tarjeta con la ruta privada vigente y cierre de sesión. En móvil se convierte en cajón con backdrop.
+- **Cabecera:** ruta contextual, fecha, avatar con iniciales y rol «Super administrador».
+- **Resumen:** banner con gradiente azul profundo y acciones rápidas, cuatro KPIs con acento semántico, gráfica de dona calculada con los planes reales, pagos recientes con avatar/estado y tarjeta «Requiere tu atención».
+- **Módulos:** tablas con encabezados suaves, filas con hover, badges por estado y botones secundarios; las gráficas y los totales siempre salen de los datos del gateway (nada de métricas inventadas). Notificaciones y correos muestran vista previa en vivo; pagos permiten escribir una nota de revisión; usuarios y reportes tienen tarjetas de conteo y filtros consistentes.
+- **Acceso:** pantalla dividida con marca e iconos de confianza a la izquierda y el formulario a la derecha; en móvil queda solo el formulario.
+
+Se repite el patrón del resto del front: puerto + adaptadores demo/API + factory + fachada + hooks contenedores + componentes presentacionales. Ningún componente supera 300 líneas.
+
+### Funcionalidad
+
+- **Resumen:** usuarios registrados, usuarios sin suscripción al día, pagos por validar, reportes abiertos, ingresos aprobados en USD, gráfica de suscripción más vendida y pagos recientes.
+- **Pagos:** filtros por usuario y estado (por aprobar / aprobados / rechazados / todos). El modal de evaluación muestra el comprobante, referencia, banco, monto y plan; el dueño aprueba o rechaza manualmente tras consultar su banco. Aprobar activa la suscripción del usuario y aplica el plan del pago.
+- **Usuarios:** búsqueda, paginación de 5, edición de datos, asignación de plan mensual/anual y activación o desactivación de la suscripción.
+- **Reportes:** tabla de reportes del portal y del escritorio, filtros por origen y estado, detalle del mensaje.
+- **Notificaciones y correos:** formularios personalizables con título/asunto, descripción/cuerpo, enlace o icono, tipo y destinatario (todos o un usuario). El historial queda en el panel.
+- **Ajustes:** datos de la empresa (nombre, correo, teléfono, dirección) y ruta secreta del login, con validación de path.
+
+### Contrato
+
+`ADMIN_ENDPOINTS` en `shared/services/endpoints.ts`: `POST /admin/login`, `GET /admin/overview`, `GET /admin/payments`, `PATCH /admin/payments/{id}/review`, `GET /admin/users`, `PATCH /admin/users/{id}`, `PATCH /admin/users/{id}/subscription`, `GET /admin/reports`, `GET/POST /admin/notifications`, `GET/POST /admin/emails` y `GET/PUT /admin/settings`. Los adaptadores HTTP envían el token maestro por cabecera `Authorization`, separado del token del cliente.
+
+> Verificado con CDP en demo tras el rediseño: login maestro con branding, resumen con dona y tarjeta de atención, búsqueda y aprobación de pago con nota, búsqueda/paginación de usuarios, vistas previas de notificación y correo, reportes del escritorio, guardado de la ruta personalizada y redirección del guardián a esa ruta; sin errores de consola. `npm run build` y `npm run lint` limpios.

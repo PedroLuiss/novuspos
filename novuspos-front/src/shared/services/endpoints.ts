@@ -40,3 +40,18 @@ export const SUPPORT_ENDPOINTS = {
 export const EXCHANGE_RATE_ENDPOINTS = {
   today: '/billing/exchange-rate',
 } as const
+
+/** Contrato del panel del super administrador (dueño de NovusPOS). */
+export const ADMIN_ENDPOINTS = {
+  login: '/admin/login',
+  overview: '/admin/overview',
+  payments: '/admin/payments',
+  reviewPayment: (paymentId: string) => `/admin/payments/${paymentId}/review`,
+  users: '/admin/users',
+  updateUser: (userId: string) => `/admin/users/${userId}`,
+  setSubscription: (userId: string) => `/admin/users/${userId}/subscription`,
+  reports: '/admin/reports',
+  notifications: '/admin/notifications',
+  emails: '/admin/emails',
+  settings: '/admin/settings',
+} as const

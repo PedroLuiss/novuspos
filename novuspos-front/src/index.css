@@ -91,6 +91,10 @@
   --color-outline: #737688;
   --color-outline-variant: #c3c5d9;
 
+  /* Panel maestro: azul profundo para la navegación y el acceso del dueño. */
+  --color-admin-ink: #0a1734;
+  --color-admin-ink-soft: #13295e;
+
   /* ---------- Familias tipográficas ---------- */
   --font-body-sm: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-body-md: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;

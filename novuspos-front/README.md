@@ -143,6 +143,14 @@ Ruta limpia `/panel/soporte`. Formulario con correo precargado de la sesión, te
 
 Contrato: `POST /support/tickets` con `{ email, topic, subject, description, source: 'web' }` → `{ id, reference, message }`. Misma arquitectura de gateway + adaptadores demo/API + factory + fachada + hook contenedor + componentes. Ver skill §25 y contexto 09 §5.18.
 
+## Panel maestro del dueño
+
+Consola independiente del portal de clientes en `/administracion`, con login propio cuya ruta se personaliza en **Ajustes → Enlace de acceso maestro** (por defecto `/acceso-maestro`). La sesión del dueño es distinta de la del cliente (`novuspos:admin-session`) y el guardián redirige a la ruta configurada.
+
+`src/features/admin/` sigue el patrón de capas del resto del front (puerto + adaptadores demo/API + factory + fachada + hooks + componentes). Incluye resumen ejecutivo con KPIs, gráfica de dona y atención pendiente, gestión manual de pagos con comprobante y nota de revisión (al aprobar activa la suscripción), usuarios con búsqueda/paginación y control de plan, reportes del portal y del escritorio, notificaciones y correos con vista previa (globales o por usuario) y ajustes de empresa y de seguridad.
+
+El diseño es MD3 con navegación agrupada en azul profundo (`--color-admin-ink`, `--color-admin-ink-soft`), sidebar responsive en cajón móvil, cabecera contextual con fecha y avatar, banner ejecutivo, tarjetas con acento semántico, tablas con filtros y estados, y acceso dividido con marca. Las clases repetidas están en `src/features/admin/lib/adminStyles.ts` y las primitivas en `src/features/admin/components/ui/AdminUi.tsx`; no se añadió CSS externo ni CDN. Los contratos están en `ADMIN_ENDPOINTS` y usan un token Bearer maestro separado. Ver skill §26 y contexto 09 §5.20.
+
 ## Copy de la landing
 
 Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.

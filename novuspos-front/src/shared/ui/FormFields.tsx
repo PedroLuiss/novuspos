@@ -206,6 +206,7 @@ interface TextAreaFieldProps {
   label: string
   icon: string
   placeholder?: string
+  required?: boolean
   helper?: ReactNode
   error?: string
   rows?: number
@@ -220,6 +221,7 @@ export function TextAreaField({
   label,
   icon,
   placeholder,
+  required,
   helper,
   error,
   rows = 4,
@@ -235,6 +237,7 @@ export function TextAreaField({
           id={id}
           rows={rows}
           placeholder={placeholder}
+          required={required}
           disabled={disabled}
           value={value}
           onChange={(event) => onChange?.(event.target.value)}
