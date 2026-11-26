@@ -1,4 +1,5 @@
 import { ValidationError } from '@/shared/services/apiClient'
+import { htmlToText } from '../lib/emailHtml'
 import {
   demoEmails,
   demoNotifications,
@@ -186,7 +187,7 @@ export const demoAdminGateway: AdminGateway = {
     const needle = query.search.trim().toLowerCase()
     const filtered = read('emails', demoEmails)
       .filter((item) => !query.audience || item.audience === query.audience)
-      .filter((item) => !needle || [item.subject, item.body, item.audienceLabel].join(' ').toLowerCase().includes(needle))
+      .filter((item) => !needle || [item.subject, item.bodyText ?? htmlToText(item.body), item.audienceLabel].join(' ').toLowerCase().includes(needle))
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
 
     const pageSize = PAGE_SIZES.includes(query.pageSize) ? query.pageSize : 20

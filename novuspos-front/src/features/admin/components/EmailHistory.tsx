@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { MS } from '@/shared/ui/MS'
 import { formatAdminDate } from '../lib/adminFormatters'
 import { adminCompactButton, adminInput } from '../lib/adminStyles'
+import { htmlToText } from '../lib/emailHtml'
 import type { AdminEmail, AdminUser, EmailPageSize, EmailQuery } from '../types'
 import { AdminBadge, AdminCard, AdminState } from './ui/AdminUi'
 
@@ -125,16 +126,19 @@ export function EmailHistory({
         <AdminState label="No hay correos con estos filtros." />
       ) : (
         <div className={`flex flex-col divide-y divide-outline-variant/50 transition ${isLoading ? 'opacity-60' : ''}`}>
-          {emails.map((item) => (
-            <div key={item.id} data-email-item={item.id} className="flex flex-col gap-space-xs py-space-xs first:pt-0 last:pb-0">
-              <div className="flex flex-wrap items-center gap-space-xs">
-                <span className="truncate font-label-md text-label-md font-semibold text-on-surface">{item.subject}</span>
-                <AdminBadge tone="info">{item.audienceLabel}</AdminBadge>
+          {emails.map((item) => {
+            const excerpt = item.bodyText ?? htmlToText(item.body)
+            return (
+              <div key={item.id} data-email-item={item.id} className="flex flex-col gap-space-xs py-space-xs first:pt-0 last:pb-0">
+                <div className="flex flex-wrap items-center gap-space-xs">
+                  <span className="truncate font-label-md text-label-md font-semibold text-on-surface">{item.subject}</span>
+                  <AdminBadge tone="info">{item.audienceLabel}</AdminBadge>
+                </div>
+                <span className="line-clamp-2 font-body-sm text-body-sm text-on-surface-variant">{excerpt}</span>
+                <span className="font-label-sm text-label-sm text-outline font-mono">{formatAdminDate(item.createdAt)}</span>
               </div>
-              <span className="line-clamp-2 font-body-sm text-body-sm text-on-surface-variant">{item.body}</span>
-              <span className="font-label-sm text-label-sm text-outline font-mono">{formatAdminDate(item.createdAt)}</span>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

@@ -60,8 +60,24 @@ export const demoNotifications: AdminNotification[] = [
 ]
 
 export const demoEmails: AdminEmail[] = [
-  { id: 'e-1', subject: 'Tu pago fue aprobado', body: 'Hola, revisamos tu comprobante y tu suscripción quedó activa.', audience: 'u-1', audienceLabel: 'Roberto Morales', createdAt: daysAgo(4) },
-  { id: 'e-2', subject: 'Mantenimiento programado', body: 'El portal estará en mantenimiento el domingo de 2 a 4 a. m.', audience: 'all', audienceLabel: 'Todos los usuarios', createdAt: daysAgo(7) },
+  {
+    id: 'e-1',
+    subject: 'Tu pago fue aprobado',
+    body: '<h2 style="font-size:20px;color:#0a1734;margin:0 0 12px;">Pago aprobado</h2><p style="font-size:14px;line-height:1.6;color:#41475b;margin:0 0 12px;">Hola,</p><p style="font-size:14px;line-height:1.6;color:#41475b;margin:0 0 12px;">Revisamos tu comprobante y tu suscripción quedó activa.</p><p style="font-size:14px;line-height:1.6;color:#41475b;margin:24px 0 0;">Equipo NovusPOS</p>',
+    bodyText: 'Pago aprobado. Hola, revisamos tu comprobante y tu suscripción quedó activa. Equipo NovusPOS',
+    audience: 'u-1',
+    audienceLabel: 'Roberto Morales',
+    createdAt: daysAgo(4),
+  },
+  {
+    id: 'e-2',
+    subject: 'Mantenimiento programado',
+    body: '<h2 style="font-size:20px;color:#0a1734;margin:0 0 12px;">Mantenimiento programado</h2><p style="font-size:14px;line-height:1.6;color:#41475b;margin:0 0 12px;">El portal estará en mantenimiento el domingo de 2 a 4 a. m.</p><p style="font-size:14px;line-height:1.6;color:#41475b;margin:24px 0 0;">Gracias por tu comprensión.</p>',
+    bodyText: 'Mantenimiento programado. El portal estará en mantenimiento el domingo de 2 a 4 a. m. Gracias por tu comprensión.',
+    audience: 'all',
+    audienceLabel: 'Todos los usuarios',
+    createdAt: daysAgo(7),
+  },
 ]
 
 export const demoSettings: AdminSettings = { ...DEFAULT_ADMIN_SETTINGS }

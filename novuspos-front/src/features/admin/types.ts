@@ -99,10 +99,19 @@ export interface AdminNotification {
 export interface AdminEmail {
   id: string
   subject: string
+  /** HTML saneado, listo para enviar por correo. */
   body: string
+  /** Texto plano derivado; opcional para registros antiguos del modo demo. */
+  bodyText?: string
   audience: 'all' | string
   audienceLabel: string
   createdAt: string
+}
+
+export interface EmailDraft {
+  subject: string
+  html: string
+  audience: string
 }
 
 export interface AdminSettings {
