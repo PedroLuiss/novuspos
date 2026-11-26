@@ -58,8 +58,10 @@ export interface LandingProductVariety {
 }
 
 export interface LandingScreenshot {
-  /** Ruta local del asset, por ejemplo `/imagen/novusposventa.png`. */
+  /** Ruta local, URL absoluta o data URL de una imagen subida por el dueño. */
   src: string
+  /** Nombre del archivo subido; se usa solo en el editor. */
+  name?: string
   alt: string
   fit: 'contain' | 'cover'
 }

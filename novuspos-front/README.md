@@ -26,6 +26,7 @@ src/
 ├── shared/services/landing/      # configuración de la landing (defaults, store, gateways, preview, token)
 ├── shared/hooks/usePlans.ts      # suscripciones activas para portal y landing
 ├── shared/hooks/useLandingConfig.ts # config pública o borrador en /?preview=1
+├── shared/lib/imageUpload.ts     # prepara imágenes subidas (data URL) para carrusel y comprobantes
 ├── shared/ui/MS.tsx              # icono Material Symbols (filled opcional)
 ├── features/auth/                # AuthBrandPanel, AuthFormPanel, formularios y datos
 ├── features/landing/
@@ -102,7 +103,7 @@ Viewport de referencia: 1280px. Altura actual ≈4780px (hero de dos columnas; a
 
 El carrusel se muestra en la **columna derecha del hero** (`HeroHeader` usa `lg:grid-cols-2 items-center gap-space-xl`): el texto queda a la izquierda y las capturas se suben desde el fondo hasta la parte superior derecha. En móvil se apilan (texto arriba, capturas abajo).
 
-El relevo ya está activo con cinco capturas, en orden de módulo: `novusposventa.png`, `novuspos_producto.png`, `novuspos_kardex.png`, `novus_caja.png` y `novus_cliente.png`. Las cuatro primeras usan `object-contain`; `novus_caja.png` es 1280×1384 (más alta que el contenedor 5:4) y lleva `fit: 'cover'` para mostrarse con `object-cover object-top`, sin bandas laterales. Para agregar más, coloca el PNG en `public/imagen/` y edítalo en **Panel maestro → Landing → Capturas** (ruta, texto alternativo, ajuste y orden). Los valores iniciales viven en `shared/services/landing/defaults.ts`; `landing-data.tsx` solo re-exporta por compatibilidad.
+El relevo ya está activo con cinco capturas, en orden de módulo: `novusposventa.png`, `novuspos_producto.png`, `novuspos_kardex.png`, `novus_caja.png` y `novus_cliente.png`. Las cuatro primeras usan `object-contain`; `novus_caja.png` es 1280×1384 (más alta que el contenedor 5:4) y lleva `fit: 'cover'` para mostrarse con `object-cover object-top`, sin bandas laterales. Para agregar más, entra en **Panel maestro → Landing → Capturas** y pulsa **Subir capturas**: selecciona una o varias imágenes JPG, PNG o WEBP (hasta 8 MB) desde tu computadora; no hay que escribir rutas ni URLs. Cada captura se puede reemplazar, reordenar, eliminar y ajustar (texto alternativo y `contain`/`cover`). `src/shared/lib/imageUpload.ts` reduce las imágenes a 1920px y las guarda como data URL en `novuspos:landing`. Si el navegador se queda sin espacio, el editor avisa para usar capturas más pequeñas. Los valores iniciales viven en `shared/services/landing/defaults.ts`; `landing-data.tsx` solo re-exporta por compatibilidad.
 
 ## Sección de productos (`#productos`)
 
@@ -172,7 +173,7 @@ Todo el texto está escrito para quien va a usar el sistema: beneficios claros y
 
 ## Constructor visual de la landing
 
-En **Panel maestro → Landing** (`/administracion/landing`) el dueño edita textos, colores, visibilidad/orden de secciones y capturas, con un iframe de `/?preview=1` que se actualiza en vivo. Nada se publica hasta **Publicar cambios**; **Descartar cambios** vuelve al último guardado y **Restaurar original** recupera el diseño inicial.
+En **Panel maestro → Landing** (`/administracion/landing`) el dueño edita textos, colores, visibilidad/orden de secciones y capturas, con un iframe de `/?preview=1` que se actualiza en vivo. Las capturas se cargan con un selector de archivos desde la computadora del dueño (JPG/PNG/WEBP, varias a la vez), sin escribir rutas ni URLs; se reducen y se guardan como data URL mediante `src/shared/lib/imageUpload.ts`. Nada se publica hasta **Publicar cambios**; **Descartar cambios** vuelve al último guardado y **Restaurar original** recupera el diseño inicial.
 
 La configuración vive en `src/shared/services/landing/` y usa `novuspos:landing` en demo. `defaults.ts` es la única fuente del copy original; `landing-data.tsx` solo re-exporta por compatibilidad. La vista previa viaja por `postMessage` + `sessionStorage`, y `themeToStyle()` aplica únicamente los tokens que cambiaron. En API: `GET /admin/landing`, `PUT /admin/landing` con `{ config }` (token maestro) y `GET /landing/config` (público). Los nombres de icono deben ser ligaduras de `public/MaterialSymbolsOutlined.ttf`; si no existen, se ven como texto literal. Ver skill §28 y contexto 09 §5.23.
 

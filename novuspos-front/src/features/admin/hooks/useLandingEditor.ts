@@ -100,8 +100,13 @@ export function useLandingEditor() {
       setSavedSnapshot(JSON.stringify(updated))
       setSaved(true)
       return true
-    } catch {
-      setError('No pudimos guardar la landing. Inténtalo de nuevo.')
+    } catch (cause) {
+      const withoutSpace = cause instanceof DOMException && (cause.name === 'QuotaExceededError' || cause.code === 22)
+      setError(
+        withoutSpace
+          ? 'Las imágenes ocupan demasiado espacio en este navegador. Usa capturas más pequeñas o elimina alguna.'
+          : 'No pudimos guardar la landing. Inténtalo de nuevo.',
+      )
       return false
     } finally {
       setIsSaving(false)

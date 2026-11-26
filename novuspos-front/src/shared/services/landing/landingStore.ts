@@ -71,13 +71,20 @@ function sectionsOf(value: unknown): LandingSectionState[] {
   return ordered.map((id) => ({ id, visible: states.get(id) !== false }))
 }
 
+function screenshotSrc(value: string, fallback: string): string {
+  if (value.startsWith('/') && !value.startsWith('//')) return value
+  if (/^https?:\/\/\S+$/i.test(value)) return value
+  if (/^data:image\/(?:jpeg|png|webp);base64,/i.test(value)) return value
+  return fallback
+}
+
 function screenshotsOf(value: unknown): LandingScreenshot[] {
   return list(value, LANDING_DEFAULTS.screenshots, (item, index) => {
     const row = record(item)
     const fallback = LANDING_DEFAULTS.screenshots[index] ?? { src: '', alt: '', fit: 'contain' as const }
-    const src = text(row.src, fallback.src).trim()
     return {
-      src: src.startsWith('/') && !src.startsWith('//') ? src : fallback.src,
+      src: screenshotSrc(text(row.src, fallback.src).trim(), fallback.src),
+      name: text(row.name, fallback.name ?? '') || undefined,
       alt: text(row.alt, fallback.alt),
       fit: row.fit === 'cover' ? 'cover' : 'contain',
     }
