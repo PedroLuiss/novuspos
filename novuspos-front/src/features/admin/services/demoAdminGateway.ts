@@ -23,6 +23,9 @@ import type {
   PaymentPage,
   PaymentQuery,
   PaymentSummary,
+  ReportPage,
+  ReportQuery,
+  ReportSummary,
   UserOption,
   UserPage,
   UserPatch,
@@ -85,6 +88,17 @@ function userSummary(all: AdminUser[]): UserSummary {
     pending: all.filter((item) => item.subscriptionStatus === 'pending').length,
     inactive: all.filter((item) => ['expired', 'cancelled'].includes(item.subscriptionStatus)).length,
     total: all.length,
+  }
+}
+
+/** Conteos globales de incidencias para las tarjetas del panel. */
+function reportSummary(all: AdminReport[]): ReportSummary {
+  return {
+    total: all.length,
+    open: all.filter((item) => item.status === 'open').length,
+    resolved: all.filter((item) => item.status === 'resolved').length,
+    web: all.filter((item) => item.source === 'web').length,
+    desktop: all.filter((item) => item.source === 'desktop').length,
   }
 }
 
@@ -214,9 +228,26 @@ export const demoAdminGateway: AdminGateway = {
     return { ...user }
   },
 
-  async listReports(): Promise<AdminReport[]> {
+  async listReports(query: ReportQuery): Promise<ReportPage> {
     await wait()
-    return [...read('reports', demoReports)].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    const all = read('reports', demoReports)
+    const needle = query.search.trim().toLowerCase()
+    const filtered = all
+      .filter((item) => query.source === 'all' || item.source === query.source)
+      .filter((item) => query.status === 'all' || item.status === query.status)
+      .filter((item) => !needle || [item.userName, item.subject, item.description].join(' ').toLowerCase().includes(needle))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id))
+
+    const pageSize = PAGE_SIZES.includes(query.pageSize) ? query.pageSize : 20
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
+    const page = Math.min(Math.max(1, query.page), totalPages)
+    return {
+      items: filtered.slice((page - 1) * pageSize, page * pageSize),
+      total: filtered.length,
+      page,
+      pageSize,
+      summary: reportSummary(all),
+    }
   },
 
   async listNotifications(query: NotificationQuery): Promise<NotificationPage> {

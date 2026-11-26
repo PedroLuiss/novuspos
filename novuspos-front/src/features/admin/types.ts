@@ -141,6 +141,36 @@ export interface AdminReport {
   createdAt: string
 }
 
+export type ReportSourceFilter = AdminReport['source'] | 'all'
+export type ReportStatusFilter = AdminReportStatus | 'all'
+export type ReportPageSize = 20 | 50 | 100
+
+/** Filtros del historial. `all` en origen o estado = sin filtro. */
+export interface ReportQuery {
+  page: number
+  pageSize: ReportPageSize
+  search: string
+  source: ReportSourceFilter
+  status: ReportStatusFilter
+}
+
+/** Conteos globales para las tarjetas, sin importar filtros ni página. */
+export interface ReportSummary {
+  total: number
+  open: number
+  resolved: number
+  web: number
+  desktop: number
+}
+
+export interface ReportPage {
+  items: AdminReport[]
+  total: number
+  page: number
+  pageSize: ReportPageSize
+  summary: ReportSummary
+}
+
 export interface AdminNotification {
   id: string
   title: string

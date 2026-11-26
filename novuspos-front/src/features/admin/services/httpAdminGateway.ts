@@ -6,7 +6,8 @@ import type {
   AdminNotification,
   AdminOverview,
   AdminPayment,
-  AdminReport,
+  ReportPage,
+  ReportQuery,
   AdminSession,
   AdminSettings,
   AdminUser,
@@ -44,7 +45,7 @@ export const httpAdminGateway: AdminGateway = {
     apiClient.patch<AdminUser>(ADMIN_ENDPOINTS.updateUser(userId), patch, { headers: authHeaders() }),
   setSubscription: (userId, planId, active) =>
     apiClient.patch<AdminUser>(ADMIN_ENDPOINTS.setSubscription(userId), { planId, active }, { headers: authHeaders() }),
-  listReports: () => apiClient.get<AdminReport[]>(ADMIN_ENDPOINTS.reports, { headers: authHeaders() }),
+  listReports: (query: ReportQuery) => apiClient.get<ReportPage>(ADMIN_ENDPOINTS.reportHistory(query), { headers: authHeaders() }),
   listNotifications: (query: NotificationQuery) =>
     apiClient.get<NotificationPage>(ADMIN_ENDPOINTS.notificationHistory(query), { headers: authHeaders() }),
 

@@ -9,7 +9,8 @@ import type {
   AdminPayment,
   PaymentPage,
   PaymentQuery,
-  AdminReport,
+  ReportPage,
+  ReportQuery,
   AdminSession,
   AdminSettings,
   AdminUser,
@@ -29,7 +30,7 @@ export interface AdminGateway {
   listUserOptions(): Promise<UserOption[]>
   updateUser(userId: string, patch: UserPatch): Promise<AdminUser>
   setSubscription(userId: string, planId: string, active: boolean): Promise<AdminUser>
-  listReports(): Promise<AdminReport[]>
+  listReports(query: ReportQuery): Promise<ReportPage>
   listNotifications(query: NotificationQuery): Promise<NotificationPage>
   createNotification(input: Omit<AdminNotification, 'id' | 'createdAt'>): Promise<AdminNotification>
   listEmails(query: EmailQuery): Promise<EmailPage>
