@@ -11,6 +11,7 @@ import type {
   AdminNotification,
   AdminOverview,
   AdminPayment,
+  AdminProfile,
   ReportPage,
   ReportQuery,
   AdminSession,
@@ -81,4 +82,8 @@ export const httpAdminGateway: AdminGateway = {
   savePlans: (plans) => apiClient.put<PlanOption[]>(ADMIN_ENDPOINTS.plans, { plans }, { headers: authHeaders() }),
   savePaymentMethods: (methods) =>
     apiClient.put<PaymentMethodOption[]>(ADMIN_ENDPOINTS.paymentMethods, { methods }, { headers: authHeaders() }),
+  getProfile: () => apiClient.get<AdminProfile>(ADMIN_ENDPOINTS.profile, { headers: authHeaders() }),
+  updateProfile: (profile) => apiClient.put<AdminProfile>(ADMIN_ENDPOINTS.profile, profile, { headers: authHeaders() }),
+  updatePassword: (payload) =>
+    apiClient.put<{ message: string }>(ADMIN_ENDPOINTS.password, payload, { headers: authHeaders() }),
 }

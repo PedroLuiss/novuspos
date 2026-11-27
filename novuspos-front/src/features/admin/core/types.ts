@@ -227,6 +227,17 @@ export interface AdminSession {
   token: string
 }
 
+export interface AdminProfile {
+  name: string
+  email: string
+}
+
+export interface AdminPasswordPayload {
+  currentPassword: string
+  password: string
+  passwordConfirmation: string
+}
+
 export interface UserPatch {
   name?: string
   email?: string

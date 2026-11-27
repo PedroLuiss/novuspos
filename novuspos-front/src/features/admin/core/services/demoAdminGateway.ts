@@ -18,7 +18,9 @@ import type {
   AdminEmail,
   AdminNotification,
   AdminOverview,
+  AdminPasswordPayload,
   AdminPayment,
+  AdminProfile,
   AdminReport,
   AdminSettings,
   AdminUser,
@@ -343,5 +345,21 @@ export const demoAdminGateway: AdminGateway = {
   async savePaymentMethods(methods: PaymentMethodOption[]): Promise<PaymentMethodOption[]> {
     await wait()
     return paymentMethodsStore.write(methods)
+  },
+
+  async getProfile(): Promise<AdminProfile> {
+    await wait()
+    return read('profile', { name: 'Dueño de NovusPOS', email: 'admin@novuspos.com' })
+  },
+
+  async updateProfile(profile: AdminProfile): Promise<AdminProfile> {
+    await wait()
+    write('profile', profile)
+    return profile
+  },
+
+  async updatePassword(_payload: AdminPasswordPayload): Promise<{ message: string }> {
+    await wait()
+    return { message: 'Contraseña actualizada correctamente.' }
   },
 }

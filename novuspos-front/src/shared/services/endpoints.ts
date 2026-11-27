@@ -135,4 +135,7 @@ export const ADMIN_ENDPOINTS = {
   plans: '/admin/plans',
   /** PUT reemplaza el catálogo completo de métodos y cuentas de cobro. */
   paymentMethods: '/admin/payment-methods',
+  /** Perfil del super administrador. */
+  profile: '/admin/profile',
+  password: '/admin/profile/password',
 } as const

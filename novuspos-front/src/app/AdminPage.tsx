@@ -8,6 +8,7 @@ import { NotificationsPage } from '@/features/admin/modules/notifications'
 import { PaymentsPage } from '@/features/admin/modules/payments'
 import { PlansPage } from '@/features/admin/modules/plans'
 import { ReportsPage } from '@/features/admin/modules/reports'
+import { ProfilePage } from '@/features/admin/modules/profile'
 import { SettingsPage } from '@/features/admin/modules/settings'
 import { UsersPage } from '@/features/admin/modules/users'
 
@@ -24,6 +25,7 @@ const SECTION_VIEWS: Record<AdminSection, ComponentType> = {
   notifications: NotificationsPage,
   emails: EmailsPage,
   settings: SettingsPage,
+  profile: ProfilePage,
 }
 
 /** Panel del dueño: compone el layout maestro y el módulo solicitado. */

@@ -1,16 +1,9 @@
-import { navigate } from '@/shared/router/navigation'
 import { MS } from '@/shared/ui/MS'
 import { ADMIN_SECTION_GROUPS, type AdminSection } from '../config/adminSections'
 import { getAdminLoginPath } from '@/features/admin/core/lib/adminSettings'
-import { adminSessionStore } from '@/features/admin/core/lib/adminSession'
 
 /** Navegación del dueño: agrupada y con acento activo. */
 export function AdminSidebar({ section, onNavigate }: { section: AdminSection; onNavigate?: () => void }) {
-  const session = adminSessionStore.read()
-  const logout = () => {
-    adminSessionStore.clear()
-    navigate('/auth/login', { replace: true })
-  }
 
   return (
     <div className="flex h-full w-[272px] flex-col justify-between bg-admin-ink text-white">
@@ -63,14 +56,6 @@ export function AdminSidebar({ section, onNavigate }: { section: AdminSection; o
         <a href="/panel" className="flex items-center gap-space-xs rounded-lg px-space-xs py-1.5 font-body-sm text-body-sm text-[#aebce0] hover:bg-white/5 hover:text-white">
           <MS name="arrow_back" className="text-[16px]" /> Portal de clientes
         </a>
-        <button
-          type="button"
-          onClick={logout}
-          className="flex items-center gap-space-xs rounded-lg px-space-xs py-1.5 text-left font-body-sm text-body-sm text-[#aebce0] hover:bg-white/5 hover:text-[#ffdad6]"
-        >
-          <MS name="logout" className="text-[16px]" /> Cerrar sesión maestra
-        </button>
-        <span className="truncate pt-space-xs font-label-sm text-label-sm text-[#7f96cf]">{session?.email ?? 'Dueño de NovusPOS'}</span>
       </div>
     </div>
   )

@@ -5,6 +5,8 @@ import type {
   AdminEmail,
   AdminNotification,
   AdminOverview,
+  AdminPasswordPayload,
+  AdminProfile,
   EmailPage,
   EmailQuery,
   NotificationPage,
@@ -48,4 +50,7 @@ export interface AdminGateway {
   savePlans(plans: PlanOption[]): Promise<PlanOption[]>
   /** Reemplaza el catálogo completo de cuentas y métodos que ve el usuario al pagar. */
   savePaymentMethods(methods: PaymentMethodOption[]): Promise<PaymentMethodOption[]>
+  getProfile(): Promise<AdminProfile>
+  updateProfile(profile: AdminProfile): Promise<AdminProfile>
+  updatePassword(payload: AdminPasswordPayload): Promise<{ message: string }>
 }

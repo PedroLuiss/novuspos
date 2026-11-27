@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminOverviewController;
 use App\Http\Controllers\Api\V1\Admin\AdminPaymentController;
 use App\Http\Controllers\Api\V1\Admin\AdminPaymentMethodController as AdminPaymentMethodControllerAlias;
 use App\Http\Controllers\Api\V1\Admin\AdminPlanController;
+use App\Http\Controllers\Api\V1\Admin\AdminProfileController;
 use App\Http\Controllers\Api\V1\Admin\AdminReportController;
 use App\Http\Controllers\Api\V1\Admin\AdminSettingsController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserController;
@@ -93,6 +94,10 @@ Route::prefix('v1')->group(function (): void {
             Route::put('/plans', [AdminPlanController::class, 'update']);
 
             Route::put('/payment-methods', [AdminPaymentMethodControllerAlias::class, 'update']);
+
+            Route::get('/profile', [AdminProfileController::class, 'show']);
+            Route::put('/profile', [AdminProfileController::class, 'update']);
+            Route::put('/profile/password', [AdminProfileController::class, 'updatePassword']);
         });
     });
 });

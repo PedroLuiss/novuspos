@@ -10,6 +10,7 @@ export type AdminSection =
   | 'notifications'
   | 'emails'
   | 'settings'
+  | 'profile'
 
 export interface AdminSectionMeta {
   key: AdminSection
@@ -29,6 +30,7 @@ export const ADMIN_SECTIONS: readonly AdminSectionMeta[] = [
   { key: 'notifications', navLabel: 'Notificaciones', headerLabel: 'Notificaciones', icon: 'notifications', href: '/administracion/notificaciones' },
   { key: 'emails', navLabel: 'Correos', headerLabel: 'Correos', icon: 'mail', href: '/administracion/correos' },
   { key: 'settings', navLabel: 'Ajustes', headerLabel: 'Ajustes', icon: 'settings', href: '/administracion/ajustes' },
+  { key: 'profile', navLabel: 'Mi Perfil', headerLabel: 'Mi Perfil', icon: 'person', href: '/administracion/perfil' },
 ]
 
 const SECTION_META = Object.fromEntries(ADMIN_SECTIONS.map((item) => [item.key, item])) as Record<AdminSection, AdminSectionMeta>

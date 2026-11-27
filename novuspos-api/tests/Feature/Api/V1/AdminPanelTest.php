@@ -154,4 +154,42 @@ class AdminPanelTest extends TestCase
             ],
         ])->assertOk()->assertJsonCount(1);
     }
+
+    #[Test]
+    public function super_admin_can_update_profile_and_password_with_rules(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        $this->getJson('/api/v1/admin/profile')
+            ->assertOk()
+            ->assertJsonPath('email', 'admin@novuspos.com');
+
+        $this->putJson('/api/v1/admin/profile', [
+            'name' => 'Admin Nuevo',
+            'email' => 'admin2@novuspos.com',
+        ])->assertOk()
+            ->assertJsonPath('name', 'Admin Nuevo')
+            ->assertJsonPath('email', 'admin2@novuspos.com');
+
+        $this->putJson('/api/v1/admin/profile/password', [
+            'currentPassword' => 'NovusPOS123*',
+            'password' => 'Abc@1234',
+            'passwordConfirmation' => 'Abc@1234',
+        ])->assertOk()
+            ->assertJsonPath('message', 'Contraseña actualizada correctamente.');
+
+        $this->putJson('/api/v1/admin/profile/password', [
+            'currentPassword' => 'Abc@1234',
+            'password' => 'short1!',
+            'passwordConfirmation' => 'short1!',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['password']);
+
+        $this->putJson('/api/v1/admin/profile/password', [
+            'currentPassword' => 'Abc@1234',
+            'password' => 'TooLong123!',
+            'passwordConfirmation' => 'TooLong123!',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['password']);
+    }
 }
