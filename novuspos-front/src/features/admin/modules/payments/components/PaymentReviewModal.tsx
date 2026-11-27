@@ -16,6 +16,8 @@ interface Props {
 /** Evaluación manual: comprobante, datos del pago y decisión del dueño. */
 export function PaymentReviewModal({ payment, methodLabel, busy, onClose, onReview }: Props) {
   const [note, setNote] = useState(payment.reviewNote ?? '')
+  const [imgError, setImgError] = useState(false)
+  const hasProof = Boolean(payment.proofUrl?.trim()) && !imgError
   const rows = [
     ['Usuario', payment.userName],
     ['Suscripción', payment.planName],
@@ -68,12 +70,30 @@ export function PaymentReviewModal({ payment, methodLabel, busy, onClose, onRevi
         <div className="flex flex-col gap-space-xs">
           <div className="flex items-center justify-between">
             <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Comprobante enviado</span>
-            <a href={payment.proofUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-label-sm text-label-sm font-semibold text-primary hover:underline">
-              <MS name="open_in_new" className="text-[15px]" /> Ampliar
-            </a>
+            {hasProof ? (
+              <a href={payment.proofUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-label-sm text-label-sm font-semibold text-primary hover:underline">
+                <MS name="open_in_new" className="text-[15px]" /> Ampliar
+              </a>
+            ) : (
+              <span className="font-label-sm text-label-sm text-on-surface-variant">No disponible</span>
+            )}
           </div>
           <div className="rounded-xl border border-outline-variant/50 bg-surface-container-low p-space-xs">
-            <img src={payment.proofUrl} alt="Comprobante del pago" className="mx-auto max-h-64 w-full rounded-lg object-contain" />
+            {hasProof ? (
+              <img
+                src={payment.proofUrl}
+                alt="Comprobante del pago"
+                className="mx-auto max-h-64 w-full rounded-lg object-contain"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="flex min-h-64 flex-col items-center justify-center gap-space-xs rounded-lg bg-surface-container/60 text-on-surface-variant">
+                <MS name={payment.proofUrl?.trim() ? 'broken_image' : 'receipt_long'} className="text-[40px] text-outline" />
+                <span className="font-body-sm text-body-sm font-medium">
+                  {payment.proofUrl?.trim() ? 'No se pudo cargar el comprobante' : 'Sin comprobante adjunto'}
+                </span>
+              </div>
+            )}
           </div>
           <AdminBadge tone={payment.status === 'approved' ? 'success' : payment.status === 'pending' ? 'warning' : 'error'}>
             {payment.status === 'approved' ? 'Aprobado' : payment.status === 'pending' ? 'Pendiente' : 'Rechazado'}
