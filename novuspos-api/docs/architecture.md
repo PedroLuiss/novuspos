@@ -4,33 +4,58 @@
 
 ```text
 app/
-  Http/Controllers/Api/V1/   # Controladores por versión/módulo
-  Models/                    # Modelos Eloquent
-  Support/                   # Helpers/clases de soporte (ej. defaults)
-bootstrap/app.php            # Registro de rutas web/api/console/health
-routes/api.php               # Rutas API v1
+  Contracts/Repositories/     # Interfaces de repositorios
+  Repositories/               # Implementaciones Eloquent
+  Services/                   # Lógica de negocio por módulo
+    Auth/
+    Backup/
+    Billing/
+    Dashboard/
+    ExchangeRate/
+    Landing/
+    Support/
+  Http/
+    Controllers/Api/V1/       # Controladores delgados por módulo
+    Requests/Api/V1/          # Form Requests de validación
+    Resources/Api/V1/         # API Resources / transformación JSON
+  Models/                     # Modelos Eloquent
+  Providers/
+    RepositoryServiceProvider.php  # Bindings interface -> implementation
+  Support/                    # Helpers (ej. LandingDefaults)
+bootstrap/app.php             # Registro de rutas web/api/console/health
+routes/api.php                # Rutas API v1
 database/
-  migrations/                # Cambios de esquema
-  data/                      # Datos estáticos (ej. landing-defaults.json)
+  migrations/                 # Cambios de esquema
+  data/                       # Datos estáticos (ej. landing-defaults.json)
   seeders/
   factories/
-docs/                        # Documentación para agentes/desarrolladores
-tests/Feature/Api/V1/        # Tests por módulo
+docs/                         # Documentación para agentes/desarrolladores
+tests/Feature/Api/V1/         # Tests por módulo
 ```
+
+## Patrón de diseño
+
+- **Controller**: recibe request, delega a Service, retorna JSON. Sin lógica de negocio.
+- **Service**: orquesta casos de uso, reglas, composición de repositorios.
+- **Repository Interface** (`Contracts/Repositories`): contrato de acceso a datos.
+- **Repository** (`Repositories`): implementación Eloquent del contrato.
+- **Binding**: `RepositoryServiceProvider` registra `interface => implementation`.
+
+Esto permite cambiar la fuente de datos, testear con mocks y mantener controladores pequeños.
 
 ## Versionado y rutas
 
 - Base: `/api/v1`.
 - Rutas públicas: sin middleware auth.
 - Rutas protegidas: `auth:sanctum` (Bearer token).
-- Contratos deben alinearse con `novuspos-front/src/shared/services/endpoints.ts`.
+- Contratos alineados con `novuspos-front/src/shared/services/endpoints.ts`.
 
 ## Autenticación
 
-- **Planeada/contratada**: Sanctum Personal Access Tokens.
-- El front envía `Authorization: Bearer <token>`.
+- Sanctum Personal Access Tokens.
+- Front envía `Authorization: Bearer <token>`.
 - Respuesta de login/register/reset: `{ token, user }`.
-- `user` esperado por front: `{ id, email, organizationName, role }`.
+- `user`: `{ id, email, organizationName, role }`.
 
 ## CORS
 
@@ -39,7 +64,7 @@ tests/Feature/Api/V1/        # Tests por módulo
 
 ## Formato de respuestas
 
-- Éxito: JSON con recurso o `{ data/config/... }` según contrato del módulo.
+- Éxito: JSON con recurso o shape esperado por el front.
 - Validación: 422 con estructura estándar Laravel (`message`, `errors`).
 - No autenticado: 401.
 - No encontrado: 404.

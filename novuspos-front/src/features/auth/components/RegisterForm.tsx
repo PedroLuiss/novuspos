@@ -1,25 +1,68 @@
+﻿import { useState } from 'react'
 import { businessSectors } from '@/features/auth/data/auth-data'
+import type { RegisterCredentials } from '@/features/auth/types'
+import type { ValidationIssues } from '@/shared/services/apiClient'
 import { MS } from '@/shared/ui/MS'
 import { PasswordField, SelectField, TextField } from './AuthFields'
 
-/** Formulario de registro / activar licencia (réplica de Stitch). */
-export function RegisterForm({ onSubmit }: { onSubmit: () => void }) {
+interface RegisterFormProps {
+  onSubmit: (credentials: RegisterCredentials) => void
+  fieldErrors?: ValidationIssues
+  formError?: string | null
+  isSubmitting?: boolean
+}
+
+/** Formulario de registro conectado a la API. */
+export function RegisterForm({ onSubmit, fieldErrors = {}, formError, isSubmitting = false }: RegisterFormProps) {
+  const [name, setName] = useState('')
+  const [organizationName, setOrganizationName] = useState('')
+  const [businessSector, setBusinessSector] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
   return (
     <form
       className="space-y-space-sm"
       onSubmit={(event) => {
         event.preventDefault()
-        onSubmit()
+        if (isSubmitting) return
+        onSubmit({
+          name,
+          organization_name: organizationName,
+          business_sector: businessSector,
+          email,
+          password,
+        })
       }}
     >
+      {formError && (
+        <div className="p-space-sm rounded-lg bg-error-container text-on-error-container font-body-sm text-body-sm" role="alert">
+          {formError}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
-        <TextField id="regName" label="Nombre y Apellido" icon="person" placeholder="Ej. Roberto Morales" required />
+        <TextField
+          id="regName"
+          label="Nombre y Apellido"
+          icon="person"
+          placeholder="Ej. Roberto Morales"
+          required
+          value={name}
+          onChange={setName}
+          error={fieldErrors.name?.[0]}
+          disabled={isSubmitting}
+        />
         <TextField
           id="regBusiness"
           label="Nombre de tu Negocio / Tienda"
           icon="storefront"
           placeholder="Ej. Abarrotes San Juan"
           required
+          value={organizationName}
+          onChange={setOrganizationName}
+          error={fieldErrors.organization_name?.[0] ?? fieldErrors.business?.[0]}
+          disabled={isSubmitting}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-space-sm">
@@ -29,47 +72,43 @@ export function RegisterForm({ onSubmit }: { onSubmit: () => void }) {
           icon="category"
           required
           options={[{ value: '', label: 'Selecciona el tipo de comercio' }, ...businessSectors]}
+          value={businessSector}
+          onChange={setBusinessSector}
+          error={fieldErrors.business_sector?.[0] ?? fieldErrors.sector?.[0]}
+          disabled={isSubmitting}
         />
         <TextField
           id="regEmail"
           label="Correo Electrónico"
-          icon="mail"
           type="email"
-          placeholder="admin@tunegocio.com"
+          icon="mail"
+          placeholder="correo@ejemplo.com"
           required
+          value={email}
+          onChange={setEmail}
+          error={fieldErrors.email?.[0]}
+          disabled={isSubmitting}
         />
       </div>
       <PasswordField
         id="regPassword"
-        label="Contraseña Maestra del Sistema"
-        hint="Mínimo 8 caracteres"
-        placeholder="Crea una contraseña segura"
+        label="Crear Contraseña"
+        placeholder="Mínimo 8 caracteres, números y letras"
         required
+        value={password}
+        onChange={setPassword}
+        error={fieldErrors.password?.[0]}
+        disabled={isSubmitting}
       />
-      <div className="flex items-start gap-space-xs pt-1">
-        <input
-          id="termsCheck"
-          type="checkbox"
-          required
-          className="mt-1 w-4 h-4 rounded text-primary focus:ring-primary cursor-pointer accent-primary"
-        />
-        <label htmlFor="termsCheck" className="font-body-sm text-body-sm text-on-surface-variant cursor-pointer">
-          Acepto los{' '}
-          <a className="text-primary font-semibold hover:underline" href="/">
-            Términos de Servicio
-          </a>{' '}
-          y la política de privacidad de datos comerciales de NovusPOS.
-        </label>
-      </div>
-      <div className="pt-space-xs">
-        <button
-          type="submit"
-          className="w-full h-12 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-space-xs shadow-md hover:shadow-lg transition-all transform active:scale-[0.99]"
-        >
-          <MS name="rocket_launch" />
-          <span>Crear Cuenta y Descargar NovusPOS</span>
-        </button>
-      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="group flex items-center justify-center gap-space-sm w-full h-12 rounded-xl bg-primary font-label-md text-label-md text-on-primary hover:bg-primary/90 active:scale-[0.98] transition-all shadow-lg shadow-primary/20 disabled:opacity-60 disabled:pointer-events-none"
+      >
+        {isSubmitting ? 'Creando cuenta...' : 'Crear mi cuenta en NovusPOS'}
+        {!isSubmitting && <MS name="arrow_forward" className="text-[20px] group-hover:translate-x-1 transition-transform" />}
+      </button>
     </form>
   )
 }

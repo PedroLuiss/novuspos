@@ -1,5 +1,6 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useLogin } from '@/features/auth/hooks/useLogin'
+import { useRegister } from '@/features/auth/hooks/useRegister'
 import type { AuthMode } from '@/features/auth/types'
 import { MS } from '@/shared/ui/MS'
 import { LoginForm } from './LoginForm'
@@ -10,128 +11,106 @@ const tabActive =
 const tabIdle =
   'px-space-md py-2 rounded-lg font-label-md text-label-md text-on-surface-variant transition-all hover:text-on-surface'
 
-interface RegisterAlert {
-  title: string
-  description: string
-}
-
-/** Columna derecha del split (presentacional): tabs, formularios y accesos alternos. */
+/** Columna derecha del split: tabs, formularios y accesos alternos. */
 export function AuthFormPanel({ initialMode }: { initialMode: AuthMode }) {
   const [mode, setMode] = useState<AuthMode>(initialMode)
-  const [alert, setAlert] = useState<RegisterAlert | null>(null)
   const login = useLogin()
-
-  const switchMode = (next: AuthMode) => {
-    setMode(next)
-    setAlert(null)
-  }
+  const register = useRegister()
 
   return (
     <div className="lg:col-span-7 p-space-md lg:p-space-xl flex flex-col justify-center bg-surface-container-lowest">
       {/* Tabs registro / inicio de sesión */}
-      <div className="flex items-center justify-between mb-space-md">
-        <div className="inline-flex p-1 rounded-lg bg-surface-container">
-          <button type="button" className={mode === 'register' ? tabActive : tabIdle} onClick={() => switchMode('register')}>
-            Crear Cuenta (30 Días Gratis)
+      <div className="flex items-center justify-between mb-space-lg">
+        <div className="inline-flex p-1 bg-surface-container-low rounded-xl">
+          <button
+            type="button"
+            onClick={() => setMode('register')}
+            className={mode === 'register' ? tabActive : tabIdle}
+          >
+            Crear cuenta
           </button>
-          <button type="button" className={mode === 'login' ? tabActive : tabIdle} onClick={() => switchMode('login')}>
-            Iniciar Sesión
+          <button
+            type="button"
+            onClick={() => setMode('login')}
+            className={mode === 'login' ? tabActive : tabIdle}
+          >
+            Iniciar sesión
           </button>
-        </div>
-        <div className="hidden sm:flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm">
-          <MS name="check_circle" className="text-[18px] text-secondary" />
-          <span>Sin tarjeta requerida</span>
         </div>
       </div>
 
-      {/* Banner de prueba de 30 días (solo registro) */}
-      {mode === 'register' && (
-        <div className="mb-space-md p-space-sm rounded-lg bg-secondary-container/30 flex items-center justify-between">
-          <div className="flex items-center gap-space-xs">
-            <MS name="card_giftcard" className="text-secondary text-[22px]" />
-            <div>
-              <p className="font-label-md text-label-md text-on-secondary-container">Licencia de Prueba Gratuita Activa</p>
-              <p className="font-body-sm text-body-sm text-secondary">
-                30 días de acceso total sin costo. Luego sólo <strong className="font-semibold">$4.99 USD/mes</strong>.
-              </p>
-            </div>
-          </div>
-          <span className="font-label-sm text-label-sm bg-secondary-container text-on-secondary-container px-2.5 py-1 rounded-full font-bold">
-            100% GRATIS
-          </span>
-        </div>
-      )}
+      {/* Encabezado */}
+      <div className="mb-space-md">
+        <h1 className="font-headline-lg text-headline-lg text-on-surface mb-space-xs">
+          {mode === 'register' ? 'Comienza a vender con NovusPOS' : 'Inicia sesión en tu cuenta'}
+        </h1>
+        <p className="font-body-md text-body-md text-on-surface-variant">
+          {mode === 'register'
+            ? 'Registra tu comercio y accede al panel para gestionar tu suscripción y respaldo.'
+            : 'Ingresa tus credenciales para acceder al panel de tu comercio.'}
+        </p>
+      </div>
 
-      {mode === 'register' ? (
-        <RegisterForm
-          onSubmit={() =>
-            setAlert({
-              title: '¡Cuenta creada exitosamente!',
-              description: 'Tu licencia de prueba de 30 días está activa. Descargando NovusPOS para Windows…',
-            })
-          }
-        />
-      ) : (
+      {/* Formulario activo */}
+      {mode === 'login' ? (
         <LoginForm
           onSubmit={login.submit}
           fieldErrors={login.fieldErrors}
           formError={login.formError}
           isSubmitting={login.isSubmitting}
         />
+      ) : (
+        <RegisterForm
+          onSubmit={register.submit}
+          fieldErrors={register.fieldErrors}
+          formError={register.formError}
+          isSubmitting={register.isSubmitting}
+        />
       )}
 
-      {/* Divisor con texto */}
-      <div className="relative my-space-md flex items-center justify-center">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full h-px bg-surface-container-highest" />
-        </div>
-        <span className="relative px-space-sm bg-surface-container-lowest font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
-          O si lo prefieres
+      {/* Separador */}
+      <div className="relative flex items-center py-space-md">
+        <div className="flex-grow border-t border-outline-variant/20" />
+        <span className="mx-space-sm font-label-sm text-label-sm uppercase tracking-widest text-outline">
+          O continúa con
         </span>
+        <div className="flex-grow border-t border-outline-variant/20" />
       </div>
 
-      {/* Acciones alternas */}
-      <div className="grid grid-cols-2 gap-space-sm">
-        <a
-          href="/#descargar"
-          className="h-10 px-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-space-xs transition-colors shadow-sm"
+      {/* Botones sociales */}
+      <div className="grid grid-cols-2 gap-space-sm mb-space-lg">
+        <button
+          type="button"
+          className="flex items-center justify-center gap-space-xs h-11 rounded-xl border border-outline-variant/20 bg-surface-container-low font-label-md text-label-md text-on-surface transition-all hover:bg-surface-container-high"
         >
-          <MS name="download" className="text-[18px]" />
-          <span>Descargar para Windows</span>
-        </a>
-        <a
-          href="/#interfaz-en-vivo"
-          className="h-10 px-space-sm rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center gap-space-xs transition-colors shadow-sm"
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt=""
+            className="w-5 h-5"
+          />
+          Google
+        </button>
+        <button
+          type="button"
+          className="flex items-center justify-center gap-space-xs h-11 rounded-xl border border-outline-variant/20 bg-surface-container-low font-label-md text-label-md text-on-surface transition-all hover:bg-surface-container-high"
         >
-          <MS name="play_circle" className="text-[18px]" />
-          <span>Ver capturas del sistema</span>
+          <MS name="terminal" className="text-[20px] text-on-surface-variant" />
+          Microsoft
+        </button>
+      </div>
+
+      {/* Nota legal */}
+      <p className="text-center font-body-sm text-body-sm text-outline max-w-sm mx-auto">
+        Al continuar, aceptas los{' '}
+        <a href="#" className="text-primary hover:underline">
+          Términos de Servicio
+        </a>{' '}
+        y la{' '}
+        <a href="#" className="text-primary hover:underline">
+          Política de Privacidad
         </a>
-      </div>
-
-      {/* Confirmación del registro */}
-      {alert && (
-        <div className="mt-space-md p-space-sm rounded-lg bg-secondary-container text-on-secondary-container flex items-center gap-space-sm animate-pulse">
-          <MS name="task_alt" className="text-[24px]" />
-          <div className="flex flex-col">
-            <span className="font-label-md text-label-md">{alert.title}</span>
-            <span className="font-body-sm text-body-sm">{alert.description}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Ayuda inmediata */}
-      <div className="mt-space-md pt-space-sm flex flex-col sm:flex-row items-center justify-between text-on-surface-variant font-body-sm text-body-sm gap-2">
-        <span>
-          ¿Dudas con la instalación?{' '}
-          <a className="text-primary font-semibold hover:underline" href="/">
-            Hablar con un asesor técnico
-          </a>
-        </span>
-        <div className="flex items-center gap-1 text-outline">
-          <MS name="lock" className="text-[16px]" />
-          <span>Tus datos protegidos</span>
-        </div>
-      </div>
+        .
+      </p>
     </div>
   )
 }

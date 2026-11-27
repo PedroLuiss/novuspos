@@ -31,17 +31,23 @@ API local por defecto: `http://localhost:8000/api/v1`.
 
 - **Versionado**: rutas bajo `/api/v1`.
 - **Auth**: Bearer token (`Authorization: Bearer <token>`) para endpoints protegidos.
+- **Patrón**: Controllers delgados → Services (lógica) → Repositories/Contracts (acceso a datos). Bindings en `App\Providers\RepositoryServiceProvider`.
 - **JSON**: respuestas JSON; errores de validación en formato Laravel 422 (`message`, `errors`).
 - **Contratos front**: revisar `novuspos-front/src/shared/services/endpoints.ts` antes de cambiar rutas o shapes.
-- **Migraciones**: toda cambio de esquema va en migración. No editar migraciones ya ejecutadas en entornos compartidos; crear una nueva.
+- **Migraciones**: todo cambio de esquema va en migración.
 - **Docs por módulo**: al crear/cambiar un endpoint, actualizar `docs/modules/<modulo>.md`.
 
 ## Mapa de módulos
 
 | Módulo | Estado | Doc | Endpoints principales |
 |---|---|---|---|
-| Landing | Implementado (base) | [modules/landing.md](modules/landing.md) | `GET /landing/config` |
-| Auth | Contrato definido / pendiente | [modules/auth.md](modules/auth.md) | `/auth/login`, `/auth/register`, `/auth/me`, `/auth/logout`, `/auth/forgot-password`, `/auth/reset-password` |
+| Landing | Implementado | [modules/landing.md](modules/landing.md) | `GET /landing/config` |
+| Auth | Implementado (base) | [modules/auth.md](modules/auth.md) | `/auth/login`, `/auth/register`, `/auth/me`, `/auth/logout`, `/auth/forgot-password`, `/auth/reset-password` |
+| Dashboard | Implementado | [modules/dashboard.md](modules/dashboard.md) | `GET /panel/overview` |
+| Billing | Implementado (base) | [modules/billing.md](modules/billing.md) | `/billing/plans`, `/billing/payment-methods`, `/billing/subscription`, `/billing/payments` |
+| Backups | Implementado | [modules/backups.md](modules/backups.md) | `/backups/latest`, `/backups` |
+| Support | Implementado | [modules/support.md](modules/support.md) | `POST /support/tickets` |
+| Exchange Rate | Implementado | [modules/exchange-rate.md](modules/exchange-rate.md) | `GET /billing/exchange-rate` |
 
 ## Documentación
 

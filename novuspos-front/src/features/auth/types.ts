@@ -7,6 +7,14 @@ export interface LoginCredentials {
   password: string
 }
 
+export interface RegisterCredentials {
+  name: string
+  organization_name: string
+  business_sector: string
+  email: string
+  password: string
+}
+
 /** Solicitud de enlace de recuperación. */
 export interface ForgotPasswordRequest {
   email: string
