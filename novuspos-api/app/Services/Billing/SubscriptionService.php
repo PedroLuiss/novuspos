@@ -56,6 +56,13 @@ class SubscriptionService
     public function submitPayment(User $user, array $data): array
     {
         $subscription = $this->ensureSubscription($user);
+
+        if (! $user->hasVerifiedEmail() && $this->isExpired($subscription)) {
+            throw ValidationException::withMessages([
+                'email' => ['Debes verificar tu correo antes de comprar una suscripción.'],
+            ]);
+        }
+
         $plan = $this->planRepository->findBySlug((string) $data['planId']);
 
         if (! $plan) {

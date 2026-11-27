@@ -6,6 +6,7 @@ use App\Contracts\Repositories\UserRepositoryInterface;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -64,6 +65,62 @@ class AuthService
     public function logout(User $user): void
     {
         $user->currentAccessToken()?->delete();
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array{user: array<string, mixed>}
+     */
+    public function updateProfile(User $user, array $data): array
+    {
+        $user = $this->userRepository->update($user, [
+            'name' => $data['name'],
+            'organization_name' => $data['organization_name'],
+            'business_sector' => $data['business_sector'] ?? null,
+        ]);
+
+        return ['user' => (new UserResource($user))->resolve()];
+    }
+
+    /**
+     * @return array{message: string}
+     */
+    public function sendEmailVerificationNotification(User $user): array
+    {
+        if ($user->hasVerifiedEmail()) {
+            return ['message' => 'Tu correo ya está verificado.'];
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return ['message' => 'Te enviamos un enlace de verificación a tu correo.'];
+    }
+
+    /**
+     * @return array{user: array<string, mixed>, message: string}
+     */
+    public function verifyEmail(User $user, string $hash): array
+    {
+        if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+            throw ValidationException::withMessages([
+                'email' => ['El enlace de verificación no es válido.'],
+            ]);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return [
+                'message' => 'Tu correo ya está verificado.',
+                'user' => (new UserResource($user))->resolve(),
+            ];
+        }
+
+        $user->markEmailAsVerified();
+        event(new Verified($user));
+
+        return [
+            'message' => 'Correo verificado correctamente.',
+            'user' => (new UserResource($user->fresh()))->resolve(),
+        ];
     }
 
     public function forgotPassword(string $email): void

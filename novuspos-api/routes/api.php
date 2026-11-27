@@ -20,10 +20,15 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
         Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+            ->name('verification.verify');
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/me', [AuthController::class, 'me']);
             Route::post('/logout', [AuthController::class, 'logout']);
+            Route::put('/profile', [AuthController::class, 'updateProfile']);
+            Route::post('/email/verification-notification', [AuthController::class, 'sendEmailVerification'])
+                ->middleware('throttle:6,1');
         });
     });
 

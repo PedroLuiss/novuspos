@@ -16,4 +16,12 @@ class UserRepository implements UserRepositoryInterface
     {
         return User::query()->create($attributes);
     }
+
+    public function update(User $user, array $attributes): User
+    {
+        $user->fill($attributes);
+        $user->save();
+
+        return $user;
+    }
 }

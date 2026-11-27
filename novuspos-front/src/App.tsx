@@ -5,6 +5,7 @@ import { ForgotPasswordPage } from '@/app/ForgotPasswordPage'
 import { LandingPage } from '@/app/LandingPage'
 import { PanelPage } from '@/app/PanelPage'
 import { ResetPasswordPage } from '@/app/ResetPasswordPage'
+import { VerifyEmailPage } from '@/app/VerifyEmailPage'
 import { resolveAppRoute } from '@/app/routeResolver'
 import { AdminGate, AdminLoginPage } from '@/features/admin'
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute'
@@ -35,6 +36,8 @@ export default function App() {
   if (route.view === 'recovery') {
     return route.mode === 'request' ? <ForgotPasswordPage /> : <ResetPasswordPage key={search} />
   }
+
+  if (route.view === 'verify-email') return <VerifyEmailPage />
 
   if (route.view === 'panel') {
     return (

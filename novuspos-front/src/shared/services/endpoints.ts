@@ -6,6 +6,8 @@ export const AUTH_ENDPOINTS = {
   logout: '/auth/logout',
   forgotPassword: '/auth/forgot-password',
   resetPassword: '/auth/reset-password',
+  profile: '/auth/profile',
+  sendEmailVerification: '/auth/email/verification-notification',
 } as const
 
 /** Contrato de rutas de facturación y suscripciones. */

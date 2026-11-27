@@ -4,9 +4,12 @@ export type UserRole = string
 
 export interface AuthUser {
   id: string
+  name?: string
   email: string
   organizationName: string
+  businessSector?: string | null
   role: UserRole
+  emailVerifiedAt?: string | null
 }
 
 export type AuthUserUpdate = Partial<AuthUser>

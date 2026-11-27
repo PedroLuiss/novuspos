@@ -55,10 +55,11 @@ Gestiona el catálogo de planes, métodos de pago, suscripción actual del usuar
 - Repos: `PlanRepository`, `PaymentMethodRepository`, `SubscriptionRepository`, `PaymentRepository`
 - Requests: `StorePaymentRequest`, `ReviewPaymentRequest`
 - Seeders: `PlanSeeder`, `PaymentMethodSeeder`
-- Tests: `tests/Feature/Api/V1/PanelEndpointsTest.php`
+- Tests: `tests/Feature/Api/V1/PanelEndpointsTest.php`, `tests/Feature/Api/V1/ProfileAndVerificationTest.php`
 
 ## Reglas
 
 - No cambiar de plan si la suscripción actual no está vencida (valida backend).
 - Referencia + banco duplicados para el mismo usuario se rechazan.
 - Pago aprobado activa suscripción, actualiza plan/monto y recalcula `renewsAt` según intervalo.
+- **Verificación de correo para compra tras prueba:** al registrarse se crea una suscripción activa de 30 días (prueba). Durante la prueba no se exige correo verificado. Si la suscripción está vencida/expirada y el usuario intenta reportar un pago, el backend responde 422 exigiendo correo verificado.

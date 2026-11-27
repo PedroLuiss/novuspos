@@ -1,12 +1,36 @@
+﻿import { useEffect, useRef, useState } from 'react'
 import { panelNavItems } from '@/features/panel/data/panel-data'
 import { useAuth } from '@/shared/hooks/useAuth'
+import { navigate } from '@/shared/router/navigation'
 import { usePathname } from '@/shared/router/useRouter'
 import { MS } from '@/shared/ui/MS'
 
-/** Barra lateral y cabecera fija del panel (réplica de Stitch). */
+/** Barra lateral y cabecera fija del panel. */
 export function PanelSidebar() {
   const { user, logout } = useAuth()
   const pathname = usePathname()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const onPointerDown = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false)
+    }
+
+    document.addEventListener('mousedown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [menuOpen])
 
   return (
     <>
@@ -71,28 +95,62 @@ export function PanelSidebar() {
           <button className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors">
             <MS name="sync" className="text-[20px]" />
           </button>
-          <div className="flex items-center gap-space-sm pl-space-xs">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-              <MS name="person" className="text-on-primary text-[18px]" />
-            </div>
-            <div className="hidden sm:flex flex-col text-left">
-              <span className="font-label-md text-label-md text-on-surface font-semibold leading-tight">
-                {user?.organizationName ?? 'Administrador'}
-              </span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">
-                {user?.email ?? 'Cuenta principal'}
-              </span>
-            </div>
+
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((open) => !open)}
+              className="flex items-center gap-space-sm pl-space-xs rounded-lg hover:bg-surface-container-low transition-colors py-1 pr-2"
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+            >
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+                <MS name="person" className="text-on-primary text-[18px]" />
+              </div>
+              <div className="hidden sm:flex flex-col text-left">
+                <span className="font-label-md text-label-md text-on-surface font-semibold leading-tight">
+                  {user?.organizationName ?? user?.name ?? 'Administrador'}
+                </span>
+                <span className="font-label-sm text-label-sm text-on-surface-variant font-mono">
+                  {user?.email ?? 'Cuenta principal'}
+                </span>
+              </div>
+              <MS name={menuOpen ? 'expand_less' : 'expand_more'} className="text-on-surface-variant text-[18px]" />
+            </button>
+
+            {menuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface-container-lowest border border-outline-variant/20 shadow-[0_8px_24px_rgba(0,0,0,0.08)] py-1 z-50"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="w-full flex items-center gap-space-sm px-space-md py-space-sm text-left font-body-sm text-body-sm text-on-surface hover:bg-surface-container-low transition-colors"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    navigate('/panel/perfil')
+                  }}
+                >
+                  <MS name="person" className="text-[18px] text-on-surface-variant" />
+                  Mi perfil
+                </button>
+                <div className="my-1 border-t border-outline-variant/20" />
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="w-full flex items-center gap-space-sm px-space-md py-space-sm text-left font-body-sm text-body-sm text-error hover:bg-error-container/30 transition-colors"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    logout()
+                  }}
+                >
+                  <MS name="logout" className="text-[18px]" />
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={logout}
-            aria-label="Cerrar sesión"
-            title="Cerrar sesión"
-            className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors"
-          >
-            <MS name="logout" className="text-[20px]" />
-          </button>
         </div>
       </header>
     </>
