@@ -8,6 +8,7 @@ import { FieldGroup, LandingField } from './LandingField'
 interface Props {
   download: LandingDownload | null
   isUploading: boolean
+  uploadProgress: number
   onUpload: (file: File, version?: string) => Promise<LandingDownload | null>
   onDelete: () => Promise<boolean>
 }
@@ -28,11 +29,12 @@ function formatDate(value?: string): string {
 }
 
 /** Carga el instalador .exe del escritorio que la landing pública ofrece para descargar. */
-export function LandingDownloadEditor({ download, isUploading, onUpload, onDelete }: Props) {
+export function LandingDownloadEditor({ download, isUploading, uploadProgress, onUpload, onDelete }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [version, setVersion] = useState(download?.version ?? '')
   const [localError, setLocalError] = useState<string | null>(null)
   const [pendingDelete, setPendingDelete] = useState(false)
+  const [uploadingFile, setUploadingFile] = useState<{ name: string; size: number } | null>(null)
 
   useEffect(() => {
     setVersion(download?.version ?? '')
@@ -59,8 +61,13 @@ export function LandingDownloadEditor({ download, isUploading, onUpload, onDelet
       return
     }
 
-    const result = await onUpload(file, version)
-    if (result?.version) setVersion(result.version)
+    setUploadingFile({ name: file.name, size: file.size })
+    try {
+      const result = await onUpload(file, version)
+      if (result?.version) setVersion(result.version)
+    } finally {
+      setUploadingFile(null)
+    }
   }
 
   const handleDelete = async () => {
@@ -91,6 +98,41 @@ export function LandingDownloadEditor({ download, isUploading, onUpload, onDelet
       </div>
 
       {localError && <AdminAlert>{localError}</AdminAlert>}
+
+      {isUploading && (
+        <div className="rounded-xl border border-primary/20 bg-surface-container-lowest p-space-sm shadow-sm" role="status" aria-live="polite">
+          <div className="flex items-start gap-space-sm">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <MS name="cloud_upload" className="text-[22px]" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-space-sm">
+                <p className="truncate font-label-md text-label-md font-semibold text-on-surface">
+                  {uploadProgress >= 100 ? 'Procesando instalador' : 'Subiendo instalador'}
+                </p>
+                <span className="shrink-0 font-label-sm text-label-sm font-semibold text-primary">{Math.round(uploadProgress)}%</span>
+              </div>
+              <p className="truncate font-body-sm text-body-sm text-on-surface-variant">
+                {uploadingFile?.name ?? 'Archivo .exe'}
+                {uploadingFile ? ` · ${formatBytes(uploadingFile.size)}` : ''}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-space-sm">
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-surface-container-high">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-primary to-primary/80 transition-[width] duration-300 ease-out"
+                style={{ width: `${Math.min(100, Math.max(0, uploadProgress))}%` }}
+              />
+            </div>
+            <div className="mt-1.5 flex items-center justify-between gap-space-sm font-body-sm text-body-sm text-on-surface-variant">
+              <span>{uploadProgress >= 100 ? 'Verificando y publicando el archivo en el servidor…' : 'No cierres esta ventana hasta completar la carga.'}</span>
+              <span className="shrink-0">{uploadProgress >= 100 ? 'Casi listo' : 'En progreso'}</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       <FieldGroup title="Instalador publicado" description="Archivo que se ofrece en los botones de descarga de la landing.">
         {download ? (

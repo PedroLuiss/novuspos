@@ -22,6 +22,7 @@ export function useLandingEditor() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [isUploadingDownload, setIsUploadingDownload] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -106,10 +107,12 @@ export function useLandingEditor() {
 
   const uploadDownload = useCallback(async (file: File, version?: string) => {
     setIsUploadingDownload(true)
+    setDownloadProgress(0)
     setError(null)
     setSaved(false)
     try {
-      const download = await adminService.uploadLandingDownload(file, version)
+      const download = await adminService.uploadLandingDownload(file, version, setDownloadProgress)
+      setDownloadProgress(100)
       setDraft((current) => ({ ...current, download }))
       syncDownloadSnapshot(download)
       return download
@@ -177,6 +180,7 @@ export function useLandingEditor() {
     isLoading,
     isSaving,
     isUploadingDownload,
+    downloadProgress,
     saved,
     error,
     patch,

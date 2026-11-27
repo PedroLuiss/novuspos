@@ -72,11 +72,14 @@ export const httpAdminGateway: AdminGateway = {
     return normalizeLandingConfig(data)
   },
   saveLanding: (config) => apiClient.put<LandingConfig>(ADMIN_ENDPOINTS.landing, { config }, { headers: authHeaders() }),
-  async uploadLandingDownload(file, version) {
+  async uploadLandingDownload(file, version, onProgress) {
     const form = new FormData()
     form.append('file', file)
     if (version?.trim()) form.append('version', version.trim())
-    const payload = await apiClient.post<{ download: LandingConfig['download'] }>(ADMIN_ENDPOINTS.landingDownload, form, { headers: authHeaders() })
+    const payload = await apiClient.post<{ download: LandingConfig['download'] }>(ADMIN_ENDPOINTS.landingDownload, form, {
+      headers: authHeaders(),
+      onUploadProgress: onProgress,
+    })
     if (!payload.download) throw new Error('No se recibió el instalador.')
     return payload.download
   },

@@ -95,6 +95,7 @@ export function LandingBuilderPage() {
               <LandingDownloadEditor
                 download={editor.draft.download}
                 isUploading={editor.isUploadingDownload}
+                uploadProgress={editor.downloadProgress}
                 onUpload={editor.uploadDownload}
                 onDelete={editor.deleteDownload}
               />

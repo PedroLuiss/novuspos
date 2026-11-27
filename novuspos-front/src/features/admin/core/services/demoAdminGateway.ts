@@ -398,8 +398,10 @@ export const demoAdminGateway: AdminGateway = {
     return landingStore.write(config)
   },
 
-  async uploadLandingDownload(file: File, version?: string) {
+  async uploadLandingDownload(file: File, version?: string, onProgress?: (percent: number) => void) {
+    onProgress?.(15)
     await wait()
+    onProgress?.(70)
     const config = landingStore.read()
     const download = {
       url: URL.createObjectURL(file),
@@ -409,6 +411,7 @@ export const demoAdminGateway: AdminGateway = {
       updatedAt: new Date().toISOString(),
     }
     landingStore.write({ ...config, download })
+    onProgress?.(100)
     return download
   },
 
