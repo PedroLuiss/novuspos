@@ -1,7 +1,7 @@
-import { MS } from '@/shared/ui/MS'
 import { useDashboard } from '../hooks/useDashboard'
 import { AccessCard } from './AccessCard'
 import { DashboardBanner } from './DashboardBanner'
+import { DashboardSkeleton } from './DashboardSkeleton'
 import { LastBackupCard } from './LastBackupCard'
 
 /** Compone el panel general a partir de una sola carga de datos. */
@@ -9,12 +9,7 @@ export function DashboardSection() {
   const { summary, isLoading, error, refresh } = useDashboard()
 
   if (isLoading && !summary) {
-    return (
-      <div className="rounded-xl bg-surface-container-lowest p-space-xl shadow-sm flex items-center justify-center gap-space-xs text-on-surface-variant">
-        <MS name="progress_activity" className="animate-spin text-primary text-xl" />
-        <span className="font-body-md text-body-md">Cargando tu panel…</span>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   if (!summary) {

@@ -28,6 +28,7 @@ src/
 ├── shared/hooks/useLandingConfig.ts # config pública o borrador en /?preview=1
 ├── shared/lib/imageUpload.ts     # prepara imágenes subidas (data URL) para carrusel y comprobantes
 ├── shared/ui/MS.tsx              # icono Material Symbols (filled opcional)
+├── shared/ui/Skeleton.tsx        # primitivas MD3 de carga (panel de clientes y maestro)
 ├── features/auth/                # AuthBrandPanel, AuthFormPanel, formularios y datos
 ├── features/landing/
 │   ├── components/               # SiteHeader, Hero, HeroHeader, HeroMockup, KeyFeatures,
@@ -172,6 +173,10 @@ El diseño es MD3 con navegación agrupada en azul profundo (`--color-admin-ink`
 La navegación interna **no recarga la página**. `src/shared/router/navigation.ts` implementa un router mínimo sobre History API (`navigate`, `popstate` e interceptor global de `<a>` internos) y `src/shared/router/useRouter.ts` expone `usePathname()`/`useSearch()`; `App.tsx` vuelve a resolver la ruta en cada cambio sin depender de `react-router`. El interceptor respeta enlaces externos, `target="_blank"`, `download`, clics con modificadores y anclas `#` de la misma página. Las redirecciones de sesión y del bus HTTP también usan `navigate(..., { replace: true })`, y `PanelSidebar` resalta el item activo con `usePathname()`.
 
 Todos los módulos del panel maestro muestran skeletons MD3 mientras cargan: resumen, suscripciones, landing, pagos, usuarios, reportes, notificaciones, correos, ajustes, métodos de pago y el guardián de acceso. Las primitivas viven en `src/features/admin/components/ui/AdminSkeleton.tsx` y las variantes por módulo en `AdminModuleSkeletons.tsx`; `useAdminSettings` también expone `isLoading`. Ver skill §29 y contexto 09 §5.24.
+
+## Skeletons del panel de clientes
+
+Las cuatro rutas del portal también tienen skeletons MD3: `DashboardSkeleton`, `SubscriptionSkeleton`, `BackupSkeleton` y `SupportSkeleton`. Los tres primeros reemplazan a los spinners de los hooks de panel, suscripción y respaldos. Soporte no carga datos al entrar: su skeleton aparece mientras se envía el reporte, sin temporizadores artificiales. Las primitivas compartidas están en `src/shared/ui/Skeleton.tsx`; `AdminSkeleton.tsx` solo las re-exporta para no tocar el panel maestro. En el modal de pago hay skeletons anidados para los métodos de cobro y la tasa del día, y el catálogo de planes admite `isLoading`. Ver skill §30 y contexto 09 §5.25.
 
 ## Copy de la landing
 

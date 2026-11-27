@@ -171,6 +171,7 @@ export function PaySubscriptionModal({ subscription, plan, onClose, onPaid }: Pr
                     options={activeMethods}
                     value={draft.method}
                     error={errors.method}
+                    isLoading={isMethodsLoading}
                     onChange={(method) => patch({ method })}
                   />
                   {!isMethodsLoading && activeMethods.length === 0 && (

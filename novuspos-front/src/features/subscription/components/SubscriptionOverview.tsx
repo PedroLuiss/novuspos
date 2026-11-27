@@ -9,6 +9,7 @@ import { PaymentHistoryTable } from './PaymentHistoryTable'
 import { PaySubscriptionModal } from './PaySubscriptionModal'
 import { PlanCatalog } from './PlanCatalog'
 import { SubscriptionCard } from './SubscriptionCard'
+import { SubscriptionSkeleton } from './SubscriptionSkeleton'
 
 /** Contenedor del módulo: obtiene datos y coordina el modal con el historial. */
 export function SubscriptionOverview() {
@@ -29,12 +30,7 @@ export function SubscriptionOverview() {
   }
 
   if (isLoading && !overview) {
-    return (
-      <div className="rounded-xl bg-surface-container-lowest p-space-xl shadow-sm flex items-center justify-center gap-space-xs text-on-surface-variant">
-        <MS name="progress_activity" className="animate-spin text-primary text-xl" />
-        <span className="font-body-md text-body-md">Cargando tu suscripción…</span>
-      </div>
-    )
+    return <SubscriptionSkeleton />
   }
 
   if (!overview) {
@@ -78,6 +74,7 @@ export function SubscriptionOverview() {
         currentPlanId={overview.subscription.planId}
         canSwitch={canSwitchPlan(overview.subscription)}
         renewsAt={overview.subscription.renewsAt}
+        isLoading={isLoading && overview.plans.length === 0}
         onSelect={openPayment}
       />
       {plan && <SubscriptionCard subscription={overview.subscription} plan={plan} onPay={() => openPayment(plan)} />}

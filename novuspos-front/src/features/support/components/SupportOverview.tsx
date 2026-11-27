@@ -1,6 +1,7 @@
 import { MS } from '@/shared/ui/MS'
 import { useSupportForm } from '../hooks/useSupportForm'
 import { SupportForm } from './SupportForm'
+import { SupportSkeleton } from './SupportSkeleton'
 import { SupportSuccess } from './SupportSuccess'
 import { SupportTips } from './SupportTips'
 
@@ -22,6 +23,8 @@ export function SupportOverview() {
 
       {ticket ? (
         <SupportSuccess ticket={ticket} email={draft.email} onAgain={startAgain} />
+      ) : isSubmitting ? (
+        <SupportSkeleton />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md items-start">
           <div className="lg:col-span-8">

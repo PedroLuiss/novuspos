@@ -1,4 +1,4 @@
-import { MS } from '@/shared/ui/MS'
+import { Skeleton, SkeletonLines } from '@/shared/ui/Skeleton'
 
 interface Props {
   rateLabel: string | null
@@ -28,9 +28,14 @@ export function PaymentRateCard({
         Total a pagar en bolívares
       </span>
       {isLoading ? (
-        <span className="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-space-xs">
-          <MS name="progress_activity" className="animate-spin text-primary text-[16px]" /> Consultando la tasa del día…
-        </span>
+        <div
+          className="flex flex-col gap-space-xs pt-space-xs"
+          role="status"
+          aria-label="Consultando la tasa del día…"
+        >
+          <Skeleton className="h-8 w-44" />
+          <SkeletonLines widths={['70%', '52%']} />
+        </div>
       ) : totalLabel && rateLabel ? (
         <>
           <div className="flex items-baseline justify-between gap-space-xs">

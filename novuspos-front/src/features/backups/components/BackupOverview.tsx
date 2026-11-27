@@ -1,10 +1,15 @@
 import { MS } from '@/shared/ui/MS'
 import { useLatestBackup } from '../hooks/useLatestBackup'
 import { BackupCard } from './BackupCard'
+import { BackupSkeleton } from './BackupSkeleton'
 
 /** Módulo de Copias de Seguridad: solo la copia vigente. */
 export function BackupOverview() {
   const { backup, isLoading, error, refresh } = useLatestBackup()
+
+  if (isLoading && !backup) {
+    return <BackupSkeleton />
+  }
 
   return (
     <div className="flex flex-col gap-space-lg">
@@ -34,12 +39,7 @@ export function BackupOverview() {
         </div>
       )}
 
-      {isLoading && !backup ? (
-        <div className="rounded-xl bg-surface-container-lowest p-space-xl shadow-sm flex items-center justify-center gap-space-xs text-on-surface-variant">
-          <MS name="progress_activity" className="animate-spin text-primary text-xl" />
-          <span className="font-body-md text-body-md">Cargando tu copia…</span>
-        </div>
-      ) : backup ? (
+      {backup ? (
         <BackupCard backup={backup} />
       ) : (
         <div className="rounded-xl bg-surface-container-lowest p-space-lg shadow-sm font-body-md text-body-md text-on-surface-variant">
