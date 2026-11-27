@@ -83,7 +83,7 @@ export interface UserPage {
 }
 
 /** Lista ligera para los selectores de destinatarios de avisos y correos. */
-export type UserOption = Pick<AdminUser, 'id' | 'businessName'>
+export type UserOption = Pick<AdminUser, 'id' | 'businessName' | 'name' | 'email'>
 
 export interface AdminPayment {
   id: string

@@ -77,17 +77,19 @@ class AdminUserService
     }
 
     /**
-     * @return array<int, array{id: string, businessName: string}>
+     * @return array<int, array{id: string, businessName: string, name: string, email: string}>
      */
     public function options(): array
     {
         return User::query()
             ->whereDoesntHave('roles', fn ($q) => $q->where('name', 'super-admin'))
             ->orderBy('organization_name')
-            ->get(['id', 'name', 'organization_name'])
+            ->get(['id', 'name', 'email', 'organization_name'])
             ->map(fn (User $u): array => [
                 'id' => (string) $u->id,
                 'businessName' => $u->organization_name ?? $u->name,
+                'name' => $u->name,
+                'email' => $u->email,
             ])
             ->values()
             ->all();

@@ -153,6 +153,7 @@ export function AdminModal({
   children,
   footer,
   wide = false,
+  size,
 }: {
   title: string
   subtitle?: string
@@ -160,7 +161,10 @@ export function AdminModal({
   children: ReactNode
   footer?: ReactNode
   wide?: boolean
+  size?: 'md' | 'lg' | 'xl'
 }) {
+  const widthClass = size === 'xl' ? 'max-w-6xl' : size === 'lg' || wide ? 'max-w-4xl' : 'max-w-xl'
+
   return (
     <div
       className="fixed inset-0 z-[80] bg-on-surface/50 backdrop-blur-sm flex items-center justify-center p-space-md"
@@ -170,7 +174,7 @@ export function AdminModal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`max-h-[92vh] w-full overflow-y-auto rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-2xl flex flex-col ${wide ? 'max-w-4xl' : 'max-w-xl'}`}
+        className={`max-h-[92vh] w-full overflow-y-auto rounded-2xl border border-outline-variant/40 bg-surface-container-lowest shadow-2xl flex flex-col ${widthClass}`}
       >
         <div className="flex items-start justify-between gap-space-sm border-b border-outline-variant/50 px-space-lg py-space-md">
           <div>

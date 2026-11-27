@@ -255,7 +255,7 @@ export const demoAdminGateway: AdminGateway = {
 
   async listUserOptions(): Promise<UserOption[]> {
     await wait()
-    return users().map(({ id, businessName }) => ({ id, businessName }))
+    return users().map(({ id, businessName, name, email }) => ({ id, businessName, name, email }))
   },
 
   async createUser(payload: AdminCreateUserPayload): Promise<AdminUser> {
