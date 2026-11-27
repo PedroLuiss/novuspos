@@ -709,43 +709,36 @@ Panel separado del portal de clientes, con acceso propio y ruta configurable. Es
 
 - Ruta de login configurable desde **Ajustes → Enlace de acceso maestro**; por defecto `/acceso-maestro`. Se guarda en `novuspos:admin-settings` y `getAdminLoginPath()` la usa desde el `routeResolver`, así que cambiar el ajuste cambia la URL real de entrada.
 - Login propio en `AdminLoginPage` con `novuspos:admin-session` independiente de `sessionStore`. `AdminGate` redirige a la ruta configurada si no hay sesión maestra; nunca usa el `AuthContext` del cliente.
-- Rutas fijas: `/administracion` (resumen), `/pagos`, `/usuarios`, `/reportes`, `/notificaciones`, `/correos` y `/ajustes`, todas bajo `/administracion`.
+- Rutas fijas: `/administracion` (resumen), `/administracion/suscripciones`, `/administracion/landing`, `/administracion/pagos`, `/administracion/usuarios`, `/administracion/reportes`, `/administracion/notificaciones`, `/administracion/correos` y `/administracion/ajustes`. La tabla única (`AdminSection`, etiquetas, iconos, rutas, menú y `resolveAdminSection()`) vive en `core/config/adminSections.ts`; el resolver de rutas y el sidebar la consumen, así que no hay prefijos duplicados.
 
-### Arquitectura
+### Arquitectura (reorganizada en módulos, ver §31)
 
 ```
 src/features/admin/
-├── types.ts                       # AdminUser, AdminPayment, AdminReport, AdminNotification, AdminEmail, AdminSettings
-├── data/admin-data.ts             # datos demo (8 usuarios, 6 pagos, reportes, avisos) y comprobante SVG
-├── lib/
-│   ├── adminSession.ts            # sesión aislada del dueño
-│   ├── adminSettings.ts           # datos de empresa + ruta de login, normalización y lectura segura
-│   └── adminFormatters.ts         # montos USD, fechas y etiquetas
-├── services/
-│   ├── adminGateway.ts            # puerto único (login, overview, pagos, usuarios, reportes, avisos, correos, ajustes y catálogo de cobro)
-│   ├── demoAdminGateway.ts        # demo sin red, persiste cada colección en localStorage
-│   ├── httpAdminGateway.ts        # endpoints reales con token Bearer maestro
-│   ├── adminGatewayFactory.ts     # VITE_AUTH_MODE
-│   └── adminService.ts            # fachada
-├── hooks/                         # useAdminSession, useAdminOverview, useAdminPayments, useAdminUsers,
-│                                   # useAdminUserOptions, useAdminReports, useAdminNotifications, useAdminEmails,
-│                                   # useAdminSettings, usePaymentMethodsEditor
-└── components/
-    ├── AdminGate.tsx / AdminLoginPage.tsx / AdminLayout.tsx / AdminSidebar.tsx
-    ├── AdminOverview.tsx           # banner ejecutivo, KPIs, dona SVG, actividad y atención
-    ├── PlanDonut.tsx / PlanDonutLegend.tsx
-    ├── PaymentsPage.tsx / PaymentReviewModal.tsx       # tabla paginada, sin filtro por usuario
-    ├── UsersPage.tsx / UserEditModal.tsx          # directorio paginado, filtros y tarjetas globales
-    ├── NotificationsPage.tsx / NotificationHistory.tsx  # formulario + historial paginado
-    ├── EmailsPage.tsx / EmailComposer.tsx / EmailEditor.tsx / EmailPreview.tsx / EmailHistory.tsx  # compose + historial
-    ├── ReportsPage.tsx / SettingsPage.tsx           # historial paginado, filtros, tarjetas y ajustes
-    ├── PaymentMethodsSection.tsx / PaymentMethodEditor.tsx  # catálogo de cobro del dueño
-    └── ui/AdminUi.tsx              # AdminPageHeader, AdminCard, AdminBadge, AdminAvatar, AdminModal…
+├── index.ts                       # API pública: gate, login, layout, AdminSection, resolveAdminSection, páginas
+├── core/                          # kernel compartido del panel maestro
+│   ├── config/adminSections.ts    # única fuente de secciones, rutas, etiquetas, iconos y menú
+│   ├── types.ts                   # contratos y tipos comunes (AdminUser, AdminPayment, AdminReport…)
+│   ├── data/admin-data.ts         # datos demo y comprobante SVG
+│   ├── lib/                       # adminSession, adminSettings, adminStyles, adminFormatters
+│   ├── services/                  # puerto AdminGateway + demo/HTTP + factory + fachada
+│   ├── hooks/                     # useAdminSession, useAdminUserOptions
+│   └── ui/                        # AdminGate, AdminLoginPage, AdminLayout, AdminSidebar, AdminUi, AdminSkeleton
+└── modules/                       # una carpeta por sección: components/, hooks/, types.ts, constants.ts, index.ts
+    ├── overview/                  # AdminOverview, PlanDonut, PlanDonutLegend, OverviewSkeleton
+    ├── plans/                     # PlansPage, PlanEditor, PlansSkeleton, usePlansEditor
+    ├── landing/                   # LandingBuilderPage, editores, LandingPreview, useLandingEditor
+    ├── payments/                  # PaymentsPage, PaymentReviewModal, useAdminPayments
+    ├── users/                     # UsersPage, UserEditModal, useAdminUsers
+    ├── reports/                   # ReportsPage, useAdminReports
+    ├── notifications/             # NotificationsPage, NotificationHistory, useAdminNotifications
+    ├── emails/                    # EmailsPage, EmailComposer/Editor/Preview/History, emailHtml
+    └── settings/                  # SettingsPage, PaymentMethodsSection/Editor, hooks de ajustes y cobro
 ```
 
 ### Diseño profesional (pedido explícito)
 
-Se mantiene MD3 (azul `#003ec7`, superficies claras, Plus Jakarta Sans y JetBrains Mono) con dos tokens nuevos en `index.css`: `--color-admin-ink` (`#0a1734`) y `--color-admin-ink-soft` (`#13295e`), usados solo en la navegación y el acceso maestro. Las clases repetidas viven en `lib/adminStyles.ts` (tarjetas, botones, inputs, celdas, avatares); no se inventan CSS ni CDN.
+Se mantiene MD3 (azul `#003ec7`, superficies claras, Plus Jakarta Sans y JetBrains Mono) con dos tokens nuevos en `index.css`: `--color-admin-ink` (`#0a1734`) y `--color-admin-ink-soft` (`#13295e`), usados solo en la navegación y el acceso maestro. Las clases repetidas viven en `core/lib/adminStyles.ts` (tarjetas, botones, inputs, celdas, avatares); no se inventan CSS ni CDN.
 
 - **Sidebar:** navegación agrupada en Operación / Comunicación / Sistema, acento verde en el item activo, logo local `novuspos-icon.png`, tarjeta con la ruta privada vigente y cierre de sesión. En móvil se convierte en cajón con backdrop.
 - **Cabecera:** ruta contextual, fecha, avatar con iniciales y rol «Super administrador».
@@ -753,7 +746,7 @@ Se mantiene MD3 (azul `#003ec7`, superficies claras, Plus Jakarta Sans y JetBrai
 - **Módulos:** tablas con encabezados suaves, filas con hover, badges por estado y botones secundarios; las gráficas y los totales siempre salen de los datos del gateway (nada de métricas inventadas). Notificaciones y correos muestran vista previa en vivo y ambos historiales son paginados; pagos tienen tabla paginada (20/50/100), chips de estado, búsqueda con debounce y nota de revisión, sin selector de usuario; usuarios tienen paginación 20/50/100, búsqueda con debounce, filtro por estado y tarjetas globales; reportes tienen paginación 20/50/100, búsqueda con debounce, chips de origen/estado y tarjetas globales.
 - **Acceso:** pantalla dividida con marca e iconos de confianza a la izquierda y el formulario a la derecha; en móvil queda solo el formulario.
 
-Se repite el patrón del resto del front: puerto + adaptadores demo/API + factory + fachada + hooks contenedores + componentes presentacionales. Ningún componente supera 300 líneas.
+Se repite el patrón del resto del front: puerto + adaptadores demo/API + factory + fachada + hooks contenedores + componentes presentacionales, ahora agrupado por módulo (§31). Ningún componente supera 300 líneas ni ningún hook 200.
 
 ### Funcionalidad
 
@@ -809,16 +802,40 @@ No hay diseño de Stitch para el editor: usa `AdminUi` y MD3. Ruta limpia `/admi
 
 **Redirecciones SPA:** `AdminGate`, `AdminSidebar`, `useAdminSession`, `useLogin`, `useResetPassword`, `ProtectedRoute` y el bus HTTP (`services/http/events.ts`) usan `navigate(..., { replace: true })` en vez de `window.location.replace/assign`. `PanelSidebar` calcula el item activo con `usePathname()`. `ResetPasswordPage` lleva `key={search}` para releer el enlace si cambia la query sin recargar.
 
-**Skeletons MD3:** `features/admin/components/ui/AdminSkeleton.tsx` (bloque, líneas, cabecera, tarjetas KPI, tabla, lista y contenedor `role="status"`) y `AdminModuleSkeletons.tsx` (una variante por módulo). Se muestran en resumen, suscripciones, landing, pagos, usuarios, reportes, notificaciones, correos, ajustes, métodos de pago y en el guardián maestro. `useAdminSettings` añadió `isLoading` para que ajustes también tenga skeleton mientras se recarga la configuración. Las tablas siguen atenuadas durante los refiltrados; el skeleton cubre la primera carga.
+**Skeletons MD3:** `features/admin/core/ui/AdminSkeleton.tsx` re-exporta las primitivas de `shared/ui/Skeleton.tsx` (bloque, líneas, cabecera, tarjetas KPI, tabla, lista y contenedor `role="status"`); cada módulo tiene su propia variante en `modules/<módulo>/components/*Skeleton.tsx`. Se muestran en resumen, suscripciones, landing, pagos, usuarios, reportes, notificaciones, correos, ajustes, métodos de pago y en el guardián maestro. `useAdminSettings` añadió `isLoading` para que ajustes también tenga skeleton mientras se recarga la configuración. Las tablas siguen atenuadas durante los refiltrados; el skeleton cubre la primera carga.
 
-> Verificado por CDP a 1440px en demo con un centinela en `window`: las nueve rutas del panel (`/administracion`, `/suscripciones`, `/landing`, `/pagos`, `/usuarios`, `/reportes`, `/notificaciones`, `/correos`, `/ajustes`) y `history.back()/forward()` conservaron el centinela, es decir, **0 recargas de documento**. Se capturaron los nueve `aria-label` de skeleton durante la navegación. También se verificó `/` → `/auth/login` → `/` y el ancla `#precios` sin recarga; 0 errores de consola. `npm run build` y `npm run lint` limpios.
+> Verificado por CDP a 1440px en demo con un centinela en `window`: las nueve rutas del panel (`/administracion`, `/administracion/suscripciones`, `/administracion/landing`, `/administracion/pagos`, `/administracion/usuarios`, `/administracion/reportes`, `/administracion/notificaciones`, `/administracion/correos`, `/administracion/ajustes`) y `history.back()/forward()` conservaron el centinela, es decir, **0 recargas de documento**. Se capturaron los nueve `aria-label` de skeleton durante la navegación. También se verificó `/` → `/auth/login` → `/` y el ancla `#precios` sin recarga; 0 errores de consola. `npm run build` y `npm run lint` limpios. Reverificado tras la reorganización modular de §31: mismos 9 skeletons, 0 recargas y 0 errores.
 
 ## 30. Skeletons del panel de clientes (pedido explícito)
 
-Las cuatro rutas del portal (`/panel`, `/panel/suscripcion`, `/panel/respaldos` y `/panel/soporte`) usan las mismas primitivas MD3 del panel maestro, ahora en `src/shared/ui/Skeleton.tsx`: bloque, líneas, cabecera, métricas, tarjeta, lista, tabla y contenedor con `role="status"` y `aria-label`. `features/admin/components/ui/AdminSkeleton.tsx` quedó como re-export con los alias `Admin*`; el panel maestro no cambió y `shared/` sigue sin importar `features/`.
+Las cuatro rutas del portal (`/panel`, `/panel/suscripcion`, `/panel/respaldos` y `/panel/soporte`) usan las mismas primitivas MD3 del panel maestro, ahora en `src/shared/ui/Skeleton.tsx`: bloque, líneas, cabecera, métricas, tarjeta, lista, tabla y contenedor con `role="status"` y `aria-label`. `features/admin/core/ui/AdminSkeleton.tsx` quedó como re-export con los alias `Admin*`; el panel maestro no cambió y `shared/` sigue sin importar `features/`.
 
 Cada módulo tiene su variante en su propia feature: `DashboardSkeleton`, `SubscriptionSkeleton`, `BackupSkeleton` y `SupportSkeleton`. Los tres primeros sustituyen a los antiguos spinners de `useDashboard`, `useSubscriptionOverview` y `useLatestBackup` (≈220–250 ms en demo). Soporte no pide datos al entrar: su skeleton aparece durante el envío real del ticket (`isSubmitting`, 500 ms en demo), sin delays artificiales. Los textos de carga son `Cargando tu panel…`, `Cargando tu suscripción…`, `Cargando tu copia…` y `Enviando tu reporte…`.
 
 Dentro de la suscripción también hay skeletons anidados: `PaymentMethodSelector` muestra dos opciones mientras `usePaymentMethods` carga (`Cargando métodos de pago…`), `PaymentRateCard` cambia el spinner de la tasa por bloques (`Consultando la tasa del día…`) y `PlanCatalog` acepta `isLoading` para mostrar tres tarjetas cuando no hay planes durante una recarga. El modal pasa `isLoading={isMethodsLoading}`; la tabla mantiene atenuadas las acciones mientras `reviewingId` está activo.
 
 > Verificado por CDP a 1440px en demo con centinela en `window`: `/panel/suscripcion`, `/panel/respaldos`, `/panel/soporte` y `/panel` navegaron sin recargar, lo mismo que `history.back()/back()/forward()` (0 recargas). Se capturaron los cuatro `aria-label` de los skeletons de módulo y el envío de soporte terminó en «¡Reporte enviado!»; en el modal se capturó además `Cargando métodos de pago…`. 0 errores de consola. `npm run build` y `npm run lint` limpios.
+
+## 31. Arquitectura modular del panel maestro (pedido explícito)
+
+Antes los 63 archivos del super admin vivían en `components/`, `hooks/`, `lib/`, `data/` y `services/` planos. Ahora cada sección es un **módulo vertical** con todo lo que le pertenece:
+
+```text
+features/admin/
+├── index.ts                       # API pública (gate, login, layout, secciones, páginas)
+├── core/                          # kernel: config, types, data, lib, services, hooks, ui + index.ts
+└── modules/<sección>/
+    ├── components/                # página, modales, editores y skeleton propios
+    ├── hooks/                     # contenedores de ese módulo
+    ├── types.ts                   # re-exports del kernel + tipos locales
+    ├── constants.ts               # opciones, chips, tarjetas, borradores y colores
+    └── index.ts                   # barrel del módulo
+```
+
+**Patrones aplicados:** Feature-Sliced Design dentro de la feature (core sin dependencias de módulos; módulos sin importarse entre sí), Hexagonal intacto en `core/services` (puerto `AdminGateway`, adaptador demo/HTTP, factory y fachada), Container/Presentational en cada `use…` + página, Registry/Strategy para las 9 vistas (`SECTION_VIEWS: Record<AdminSection, ComponentType>` en `src/app/AdminPage.tsx`, sustituyendo el ternary) y **Single Source of Truth** en `core/config/adminSections.ts` (rutas, etiquetas, iconos, menú y resolución de pathname; antes estaba duplicado en `app/AdminPage.tsx`, `app/routeResolver.ts` y `AdminSidebar.tsx`).
+
+**Reglas de dependencia:** los consumidores externos importan desde `@/features/admin` o desde los barrels `core/` y `modules/<sección>/`; nunca desde filesystem interno. Los tipos públicos están en `core/types.ts` y cada módulo re-exporta solo lo suyo (`EmailInput`, `NotificationInput`, `PlanEditorState`, `EditorTab`, `PaymentMethodEditorState`, etc.). Las constantes ya no viven dentro de los hooks. Los skeletons genéricos están en `core/ui/AdminSkeleton.tsx` y cada módulo tiene el suyo (`OverviewSkeleton`, `PlansSkeleton`, `LandingSkeleton`, `PaymentsSkeleton`, `UsersSkeleton`, `ReportsSkeleton`, `NotificationsSkeleton`, `EmailsSkeleton`, `SettingsSkeleton`, `PaymentMethodsSkeleton`, `AdminGateSkeleton`). `shared/ui/FormFields.tsx` acepta `options` de solo lectura para que las listas constantes no necesiten copias.
+
+**Sin cambios funcionales:** mismas 9 rutas y prefijos, mismos contratos y claves de `localStorage`, mismo canal de vista previa (`postMessage` + `sessionStorage`), mismo `id="admin-mail-body"` entre composer y editor, mismos selectores `data-*-item` y mismos estilos MD3. El barrel raíz evita colisiones de nombres (por ejemplo el componente `AdminOverview` frente al tipo `AdminOverviewData`).
+
+> Verificado tras el refactor: `npm run build` y `npm run lint` limpios; CDP en demo con login `dueno@novuspos.com` / `Novus2026`, las 9 secciones con enlace activo correcto y contenido presente, los 9 skeletons capturados por `aria-label` (`Cargando el resumen…`, `Cargando suscripciones…`, `Cargando el constructor de la landing…`, `Cargando pagos…`, `Cargando usuarios…`, `Cargando reportes…`, `Cargando notificaciones…`, `Cargando correos…`, `Cargando ajustes…`), `history.back()/forward()` con el contador de cargas de documento fijo en 1 y 0 errores de consola. Ver contexto 09 §5.26.

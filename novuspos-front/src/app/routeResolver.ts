@@ -1,6 +1,6 @@
-import { getAdminLoginPath } from '@/features/admin/lib/adminSettings'
+import { resolveAdminSection, type AdminSection } from '@/features/admin/core/config/adminSections'
+import { getAdminLoginPath } from '@/features/admin/core/lib/adminSettings'
 import type { AuthMode, RecoveryMode } from '@/features/auth/types'
-import type { AdminSection } from './AdminPage'
 import type { PanelSection } from './PanelPage'
 
 /** Decisión de ruta pura y testeable; la UI no conoce detalles del pathname. */
@@ -11,18 +11,6 @@ export type AppRoute =
   | { view: 'admin-login' }
   | { view: 'admin'; section: AdminSection }
   | { view: 'landing' }
-
-function resolveAdminSection(pathname: string): AdminSection {
-  if (pathname.startsWith('/administracion/suscripciones')) return 'plans'
-  if (pathname.startsWith('/administracion/landing')) return 'landing'
-  if (pathname.startsWith('/administracion/pagos')) return 'payments'
-  if (pathname.startsWith('/administracion/usuarios')) return 'users'
-  if (pathname.startsWith('/administracion/reportes')) return 'reports'
-  if (pathname.startsWith('/administracion/notificaciones')) return 'notifications'
-  if (pathname.startsWith('/administracion/correos')) return 'emails'
-  if (pathname.startsWith('/administracion/ajustes')) return 'settings'
-  return 'overview'
-}
 
 export function resolveAppRoute(pathname: string): AppRoute {
   // El acceso maestro tiene prioridad sobre cualquier otra ruta.

@@ -1,48 +1,37 @@
-import { AdminLayout } from '@/features/admin/components/AdminLayout'
-import { AdminOverview } from '@/features/admin/components/AdminOverview'
-import { EmailsPage } from '@/features/admin/components/EmailsPage'
-import { LandingBuilderPage } from '@/features/admin/components/landing/LandingBuilderPage'
-import { NotificationsPage } from '@/features/admin/components/NotificationsPage'
-import { PaymentsPage } from '@/features/admin/components/PaymentsPage'
-import { PlansPage } from '@/features/admin/components/PlansPage'
-import { ReportsPage } from '@/features/admin/components/ReportsPage'
-import { SettingsPage } from '@/features/admin/components/SettingsPage'
-import { UsersPage } from '@/features/admin/components/UsersPage'
+import type { ComponentType } from 'react'
+import { AdminLayout } from '@/features/admin/core'
+import type { AdminSection } from '@/features/admin/core/config/adminSections'
+import { AdminOverview } from '@/features/admin/modules/overview'
+import { EmailsPage } from '@/features/admin/modules/emails'
+import { LandingBuilderPage } from '@/features/admin/modules/landing'
+import { NotificationsPage } from '@/features/admin/modules/notifications'
+import { PaymentsPage } from '@/features/admin/modules/payments'
+import { PlansPage } from '@/features/admin/modules/plans'
+import { ReportsPage } from '@/features/admin/modules/reports'
+import { SettingsPage } from '@/features/admin/modules/settings'
+import { UsersPage } from '@/features/admin/modules/users'
 
-export type AdminSection =
-  | 'overview'
-  | 'plans'
-  | 'landing'
-  | 'payments'
-  | 'users'
-  | 'reports'
-  | 'notifications'
-  | 'emails'
-  | 'settings'
+export type { AdminSection } from '@/features/admin/core/config/adminSections'
+
+/** Registro inmutable: agregar una sección no obliga a tocar el JSX. */
+const SECTION_VIEWS: Record<AdminSection, ComponentType> = {
+  overview: AdminOverview,
+  plans: PlansPage,
+  landing: LandingBuilderPage,
+  payments: PaymentsPage,
+  users: UsersPage,
+  reports: ReportsPage,
+  notifications: NotificationsPage,
+  emails: EmailsPage,
+  settings: SettingsPage,
+}
 
 /** Panel del dueño: compone el layout maestro y el módulo solicitado. */
 export function AdminPage({ section }: { section: AdminSection }) {
+  const View = SECTION_VIEWS[section]
   return (
     <AdminLayout section={section}>
-      {section === 'plans' ? (
-        <PlansPage />
-      ) : section === 'landing' ? (
-        <LandingBuilderPage />
-      ) : section === 'payments' ? (
-        <PaymentsPage />
-      ) : section === 'users' ? (
-        <UsersPage />
-      ) : section === 'reports' ? (
-        <ReportsPage />
-      ) : section === 'notifications' ? (
-        <NotificationsPage />
-      ) : section === 'emails' ? (
-        <EmailsPage />
-      ) : section === 'settings' ? (
-        <SettingsPage />
-      ) : (
-        <AdminOverview />
-      )}
+      <View />
     </AdminLayout>
   )
 }

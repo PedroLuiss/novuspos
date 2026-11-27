@@ -254,7 +254,7 @@ interface SelectFieldProps {
   id: string
   label: string
   icon: string
-  options: { value: string; label: string }[]
+  options: readonly { value: string; label: string }[]
   hint?: string
   helper?: ReactNode
   tall?: boolean
