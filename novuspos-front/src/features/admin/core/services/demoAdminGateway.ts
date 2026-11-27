@@ -253,9 +253,11 @@ export const demoAdminGateway: AdminGateway = {
     }
   },
 
-  async listUserOptions(): Promise<UserOption[]> {
+  async listUserOptions(params?: { withoutActiveSubscription?: boolean }): Promise<UserOption[]> {
     await wait()
-    return users().map(({ id, businessName, name, email }) => ({ id, businessName, name, email }))
+    return users()
+      .filter((u) => !params?.withoutActiveSubscription || u.subscriptionStatus !== 'active')
+      .map(({ id, businessName, name, email }) => ({ id, businessName, name, email }))
   },
 
   async createUser(payload: AdminCreateUserPayload): Promise<AdminUser> {

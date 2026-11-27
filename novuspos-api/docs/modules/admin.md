@@ -24,7 +24,7 @@ Panel de super administración para gestionar usuarios, pagos, reportes, notific
 | PATCH | `/api/v1/admin/payments/{payment}/review` | Aprobar/rechazar pago |
 | GET | `/api/v1/admin/users` | Usuarios paginados + summary |
 | POST | `/api/v1/admin/users` | Crear usuario cliente desde el panel admin |
-| GET | `/api/v1/admin/users/options` | Opciones ligeras `{id,businessName,name,email}` para selectores/búsqueda |
+| GET | `/api/v1/admin/users/options` | Opciones ligeras `{id,businessName,name,email}`. Filtro: `withoutActiveSubscription=1` para excluir usuarios con suscripción activa |
 | PATCH | `/api/v1/admin/users/{user}` | Actualizar usuario |
 | PATCH | `/api/v1/admin/users/{user}/subscription` | Asignar/activar suscripción |
 | GET | `/api/v1/admin/reports` | Reportes/tickets paginados (read-only) |

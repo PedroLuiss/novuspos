@@ -21,9 +21,11 @@ class AdminUserController extends Controller
         return response()->json($this->userService->list($request->query()));
     }
 
-    public function options(): JsonResponse
+    public function options(Request $request): JsonResponse
     {
-        return response()->json($this->userService->options());
+        $withoutActiveSubscription = filter_var($request->query('withoutActiveSubscription', false), FILTER_VALIDATE_BOOLEAN);
+
+        return response()->json($this->userService->options($withoutActiveSubscription));
     }
 
     public function store(AdminCreateUserRequest $request): JsonResponse

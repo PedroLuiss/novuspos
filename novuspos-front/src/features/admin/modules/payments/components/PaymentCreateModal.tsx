@@ -9,6 +9,7 @@ import type { AdminCreatePaymentPayload, UserOption } from '../types'
 import type { PlanOption } from '@/shared/services/plans/types'
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import { AdminModal } from '@/features/admin/core/ui/AdminUi'
+import { Skeleton } from '@/shared/ui/Skeleton'
 
 type ExchangeRate = { rate: number; currency: string; date: string; source?: string; fallback?: boolean }
 
@@ -47,7 +48,7 @@ export function PaymentCreateModal({ busy, methods, onClose, onCreate }: Props) 
   useEffect(() => {
     let active = true
     Promise.all([
-      adminService.listUserOptions(),
+      adminService.listUserOptions({ withoutActiveSubscription: true }),
       adminService.listPlans(),
       apiClient.get<ExchangeRate>(EXCHANGE_RATE_ENDPOINTS.today, { auth: false }).catch(() => null),
     ])
@@ -121,7 +122,19 @@ export function PaymentCreateModal({ busy, methods, onClose, onCreate }: Props) 
     >
       <form id="admin-payment-create-form" className="flex flex-col gap-space-sm" onSubmit={submit}>
         {loading ? (
-          <p className="font-body-sm text-body-sm text-on-surface-variant">Cargando usuarios y planes...</p>
+          <div className="grid grid-cols-1 gap-space-sm md:grid-cols-2" role="status" aria-label="Cargando formulario de pago">
+            {Array.from({ length: 8 }, (_, i) => (
+              <div key={i} className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-11 w-full rounded-xl" />
+                {i === 7 && <Skeleton className="h-16 w-full rounded-xl" />}
+              </div>
+            ))}
+            <div className="md:col-span-2 flex flex-col gap-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-space-sm md:grid-cols-2">
             <div className="flex flex-col gap-1" ref={userMenuRef}>

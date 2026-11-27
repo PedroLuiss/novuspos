@@ -35,7 +35,7 @@ export interface AdminGateway {
   reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<AdminPayment>
   createPayment(payload: AdminCreatePaymentPayload): Promise<AdminPayment>
   listUsers(query: UserQuery): Promise<UserPage>
-  listUserOptions(): Promise<UserOption[]>
+  listUserOptions(params?: { withoutActiveSubscription?: boolean }): Promise<UserOption[]>
   createUser(payload: AdminCreateUserPayload): Promise<AdminUser>
   updateUser(userId: string, patch: UserPatch): Promise<AdminUser>
   setSubscription(userId: string, planId: string, active: boolean): Promise<AdminUser>

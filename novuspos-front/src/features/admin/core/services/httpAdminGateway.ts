@@ -47,7 +47,7 @@ export const httpAdminGateway: AdminGateway = {
   reviewPayment: (paymentId, approved, note) =>
     apiClient.patch<AdminPayment>(ADMIN_ENDPOINTS.reviewPayment(paymentId), { approved, note }, { headers: authHeaders() }),
   listUsers: (query: UserQuery) => apiClient.get<UserPage>(ADMIN_ENDPOINTS.userDirectory(query), { headers: authHeaders() }),
-  listUserOptions: () => apiClient.get<UserOption[]>(ADMIN_ENDPOINTS.userOptions, { headers: authHeaders() }),
+  listUserOptions: (params) => apiClient.get<UserOption[]>(ADMIN_ENDPOINTS.userOptions(params), { headers: authHeaders() }),
   createUser: (payload) => apiClient.post<AdminUser>(ADMIN_ENDPOINTS.createUser, payload, { headers: authHeaders() }),
   updateUser: (userId, patch: UserPatch) =>
     apiClient.patch<AdminUser>(ADMIN_ENDPOINTS.updateUser(userId), patch, { headers: authHeaders() }),

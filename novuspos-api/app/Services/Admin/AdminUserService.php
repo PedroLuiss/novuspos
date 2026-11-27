@@ -79,10 +79,20 @@ class AdminUserService
     /**
      * @return array<int, array{id: string, businessName: string, name: string, email: string}>
      */
-    public function options(): array
+    public function options(bool $withoutActiveSubscription = false): array
     {
-        return User::query()
+        $query = User::query()
             ->whereDoesntHave('roles', fn ($q) => $q->where('name', 'super-admin'))
+            ->with(['latestSubscription']);
+
+        if ($withoutActiveSubscription) {
+            $query->where(function ($q): void {
+                $q->whereDoesntHave('subscriptions')
+                    ->orWhereHas('latestSubscription', fn ($sq) => $sq->where('status', '!=', 'active'));
+            });
+        }
+
+        return $query
             ->orderBy('organization_name')
             ->get(['id', 'name', 'email', 'organization_name'])
             ->map(fn (User $u): array => [

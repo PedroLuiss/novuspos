@@ -84,7 +84,12 @@ export const ADMIN_ENDPOINTS = {
     return `/admin/users?${query.toString()}`
   },
   /** Lista ligera de comercios para los selectores de destinatarios. */
-  userOptions: '/admin/users/options',
+  userOptions: (params?: { withoutActiveSubscription?: boolean }) => {
+    const query = new URLSearchParams()
+    if (params?.withoutActiveSubscription) query.set('withoutActiveSubscription', '1')
+    const qs = query.toString()
+    return `/admin/users/options${qs ? `?${qs}` : ''}`
+  },
   createUser: '/admin/users',
   updateUser: (userId: string) => `/admin/users/${userId}`,
   setSubscription: (userId: string) => `/admin/users/${userId}/subscription`,
