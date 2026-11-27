@@ -1,4 +1,4 @@
-import type { LandingConfig } from '@/shared/services/landing/types'
+import type { LandingConfig, LandingDownload } from '@/shared/services/landing/types'
 import type { PlanOption } from '@/shared/services/plans/types'
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import type {
@@ -49,6 +49,10 @@ export interface AdminGateway {
   /** Configuración completa de la landing (textos, colores, secciones y capturas). */
   getLanding(): Promise<LandingConfig>
   saveLanding(config: LandingConfig): Promise<LandingConfig>
+  /** Sube el instalador .exe del escritorio y devuelve su metadata pública. */
+  uploadLandingDownload(file: File, version?: string): Promise<LandingDownload>
+  /** Elimina el instalador publicado de la landing. */
+  deleteLandingDownload(): Promise<void>
   /** Catálogo completo de suscripciones, incluidas las ocultas. */
   listPlans(): Promise<PlanOption[]>
   savePlans(plans: PlanOption[]): Promise<PlanOption[]>

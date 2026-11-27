@@ -4,4 +4,4 @@ import type { LandingCopy } from '@/shared/services/landing/types'
 export type CopyPatch = <K extends keyof LandingCopy>(group: K, changes: Partial<LandingCopy[K]>) => void
 
 /** Pestañas del panel de edición del constructor. */
-export type EditorTab = 'content' | 'sections' | 'appearance' | 'screenshots' | 'logos'
+export type EditorTab = 'content' | 'sections' | 'appearance' | 'screenshots' | 'logos' | 'download'

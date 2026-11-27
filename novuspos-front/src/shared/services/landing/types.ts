@@ -80,6 +80,20 @@ export interface LandingBranding {
   footer: LandingLogo
 }
 
+/** Instalador de escritorio que el super admin sube y la landing ofrece para descarga. */
+export interface LandingDownload {
+  /** URL pública del instalador; puede ser absoluta o ruta del API. */
+  url: string
+  /** Nombre del archivo, ej. NovusPOS-Setup-x64.exe */
+  fileName: string
+  /** Tamaño en bytes. */
+  sizeBytes: number
+  /** Versión opcional informativa. */
+  version?: string
+  /** ISO datetime de la última carga. */
+  updatedAt?: string
+}
+
 export interface LandingLinkColumn {
   title: string
   links: string[]
@@ -145,6 +159,8 @@ export interface LandingConfig {
   sections: LandingSectionState[]
   screenshots: LandingScreenshot[]
   logos: LandingBranding
+  /** Instalador de escritorio disponible para descarga pública. */
+  download: LandingDownload | null
   copy: LandingCopy
   updatedAt?: string
 }

@@ -4,6 +4,7 @@ import type {
   LandingComparisonRow,
   LandingConfig,
   LandingBranding,
+  LandingDownload,
   LandingFeature,
   LandingFaq,
   LandingLinkColumn,
@@ -110,6 +111,19 @@ function logosOf(value: unknown): LandingBranding {
   }
 }
 
+function downloadOf(value: unknown): LandingDownload | null {
+  const row = record(value)
+  const url = text(row.url, '').trim()
+  const fileName = text(row.fileName, '').trim()
+  if (!url || !fileName) return null
+  const isSafeUrl = url.startsWith('/') && !url.startsWith('//') || /^(https?|blob):\S+$/i.test(url)
+  if (!isSafeUrl) return null
+  const sizeBytes = typeof row.sizeBytes === 'number' && Number.isFinite(row.sizeBytes) && row.sizeBytes >= 0 ? row.sizeBytes : 0
+  const version = text(row.version, '').trim() || undefined
+  const updatedAt = text(row.updatedAt, '').trim() || undefined
+  return { url, fileName, sizeBytes, ...(version ? { version } : {}), ...(updatedAt ? { updatedAt } : {}) }
+}
+
 function featureOf(item: unknown, index: number): LandingFeature {
   const row = record(item)
   const fallback = LANDING_DEFAULTS.copy.features.items[index]
@@ -205,6 +219,7 @@ export function normalizeLandingConfig(value: unknown): LandingConfig {
     sections: sectionsOf(source.sections),
     screenshots: screenshotsOf(source.screenshots),
     logos: logosOf(source.logos),
+    download: downloadOf(source.download),
     updatedAt: typeof source.updatedAt === 'string' ? source.updatedAt : undefined,
     copy: {
       header: {

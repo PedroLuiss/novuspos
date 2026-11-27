@@ -1,7 +1,7 @@
 import { usePlans } from '@/shared/hooks/usePlans'
 import { plansService } from '@/shared/services/plans/plansService'
 import type { PlanOption } from '@/shared/services/plans/types'
-import type { LandingCopy } from '@/shared/services/landing/types'
+import type { LandingCopy, LandingDownload } from '@/shared/services/landing/types'
 import { MS } from './HeroHeader'
 
 type PlanBenefits = LandingCopy['pricing']['benefits']
@@ -17,10 +17,11 @@ interface PlanPriceProps {
   benefits: PlanBenefits
   cta: string
   ctaNote: string
+  download: LandingDownload | null
 }
 
 /** Tarjeta de precio reutilizable; los planes vienen del catálogo del dueño. */
-function PlanPriceCard({ name, price, period, note, ribbon, onSale, compatibility, benefits, cta, ctaNote }: PlanPriceProps) {
+function PlanPriceCard({ name, price, period, note, ribbon, onSale, compatibility, benefits, cta, ctaNote, download }: PlanPriceProps) {
   return (
     <article
       className={`w-full rounded-2xl bg-surface-container-lowest p-space-xl shadow-xl relative overflow-hidden flex flex-col ${
@@ -59,7 +60,8 @@ function PlanPriceCard({ name, price, period, note, ribbon, onSale, compatibilit
       </div>
 
       <a
-        href="#descargar"
+        href={download?.url || '#descargar'}
+        {...(download?.url ? { download: download.fileName || true, target: '_blank', rel: 'noreferrer' } : {})}
         className="mt-auto w-full inline-flex items-center justify-center gap-space-sm px-space-xl py-space-md rounded-lg bg-primary text-on-primary font-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95"
       >
         <MS name="download" className="text-[24px] cta-download-icon transition-transform" />
@@ -81,7 +83,7 @@ function priceLabel(plan: PlanOption): string {
 }
 
 /** Sección de precios con los planes y textos que configura el dueño. */
-export function Pricing({ section }: { section: LandingCopy['pricing'] }) {
+export function Pricing({ section, download }: { section: LandingCopy['pricing']; download: LandingDownload | null }) {
   const { plans } = usePlans()
   const visiblePlans = plans.length > 0 ? plans : plansService.readCached()
 
@@ -112,6 +114,7 @@ export function Pricing({ section }: { section: LandingCopy['pricing'] }) {
                 benefits={section.benefits}
                 cta={section.cta}
                 ctaNote={section.ctaNote}
+                download={download}
               />
             )
           })}

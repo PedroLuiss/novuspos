@@ -5,6 +5,7 @@ import type {
   LandingBranding,
   LandingConfig,
   LandingCopy,
+  LandingDownload,
   LandingScreenshot,
   LandingSectionId,
   LandingSectionState,
@@ -20,6 +21,7 @@ export function useLandingEditor() {
   const [savedSnapshot, setSavedSnapshot] = useState(JSON.stringify(initial))
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploadingDownload, setIsUploadingDownload] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -91,6 +93,51 @@ export function useLandingEditor() {
     mutate((current) => ({ ...current, logos }))
   }, [mutate])
 
+  const setDownload = useCallback((download: LandingDownload | null) => {
+    mutate((current) => ({ ...current, download }))
+  }, [mutate])
+
+  const syncDownloadSnapshot = useCallback((download: LandingDownload | null) => {
+    setSavedSnapshot((current) => {
+      const parsed = JSON.parse(current) as LandingConfig
+      return JSON.stringify({ ...parsed, download })
+    })
+  }, [])
+
+  const uploadDownload = useCallback(async (file: File, version?: string) => {
+    setIsUploadingDownload(true)
+    setError(null)
+    setSaved(false)
+    try {
+      const download = await adminService.uploadLandingDownload(file, version)
+      setDraft((current) => ({ ...current, download }))
+      syncDownloadSnapshot(download)
+      return download
+    } catch {
+      setError('No pudimos subir el instalador. Verifica que sea un .exe válido e inténtalo de nuevo.')
+      return null
+    } finally {
+      setIsUploadingDownload(false)
+    }
+  }, [syncDownloadSnapshot])
+
+  const deleteDownload = useCallback(async () => {
+    setIsUploadingDownload(true)
+    setError(null)
+    setSaved(false)
+    try {
+      await adminService.deleteLandingDownload()
+      setDraft((current) => ({ ...current, download: null }))
+      syncDownloadSnapshot(null)
+      return true
+    } catch {
+      setError('No pudimos quitar el instalador. Inténtalo de nuevo.')
+      return false
+    } finally {
+      setIsUploadingDownload(false)
+    }
+  }, [syncDownloadSnapshot])
+
   const restoreDefaults = useCallback(() => {
     mutate(() => normalizeLandingConfig(LANDING_DEFAULTS))
   }, [mutate])
@@ -129,6 +176,7 @@ export function useLandingEditor() {
     isDirty: JSON.stringify(draft) !== savedSnapshot,
     isLoading,
     isSaving,
+    isUploadingDownload,
     saved,
     error,
     patch,
@@ -138,6 +186,9 @@ export function useLandingEditor() {
     moveSection,
     setScreenshots,
     setLogos,
+    setDownload,
+    uploadDownload,
+    deleteDownload,
     restoreDefaults,
     save,
     reset,

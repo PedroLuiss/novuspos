@@ -29,6 +29,7 @@ export const PANEL_ENDPOINTS = {
 /** Contrato de la landing pública que promociona NovusPOS Desktop. */
 export const LANDING_ENDPOINTS = {
   config: '/landing/config',
+  download: '/landing/download',
 } as const
 
 /**
@@ -138,6 +139,7 @@ export const ADMIN_ENDPOINTS = {
   settings: '/admin/settings',
   /** GET/PUT de la landing que el dueño personaliza en el constructor visual. */
   landing: '/admin/landing',
+  landingDownload: '/admin/landing/download',
   /** GET/PUT del catálogo de suscripciones que ofrece NovusPOS Desktop. */
   plans: '/admin/plans',
   /** PUT reemplaza el catálogo completo de métodos y cuentas de cobro. */

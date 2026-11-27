@@ -1,4 +1,4 @@
-import type { LandingCopy, LandingScreenshot } from '@/shared/services/landing/types'
+import type { LandingCopy, LandingDownload, LandingScreenshot } from '@/shared/services/landing/types'
 import { HeroHeader } from './HeroHeader'
 import { HeroMockup } from './HeroMockup'
 
@@ -6,14 +6,16 @@ import { HeroMockup } from './HeroMockup'
 export function Hero({
   hero,
   screenshots,
+  download,
 }: {
   hero: LandingCopy['hero']
   screenshots: LandingScreenshot[]
+  download: LandingDownload | null
 }) {
   return (
     <div className="relative w-full overflow-hidden" id="inicio">
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-gradient-to-b from-primary-fixed/40 via-surface-tint/10 to-transparent blur-3xl pointer-events-none rounded-full" />
-      <HeroHeader hero={hero}>
+      <HeroHeader hero={hero} download={download}>
         <HeroMockup screenshots={screenshots} />
       </HeroHeader>
     </div>

@@ -22,11 +22,11 @@ function renderSection(id: LandingSectionId, config: LandingConfig): ReactNode {
     case 'comparison':
       return <ComparisonTable section={config.copy.comparison} />
     case 'pricing':
-      return <Pricing section={config.copy.pricing} />
+      return <Pricing section={config.copy.pricing} download={config.download} />
     case 'faq':
       return <HardwareFaq section={config.copy.faq} />
     case 'finalCta':
-      return <FinalCta section={config.copy.finalCta} />
+      return <FinalCta section={config.copy.finalCta} download={config.download} />
   }
 }
 
@@ -38,7 +38,7 @@ export function LandingPage() {
     <div className="w-full bg-surface" style={themeToStyle(config.theme)}>
       <SiteHeader header={config.copy.header} logo={config.logos.header} visibleSections={visible.map((section) => section.id)} />
       <main className="w-full pt-20 bg-surface">
-        <Hero hero={config.copy.hero} screenshots={config.screenshots} />
+        <Hero hero={config.copy.hero} screenshots={config.screenshots} download={config.download} />
         {visible.map((section) => (
           <Fragment key={section.id}>{renderSection(section.id, config)}</Fragment>
         ))}

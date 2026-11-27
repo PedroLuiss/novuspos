@@ -7,6 +7,7 @@ import { LandingSkeleton } from './LandingSkeleton'
 import { AdminAlert, AdminCard, AdminPageHeader } from '@/features/admin/core/ui/AdminUi'
 import { LandingAppearanceEditor } from './LandingAppearanceEditor'
 import { LandingContentEditor } from './LandingContentEditor'
+import { LandingDownloadEditor } from './LandingDownloadEditor'
 import { LandingLogosEditor } from './LandingLogosEditor'
 import { LandingPreview } from './LandingPreview'
 import { LandingScreenshotsEditor } from './LandingScreenshotsEditor'
@@ -58,7 +59,7 @@ export function LandingBuilderPage() {
           description="Elige qué quieres cambiar; los cambios se aplican al guardar."
           action={<MS name="bolt" className="text-[20px] text-primary" />}
         >
-          <div className="grid grid-cols-5 gap-1 rounded-xl bg-surface-container p-1">
+          <div className="grid grid-cols-3 gap-1 rounded-xl bg-surface-container p-1 sm:grid-cols-6">
             {LANDING_EDITOR_TABS.map((item) => (
               <button
                 key={item.key}
@@ -88,8 +89,15 @@ export function LandingBuilderPage() {
               <LandingAppearanceEditor theme={editor.draft.theme} onChange={editor.setTheme} />
             ) : tab === 'screenshots' ? (
               <LandingScreenshotsEditor screenshots={editor.draft.screenshots} onChange={editor.setScreenshots} />
-            ) : (
+            ) : tab === 'logos' ? (
               <LandingLogosEditor logos={editor.draft.logos} onChange={editor.setLogos} />
+            ) : (
+              <LandingDownloadEditor
+                download={editor.draft.download}
+                isUploading={editor.isUploadingDownload}
+                onUpload={editor.uploadDownload}
+                onDelete={editor.deleteDownload}
+              />
             )}
           </div>
 
@@ -121,7 +129,7 @@ export function LandingBuilderPage() {
       {pendingRestore && (
         <ConfirmDialog
           title="Restaurar la landing original"
-          message="Los textos, colores, secciones, capturas y logos volverán al diseño inicial. Guarda los cambios para aplicarlo."
+          message="Los textos, colores, secciones, capturas, logos e instalador volverán al diseño inicial. Guarda los cambios para aplicarlo."
           confirmLabel="Restaurar"
           onConfirm={restore}
           onClose={() => setPendingRestore(false)}

@@ -264,6 +264,7 @@ export const LANDING_DEFAULTS: LandingConfig = {
   sections: defaultSections,
   screenshots: defaultScreenshots,
   logos: defaultLogos,
+  download: null,
   copy: {
     header: {
       features: 'Características',

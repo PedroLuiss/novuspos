@@ -6,18 +6,24 @@ Proveer la configuración pública de la landing page de NovusPOS. El front (`no
 
 ## Estado
 
-**Implementado (base pública).**
+**Implementado.**
 
-## Endpoint
+## Endpoints
 
 | Método | Ruta | Auth | Descripción |
 |---|---|---:|---|
 | GET | `/api/v1/landing/config` | No | Obtiene la configuración actual de la landing. |
+| GET | `/api/v1/landing/download` | No | Descarga el instalador .exe publicado; 404 si no hay archivo. |
+| GET | `/api/v1/admin/landing` | Sí (`super-admin`) | Obtiene la configuración completa para el constructor. |
+| PUT | `/api/v1/admin/landing` | Sí (`super-admin`) | Guarda la configuración completa `{config: LandingConfig}`. |
+| POST | `/api/v1/admin/landing/download` | Sí (`super-admin`) | Sube/reemplaza el instalador .exe. Multipart: `file` (.exe, máx 512MB), `version?`. |
+| DELETE | `/api/v1/admin/landing/download` | Sí (`super-admin`) | Quita el instalador publicado de la landing. |
 
 ## Contrato Front
 
-- Endpoint: `LANDING_ENDPOINTS.config = '/landing/config'`
-- Front: `src/shared/services/landing/httpLandingGateway.ts`
+- Endpoint público: `LANDING_ENDPOINTS.config = '/landing/config'`, `LANDING_ENDPOINTS.download = '/landing/download'`
+- Endpoint admin: `ADMIN_ENDPOINTS.landing = '/admin/landing'`, `ADMIN_ENDPOINTS.landingDownload = '/admin/landing/download'`
+- Front: `src/shared/services/landing/httpLandingGateway.ts`, `src/features/admin/modules/landing/*`
 - El front acepta: `payload.config ?? payload.landing ?? payload`
 - Normaliza con `normalizeLandingConfig` y tiene fallback a defaults locales si falla.
 
@@ -32,6 +38,13 @@ Proveer la configuración pública de la landing page de NovusPOS. El front (`no
     "logos": {
       "header": { "src": "/novuspos-logo.png", "alt": "NovusPOS Logo" },
       "footer": { "src": "/novuspos-logo.png", "alt": "NovusPOS Logo" }
+    },
+    "download": {
+      "url": "https://.../api/v1/landing/download",
+      "fileName": "NovusPOS-Setup-x64.exe",
+      "sizeBytes": 85000000,
+      "version": "2.5.0",
+      "updatedAt": "2026-11-27T00:00:00.000000Z"
     },
     "copy": {
       "header": {},
@@ -69,7 +82,11 @@ Proveer la configuración pública de la landing page de NovusPOS. El front (`no
 ## Archivos clave
 
 - Ruta: `routes/api.php`
-- Controller: `app/Http/Controllers/Api/V1/LandingConfigController.php`
+- Controller público: `app/Http/Controllers/Api/V1/LandingConfigController.php`
+- Controller admin: `app/Http/Controllers/Api/V1/Admin/AdminLandingController.php`
+- Service: `app/Services/Landing/LandingConfigService.php`
+- Request save: `app/Http/Requests/Api/V1/Admin/AdminSaveLandingRequest.php`
+- Request upload: `app/Http/Requests/Api/V1/Admin/AdminUploadLandingDownloadRequest.php`
 - Modelo: `app/Models/LandingConfig.php`
 - Defaults: `app/Support/LandingDefaults.php`
 - Data defaults: `database/data/landing-defaults.json`
@@ -82,12 +99,15 @@ Proveer la configuración pública de la landing page de NovusPOS. El front (`no
 - Si no hay registro en `landing_configs`, devuelve defaults desde `database/data/landing-defaults.json`.
 - Si hay registros, devuelve el último por `id`.
 - La config se guarda como JSON completo para compatibilidad con el editor/admin del front.
+- `download` puede ser `null` o `{url,fileName,sizeBytes,version?,updatedAt?}`.
+- El instalador se guarda en disco `public` en `landing/novuspos-desktop-setup.exe`; al subir uno nuevo se reemplaza.
+- El endpoint público `GET /landing/download` hace stream del archivo con `Content-Disposition: attachment`.
 
 ## Pendientes / siguiente fase
 
-- `PUT /api/v1/admin/landing` para que el dueño edite la landing (contrato ya existe en front: `ADMIN_ENDPOINTS.landing`).
-- Validación server-side del shape de config antes de guardar.
+- Validación server-side del shape completo de config antes de guardar.
 - Versionado/historial de cambios opcional.
+- Autenticación/firma de URL si el instalador deja de ser público.
 
 ## Pruebas
 

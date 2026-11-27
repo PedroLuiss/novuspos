@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 import { TRUST_BADGE_ICONS } from '@/shared/services/landing/defaults'
-import type { LandingCopy } from '@/shared/services/landing/types'
+import type { LandingCopy, LandingDownload } from '@/shared/services/landing/types'
 import { MS } from '@/shared/ui/MS'
 
 export { MS }
 
 /** Cabecera del Hero en dos columnas: texto configurable a la izquierda y capturas a la derecha. */
-export function HeroHeader({ hero, children }: { hero: LandingCopy['hero']; children: ReactNode }) {
+export function HeroHeader({ hero, download, children }: { hero: LandingCopy['hero']; download: LandingDownload | null; children: ReactNode }) {
   return (
     <section className="relative w-full px-margin pt-space-xl pb-space-xl max-w-7xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-space-xl">
@@ -26,7 +26,8 @@ export function HeroHeader({ hero, children }: { hero: LandingCopy['hero']; chil
 
           <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-space-md w-full max-w-md mb-space-lg">
             <a
-              href="#descargar"
+              href={download?.url || '#descargar'}
+              {...(download?.url ? { download: download.fileName || true, target: '_blank', rel: 'noreferrer' } : {})}
               className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-lg bg-primary text-on-primary font-headline-sm text-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95"
             >
               <MS name="download" className="text-[24px] cta-download-icon transition-transform" />

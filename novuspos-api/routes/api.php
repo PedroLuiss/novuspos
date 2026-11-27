@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::get('/landing/config', [LandingConfigController::class, 'show']);
+    Route::get('/landing/download', [LandingConfigController::class, 'download']);
 
     Route::prefix('auth')->group(function (): void {
         Route::post('/login', [AuthController::class, 'login']);
@@ -91,6 +92,8 @@ Route::prefix('v1')->group(function (): void {
 
             Route::get('/landing', [AdminLandingController::class, 'show']);
             Route::put('/landing', [AdminLandingController::class, 'update']);
+            Route::post('/landing/download', [AdminLandingController::class, 'uploadDownload']);
+            Route::delete('/landing/download', [AdminLandingController::class, 'deleteDownload']);
 
             Route::get('/plans', [AdminPlanController::class, 'index']);
             Route::put('/plans', [AdminPlanController::class, 'update']);

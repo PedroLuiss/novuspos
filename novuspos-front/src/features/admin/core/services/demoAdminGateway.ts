@@ -398,6 +398,26 @@ export const demoAdminGateway: AdminGateway = {
     return landingStore.write(config)
   },
 
+  async uploadLandingDownload(file: File, version?: string) {
+    await wait()
+    const config = landingStore.read()
+    const download = {
+      url: URL.createObjectURL(file),
+      fileName: file.name || 'novuspos-desktop-setup.exe',
+      sizeBytes: file.size,
+      ...(version?.trim() ? { version: version.trim() } : {}),
+      updatedAt: new Date().toISOString(),
+    }
+    landingStore.write({ ...config, download })
+    return download
+  },
+
+  async deleteLandingDownload() {
+    await wait()
+    const config = landingStore.read()
+    landingStore.write({ ...config, download: null })
+  },
+
   async listPlans(): Promise<PlanOption[]> {
     await wait()
     return plansStore.read()

@@ -25,6 +25,7 @@
     "header": { "src": "/novuspos-logo.png", "alt": "NovusPOS Logo" },
     "footer": { "src": "/novuspos-logo.png", "alt": "NovusPOS Logo" }
   },
+  "download": null,
   "copy": {
     "header": { "features": "Características", "products": "Productos", "pricing": "Precios", "docs": "Documentación", "login": "Iniciar Sesión" },
     "hero": {
