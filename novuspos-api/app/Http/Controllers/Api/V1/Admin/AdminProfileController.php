@@ -7,7 +7,6 @@ use App\Http\Requests\Api\V1\Admin\AdminChangePasswordRequest;
 use App\Http\Requests\Api\V1\Admin\AdminUpdateProfileRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AdminProfileController extends Controller
@@ -52,12 +51,6 @@ class AdminProfileController extends Controller
     {
         $user = $request->user();
         $data = $request->validated();
-
-        if (! Hash::check($data['currentPassword'], $user->password)) {
-            throw ValidationException::withMessages([
-                'currentPassword' => ['La contraseña actual no es correcta.'],
-            ]);
-        }
 
         $user->password = $data['password'];
         $user->save();

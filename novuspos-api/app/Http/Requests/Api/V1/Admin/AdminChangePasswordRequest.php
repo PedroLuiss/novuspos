@@ -17,8 +17,7 @@ class AdminChangePasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'currentPassword' => ['required', 'string'],
-            'password' => ['required', 'string', 'min:8', 'max:10', 'confirmed'],
+            'password' => ['required', 'string', 'min:8', 'max:20', 'confirmed'],
         ];
     }
 

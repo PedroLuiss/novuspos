@@ -60,9 +60,9 @@ export function useAdminProfile() {
     }
   }, [])
 
-  const changePassword = useCallback(async (payload: { currentPassword: string; password: string; passwordConfirmation: string }) => {
-    if (payload.password.length < 8 || payload.password.length > 10) {
-      setState((s) => ({ ...s, fieldErrors: { password: ['La contraseña debe tener entre 8 y 10 caracteres.'] }, formError: null, passwordSuccess: null }))
+  const changePassword = useCallback(async (payload: { password: string; passwordConfirmation: string }) => {
+    if (payload.password.length < 8 || payload.password.length > 20) {
+      setState((s) => ({ ...s, fieldErrors: { password: ['La contraseña debe tener entre 8 y 20 caracteres.'] }, formError: null, passwordSuccess: null }))
       return
     }
     if (payload.password !== payload.passwordConfirmation) {

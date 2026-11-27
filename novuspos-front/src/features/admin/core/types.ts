@@ -233,7 +233,6 @@ export interface AdminProfile {
 }
 
 export interface AdminPasswordPayload {
-  currentPassword: string
   password: string
   passwordConfirmation: string
 }

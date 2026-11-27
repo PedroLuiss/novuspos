@@ -172,23 +172,20 @@ class AdminPanelTest extends TestCase
             ->assertJsonPath('email', 'admin2@novuspos.com');
 
         $this->putJson('/api/v1/admin/profile/password', [
-            'currentPassword' => 'NovusPOS123*',
             'password' => 'Abc@1234',
             'passwordConfirmation' => 'Abc@1234',
         ])->assertOk()
             ->assertJsonPath('message', 'Contraseña actualizada correctamente.');
 
         $this->putJson('/api/v1/admin/profile/password', [
-            'currentPassword' => 'Abc@1234',
             'password' => 'short1!',
             'passwordConfirmation' => 'short1!',
         ])->assertUnprocessable()
             ->assertJsonValidationErrors(['password']);
 
         $this->putJson('/api/v1/admin/profile/password', [
-            'currentPassword' => 'Abc@1234',
-            'password' => 'TooLong123!',
-            'passwordConfirmation' => 'TooLong123!',
+            'password' => 'ThisPasswordIsWayTooLong!',
+            'passwordConfirmation' => 'ThisPasswordIsWayTooLong!',
         ])->assertUnprocessable()
             ->assertJsonValidationErrors(['password']);
     }
