@@ -415,6 +415,11 @@ export const demoAdminGateway: AdminGateway = {
     return download
   },
 
+  async downloadLandingInstaller() {
+    await wait()
+    return new Blob(['demo-installer'], { type: 'application/vnd.microsoft.portable-executable' })
+  },
+
   async deleteLandingDownload() {
     await wait()
     const config = landingStore.read()

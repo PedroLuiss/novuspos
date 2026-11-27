@@ -12,6 +12,7 @@ import type {
   LandingTheme,
 } from '@/shared/services/landing/types'
 import { adminService } from '@/features/admin/core/services/adminService'
+import { saveBlob } from '@/shared/services/landing/desktopDownload'
 
 const initial = normalizeLandingConfig(LANDING_DEFAULTS)
 
@@ -141,6 +142,15 @@ export function useLandingEditor() {
     }
   }, [syncDownloadSnapshot])
 
+  const downloadInstaller = useCallback(async () => {
+    try {
+      const blob = await adminService.downloadLandingInstaller()
+      saveBlob(blob, draft.download?.fileName || 'novuspos-desktop-setup.exe')
+    } catch {
+      setError('No pudimos descargar el instalador. Inténtalo de nuevo.')
+    }
+  }, [draft.download?.fileName])
+
   const restoreDefaults = useCallback(() => {
     mutate(() => normalizeLandingConfig(LANDING_DEFAULTS))
   }, [mutate])
@@ -193,6 +203,7 @@ export function useLandingEditor() {
     setDownload,
     uploadDownload,
     deleteDownload,
+    downloadInstaller,
     restoreDefaults,
     save,
     reset,

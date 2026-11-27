@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { TRUST_BADGE_ICONS } from '@/shared/services/landing/defaults'
+import { requestDesktopDownload } from '@/shared/services/landing/desktopDownload'
 import type { LandingCopy, LandingDownload } from '@/shared/services/landing/types'
 import { MS } from '@/shared/ui/MS'
 
@@ -7,6 +8,17 @@ export { MS }
 
 /** Cabecera del Hero en dos columnas: texto configurable a la izquierda y capturas a la derecha. */
 export function HeroHeader({ hero, download, children }: { hero: LandingCopy['hero']; download: LandingDownload | null; children: ReactNode }) {
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  const handleDownload = () => {
+    if (!download?.url) {
+      document.getElementById('descargar')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    setIsDownloading(true)
+    void requestDesktopDownload(download.fileName).finally(() => setIsDownloading(false))
+  }
+
   return (
     <section className="relative w-full px-margin pt-space-xl pb-space-xl max-w-7xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center gap-space-xl">
@@ -25,17 +37,18 @@ export function HeroHeader({ hero, download, children }: { hero: LandingCopy['he
           <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mb-space-xl">{hero.description}</p>
 
           <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-space-md w-full max-w-md mb-space-lg">
-            <a
-              href={download?.url || '#descargar'}
-              {...(download?.url ? { download: download.fileName || true, target: '_blank', rel: 'noreferrer' } : {})}
-              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-lg bg-primary text-on-primary font-headline-sm text-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95"
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={isDownloading}
+              className="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-space-sm px-space-lg py-space-md rounded-lg bg-primary text-on-primary font-headline-sm text-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95 disabled:opacity-70"
             >
-              <MS name="download" className="text-[24px] cta-download-icon transition-transform" />
+              <MS name={isDownloading ? 'progress_activity' : 'download'} className={`text-[24px] transition-transform ${isDownloading ? 'animate-spin' : 'cta-download-icon'}`} />
               <span className="flex flex-col text-left">
-                <span>{hero.primaryCta}</span>
+                <span>{isDownloading ? 'Preparando descarga…' : hero.primaryCta}</span>
                 <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">{hero.primaryCtaNote}</span>
               </span>
-            </a>
+            </button>
             <a
               href="#interfaz-en-vivo"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-space-xs px-space-lg py-space-md rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold hover:bg-surface-container-highest transition-colors"

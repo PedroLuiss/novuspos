@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/services/apiClient'
-import { ADMIN_ENDPOINTS } from '@/shared/services/endpoints'
+import { ADMIN_ENDPOINTS, LANDING_ENDPOINTS } from '@/shared/services/endpoints'
 import { normalizeLandingConfig } from '@/shared/services/landing/landingStore'
 import type { LandingConfig } from '@/shared/services/landing/types'
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
@@ -83,6 +83,7 @@ export const httpAdminGateway: AdminGateway = {
     if (!payload.download) throw new Error('No se recibió el instalador.')
     return payload.download
   },
+  downloadLandingInstaller: () => apiClient.getBlob(LANDING_ENDPOINTS.download, { headers: authHeaders() }),
   async deleteLandingDownload() {
     await apiClient.delete(ADMIN_ENDPOINTS.landingDownload, { headers: authHeaders() })
   },

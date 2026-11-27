@@ -13,7 +13,7 @@ Proveer la configuración pública de la landing page de NovusPOS. El front (`no
 | Método | Ruta | Auth | Descripción |
 |---|---|---:|---|
 | GET | `/api/v1/landing/config` | No | Obtiene la configuración actual de la landing. |
-| GET | `/api/v1/landing/download` | No | Descarga el instalador .exe publicado; 404 si no hay archivo. |
+| GET | `/api/v1/landing/download` | Sí (Sanctum) | Descarga el instalador .exe publicado; 404 si no hay archivo. Requiere usuario autenticado. |
 | GET | `/api/v1/admin/landing` | Sí (`super-admin`) | Obtiene la configuración completa para el constructor. |
 | PUT | `/api/v1/admin/landing` | Sí (`super-admin`) | Guarda la configuración completa `{config: LandingConfig}`. |
 | POST | `/api/v1/admin/landing/download` | Sí (`super-admin`) | Sube/reemplaza el instalador .exe. Multipart: `file` (.exe, máx 512MB), `version?`. |
@@ -101,7 +101,7 @@ Proveer la configuración pública de la landing page de NovusPOS. El front (`no
 - La config se guarda como JSON completo para compatibilidad con el editor/admin del front.
 - `download` puede ser `null` o `{url,fileName,sizeBytes,version?,updatedAt?}`.
 - El instalador se guarda en disco `public` en `landing/novuspos-desktop-setup.exe`; al subir uno nuevo se reemplaza.
-- El endpoint público `GET /landing/download` hace stream del archivo con `Content-Disposition: attachment`.
+- El endpoint `GET /landing/download` requiere autenticación Sanctum y hace stream del archivo con `Content-Disposition: attachment`.
 
 ## Pendientes / siguiente fase
 

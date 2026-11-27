@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { usePlans } from '@/shared/hooks/usePlans'
 import { plansService } from '@/shared/services/plans/plansService'
+import { requestDesktopDownload } from '@/shared/services/landing/desktopDownload'
 import type { PlanOption } from '@/shared/services/plans/types'
 import type { LandingCopy, LandingDownload } from '@/shared/services/landing/types'
 import { MS } from './HeroHeader'
@@ -22,6 +24,17 @@ interface PlanPriceProps {
 
 /** Tarjeta de precio reutilizable; los planes vienen del catálogo del dueño. */
 function PlanPriceCard({ name, price, period, note, ribbon, onSale, compatibility, benefits, cta, ctaNote, download }: PlanPriceProps) {
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  const handleDownload = () => {
+    if (!download?.url) {
+      document.getElementById('descargar')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    setIsDownloading(true)
+    void requestDesktopDownload(download.fileName).finally(() => setIsDownloading(false))
+  }
+
   return (
     <article
       className={`w-full rounded-2xl bg-surface-container-lowest p-space-xl shadow-xl relative overflow-hidden flex flex-col ${
@@ -59,17 +72,18 @@ function PlanPriceCard({ name, price, period, note, ribbon, onSale, compatibilit
         ))}
       </div>
 
-      <a
-        href={download?.url || '#descargar'}
-        {...(download?.url ? { download: download.fileName || true, target: '_blank', rel: 'noreferrer' } : {})}
-        className="mt-auto w-full inline-flex items-center justify-center gap-space-sm px-space-xl py-space-md rounded-lg bg-primary text-on-primary font-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95"
+      <button
+        type="button"
+        onClick={handleDownload}
+        disabled={isDownloading}
+        className="mt-auto w-full inline-flex items-center justify-center gap-space-sm px-space-xl py-space-md rounded-lg bg-primary text-on-primary font-headline-sm font-bold shadow-xl cta-shimmer-btn group active:scale-95 disabled:opacity-70"
       >
-        <MS name="download" className="text-[24px] cta-download-icon transition-transform" />
+        <MS name={isDownloading ? 'progress_activity' : 'download'} className={`text-[24px] transition-transform ${isDownloading ? 'animate-spin' : 'cta-download-icon'}`} />
         <span className="flex flex-col text-left">
-          <span>{cta}</span>
+          <span>{isDownloading ? 'Preparando descarga…' : cta}</span>
           <span className="font-label-sm text-label-sm text-on-primary/80 font-normal">{ctaNote}</span>
         </span>
-      </a>
+      </button>
     </article>
   )
 }

@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::get('/landing/config', [LandingConfigController::class, 'show']);
-    Route::get('/landing/download', [LandingConfigController::class, 'download']);
 
     Route::prefix('auth')->group(function (): void {
         Route::post('/login', [AuthController::class, 'login']);
@@ -50,6 +49,7 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/billing/exchange-rate', [ExchangeRateController::class, 'today']);
 
     Route::middleware('auth:sanctum')->group(function (): void {
+        Route::get('/landing/download', [LandingConfigController::class, 'download']);
         Route::get('/panel/overview', [DashboardController::class, 'overview']);
 
         Route::get('/billing/subscription', [SubscriptionController::class, 'show']);

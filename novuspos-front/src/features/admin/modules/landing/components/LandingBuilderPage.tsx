@@ -98,6 +98,7 @@ export function LandingBuilderPage() {
                 uploadProgress={editor.downloadProgress}
                 onUpload={editor.uploadDownload}
                 onDelete={editor.deleteDownload}
+                onDownload={editor.downloadInstaller}
               />
             )}
           </div>

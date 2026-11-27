@@ -51,6 +51,8 @@ export interface AdminGateway {
   saveLanding(config: LandingConfig): Promise<LandingConfig>
   /** Sube el instalador .exe del escritorio y devuelve su metadata pública. */
   uploadLandingDownload(file: File, version?: string, onProgress?: (percent: number) => void): Promise<LandingDownload>
+  /** Descarga el instalador publicado usando la sesión del super admin. */
+  downloadLandingInstaller(): Promise<Blob>
   /** Elimina el instalador publicado de la landing. */
   deleteLandingDownload(): Promise<void>
   /** Catálogo completo de suscripciones, incluidas las ocultas. */

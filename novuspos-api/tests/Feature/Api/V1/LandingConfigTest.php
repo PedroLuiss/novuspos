@@ -3,8 +3,10 @@
 namespace Tests\Feature\Api\V1;
 
 use App\Models\LandingConfig;
+use App\Models\User;
 use App\Support\LandingDefaults;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class LandingConfigTest extends TestCase
@@ -39,5 +41,25 @@ class LandingConfigTest extends TestCase
                 'config' => ['theme', 'sections', 'screenshots', 'logos', 'copy'],
                 'updatedAt',
             ]);
+    }
+
+    public function test_landing_download_requires_authentication(): void
+    {
+        $response = $this->getJson('/api/v1/landing/download');
+
+        $response->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_can_download_published_installer(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('landing/novuspos-desktop-setup.exe', 'fake-installer');
+
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/api/v1/landing/download');
+
+        $response->assertOk();
+        $response->assertDownload('novuspos-desktop-setup.exe');
     }
 }

@@ -1,5 +1,7 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useEffect, useRef, type ReactNode } from 'react'
 import { useLandingConfig } from '@/shared/hooks/useLandingConfig'
+import { useAuth } from '@/shared/hooks/useAuth'
+import { consumeAutoDesktopDownload } from '@/shared/services/landing/desktopDownload'
 import { themeToStyle } from '@/shared/services/landing/landingPreview'
 import type { LandingConfig, LandingSectionId } from '@/shared/services/landing/types'
 import { ComparisonTable } from '@/features/landing/components/ComparisonTable'
@@ -32,7 +34,17 @@ function renderSection(id: LandingSectionId, config: LandingConfig): ReactNode {
 
 export function LandingPage() {
   const { config } = useLandingConfig()
+  const { isAuthenticated } = useAuth()
+  const autoDownloadHandled = useRef(false)
   const visible = config.sections.filter((section) => section.visible)
+
+  useEffect(() => {
+    if (!isAuthenticated || autoDownloadHandled.current) return
+    autoDownloadHandled.current = true
+    void consumeAutoDesktopDownload().catch(() => {
+      // El usuario puede reintentar desde el botón de descarga.
+    })
+  }, [isAuthenticated])
 
   return (
     <div className="w-full bg-surface" style={themeToStyle(config.theme)}>

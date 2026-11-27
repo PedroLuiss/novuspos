@@ -11,6 +11,7 @@ interface Props {
   uploadProgress: number
   onUpload: (file: File, version?: string) => Promise<LandingDownload | null>
   onDelete: () => Promise<boolean>
+  onDownload: () => Promise<void>
 }
 
 function formatBytes(bytes: number): string {
@@ -29,7 +30,7 @@ function formatDate(value?: string): string {
 }
 
 /** Carga el instalador .exe del escritorio que la landing pública ofrece para descargar. */
-export function LandingDownloadEditor({ download, isUploading, uploadProgress, onUpload, onDelete }: Props) {
+export function LandingDownloadEditor({ download, isUploading, uploadProgress, onUpload, onDelete, onDownload }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [version, setVersion] = useState(download?.version ?? '')
   const [localError, setLocalError] = useState<string | null>(null)
@@ -149,14 +150,13 @@ export function LandingDownloadEditor({ download, isUploading, uploadProgress, o
               </div>
             </div>
 
-            <a
-              href={download.url}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={() => void onDownload()}
               className="inline-flex items-center gap-space-xs font-label-sm text-label-sm font-semibold text-primary hover:underline"
             >
-              <MS name="open_in_new" className="text-[16px]" /> Ver enlace de descarga
-            </a>
+              <MS name="download" className="text-[16px]" /> Descargar instalador
+            </button>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-space-xs rounded-xl border border-dashed border-outline-variant/70 bg-surface-container-low/40 px-space-md py-space-lg text-center">
