@@ -1,3 +1,4 @@
+import { useAuth } from '@/shared/hooks/useAuth'
 import type { LandingCopy, LandingLogo, LandingSectionId } from '@/shared/services/landing/types'
 
 /** Header fijo del sitio; el logo y los enlaces los configura el dueño. */
@@ -10,6 +11,7 @@ export function SiteHeader({
   logo: LandingLogo
   visibleSections: LandingSectionId[]
 }) {
+  const { isAuthenticated, logout } = useAuth()
   const linkClass =
     'font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors py-space-xs px-space-sm'
   const visible = (id: LandingSectionId) => visibleSections.includes(id)
@@ -26,12 +28,30 @@ export function SiteHeader({
           {visible('pricing') && <a className={linkClass} href="#precios">{header.pricing}</a>}
           <a className={linkClass} href="#inicio">{header.docs}</a>
         </nav>
-        <a
-          className="inline-flex items-center justify-center font-label-md text-label-md px-space-md py-space-xs rounded-lg text-on-surface hover:bg-surface-container transition-colors"
-          href="/auth/login"
-        >
-          {header.login}
-        </a>
+        {isAuthenticated ? (
+          <div className="flex items-center gap-space-xs">
+            <a
+              className="inline-flex items-center justify-center font-label-md text-label-md px-space-md py-space-xs rounded-lg text-on-surface hover:bg-surface-container transition-colors"
+              href="/panel"
+            >
+              Ir al panel
+            </a>
+            <button
+              type="button"
+              onClick={() => void logout()}
+              className="inline-flex items-center justify-center font-label-md text-label-md px-space-md py-space-xs rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+            >
+              Cerrar sesión
+            </button>
+          </div>
+        ) : (
+          <a
+            className="inline-flex items-center justify-center font-label-md text-label-md px-space-md py-space-xs rounded-lg text-on-surface hover:bg-surface-container transition-colors"
+            href="/auth/login"
+          >
+            {header.login}
+          </a>
+        )}
       </div>
     </header>
   )
