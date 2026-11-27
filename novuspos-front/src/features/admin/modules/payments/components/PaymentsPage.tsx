@@ -54,7 +54,7 @@ export function PaymentsPage() {
 
   const first = total > 0 ? (page - 1) * pageSize + 1 : 0
   const last = total > 0 ? Math.min(page * pageSize, total) : 0
-  const hasFilters = Boolean(query.search || query.status !== 'pending')
+  const hasFilters = Boolean(query.search || query.status !== 'all')
 
   if (isLoading && payments.length === 0) return <PaymentsSkeleton />
 
