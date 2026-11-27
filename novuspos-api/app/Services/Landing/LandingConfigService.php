@@ -31,4 +31,34 @@ class LandingConfigService
             'updatedAt' => $landingConfig->updated_at?->toISOString(),
         ];
     }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getAdminConfig(): array
+    {
+        $landingConfig = $this->landingConfigRepository->latest();
+        $config = $landingConfig && is_array($landingConfig->config)
+            ? $landingConfig->config
+            : LandingDefaults::config();
+
+        if ($landingConfig?->updated_at) {
+            $config['updatedAt'] = $landingConfig->updated_at->toISOString();
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param  array<string, mixed>  $config
+     * @return array<string, mixed>
+     */
+    public function save(array $config): array
+    {
+        $landingConfig = $this->landingConfigRepository->save($config);
+        $saved = is_array($landingConfig->config) ? $landingConfig->config : $config;
+        $saved['updatedAt'] = $landingConfig->updated_at?->toISOString();
+
+        return $saved;
+    }
 }

@@ -9,12 +9,20 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureRole
 {
     /**
-     * Handle an incoming request.
-     *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
+        $user = $request->user();
+
+        if (! $user) {
+            abort(401, 'Unauthenticated.');
+        }
+
+        if ($roles !== [] && method_exists($user, 'hasAnyRole') && ! $user->hasAnyRole($roles)) {
+            abort(403, 'No tienes permisos para realizar esta acción.');
+        }
+
         return $next($request);
     }
 }

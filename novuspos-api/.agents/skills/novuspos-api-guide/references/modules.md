@@ -39,3 +39,10 @@
 - Estado: implementado (fallback)
 - Doc: `docs/modules/exchange-rate.md`
 - Endpoint: `GET /billing/exchange-rate`
+
+## Admin
+- Estado: implementado (base)
+- Doc: `docs/modules/admin.md`
+- Endpoints: `/api/v1/admin/login`, overview, payments, users, reports, notifications, emails, settings, landing, plans, payment-methods
+- DB: `admin_settings`, `admin_notifications`, `admin_emails`; reutiliza users/plans/payment_methods/payments/subscriptions/support_tickets/landing_configs
+- Auth: Sanctum + rol `super-admin`

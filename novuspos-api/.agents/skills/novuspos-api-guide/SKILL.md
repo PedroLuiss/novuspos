@@ -29,7 +29,8 @@ Usar siempre que se trabaje en `novuspos-api/`, especialmente al:
 | Módulo | Estado | Doc | Contrato front |
 |---|---|---|---|
 | Landing | Implementado base | `docs/modules/landing.md` | `LANDING_ENDPOINTS.config` |
-| Auth | Contrato definido | `docs/modules/auth.md` | `AUTH_ENDPOINTS.*` |
+| Auth | Implementado | `docs/modules/auth.md` | `AUTH_ENDPOINTS.*` |
+| Admin | Implementado base | `docs/modules/admin.md` | `ADMIN_ENDPOINTS.*` |
 
 ## Convenciones clave
 
@@ -48,3 +49,5 @@ Usar siempre que se trabaje en `novuspos-api/`, especialmente al:
 - [ ] Doc del módulo actualizada
 - [ ] `vendor/bin/pint --dirty --format agent`
 - [ ] `php artisan test --compact --filter=...`
+
+

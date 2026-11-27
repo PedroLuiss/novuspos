@@ -18,4 +18,10 @@ interface PlanRepositoryInterface
     public function all(): Collection;
 
     public function findBySlug(string $slug): ?Plan;
+
+    /**
+     * @param  array<int, array<string, mixed>>  $plans
+     * @return Collection<int, Plan>
+     */
+    public function replaceAll(array $plans): Collection;
 }

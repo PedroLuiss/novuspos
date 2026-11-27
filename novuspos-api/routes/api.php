@@ -1,5 +1,16 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\AdminAuthController;
+use App\Http\Controllers\Api\V1\Admin\AdminEmailController;
+use App\Http\Controllers\Api\V1\Admin\AdminLandingController;
+use App\Http\Controllers\Api\V1\Admin\AdminNotificationController;
+use App\Http\Controllers\Api\V1\Admin\AdminOverviewController;
+use App\Http\Controllers\Api\V1\Admin\AdminPaymentController;
+use App\Http\Controllers\Api\V1\Admin\AdminPaymentMethodController as AdminPaymentMethodControllerAlias;
+use App\Http\Controllers\Api\V1\Admin\AdminPlanController;
+use App\Http\Controllers\Api\V1\Admin\AdminReportController;
+use App\Http\Controllers\Api\V1\Admin\AdminSettingsController;
+use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Backup\BackupController;
 use App\Http\Controllers\Api\V1\Billing\PaymentController;
@@ -48,5 +59,40 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/backups', [BackupController::class, 'store']);
 
         Route::post('/support/tickets', [SupportTicketController::class, 'store']);
+    });
+
+    Route::prefix('admin')->group(function (): void {
+        Route::post('/login', [AdminAuthController::class, 'login']);
+
+        Route::middleware(['auth:sanctum', 'role:super-admin'])->group(function (): void {
+            Route::get('/overview', [AdminOverviewController::class, 'show']);
+
+            Route::get('/payments', [AdminPaymentController::class, 'index']);
+            Route::patch('/payments/{payment}/review', [AdminPaymentController::class, 'review']);
+
+            Route::get('/users', [AdminUserController::class, 'index']);
+            Route::get('/users/options', [AdminUserController::class, 'options']);
+            Route::patch('/users/{user}', [AdminUserController::class, 'update']);
+            Route::patch('/users/{user}/subscription', [AdminUserController::class, 'setSubscription']);
+
+            Route::get('/reports', [AdminReportController::class, 'index']);
+
+            Route::get('/notifications', [AdminNotificationController::class, 'index']);
+            Route::post('/notifications', [AdminNotificationController::class, 'store']);
+
+            Route::get('/emails', [AdminEmailController::class, 'index']);
+            Route::post('/emails', [AdminEmailController::class, 'store']);
+
+            Route::get('/settings', [AdminSettingsController::class, 'show']);
+            Route::put('/settings', [AdminSettingsController::class, 'update']);
+
+            Route::get('/landing', [AdminLandingController::class, 'show']);
+            Route::put('/landing', [AdminLandingController::class, 'update']);
+
+            Route::get('/plans', [AdminPlanController::class, 'index']);
+            Route::put('/plans', [AdminPlanController::class, 'update']);
+
+            Route::put('/payment-methods', [AdminPaymentMethodControllerAlias::class, 'update']);
+        });
     });
 });

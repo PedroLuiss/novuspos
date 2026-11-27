@@ -23,6 +23,29 @@ class PlanService
     }
 
     /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function listAll(): array
+    {
+        return $this->planRepository->all()
+            ->map(fn (Plan $plan): array => $this->toArray($plan))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $plans
+     * @return array<int, array<string, mixed>>
+     */
+    public function replaceAll(array $plans): array
+    {
+        return $this->planRepository->replaceAll($plans)
+            ->map(fn (Plan $plan): array => $this->toArray($plan))
+            ->values()
+            ->all();
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toArray(Plan $plan): array

@@ -48,6 +48,7 @@ API local por defecto: `http://localhost:8000/api/v1`.
 | Backups | Implementado | [modules/backups.md](modules/backups.md) | `/backups/latest`, `/backups` |
 | Support | Implementado | [modules/support.md](modules/support.md) | `POST /support/tickets` |
 | Exchange Rate | Implementado | [modules/exchange-rate.md](modules/exchange-rate.md) | `GET /billing/exchange-rate` |
+| Admin | Implementado (base) | [modules/admin.md](modules/admin.md) | `/admin/login`, `/admin/overview`, `/admin/users`, `/admin/payments`, `/admin/reports`, `/admin/notifications`, `/admin/emails`, `/admin/settings`, `/admin/landing`, `/admin/plans`, `/admin/payment-methods` |
 
 ## Documentación
 
