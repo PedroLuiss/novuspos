@@ -121,6 +121,25 @@ class AdminUserService
     }
 
     /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public function create(array $data): array
+    {
+        $user = User::query()->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'organization_name' => $data['businessName'],
+            'business_sector' => $data['businessType'] ?? null,
+        ]);
+
+        $user->assignRole('client');
+
+        return $this->toArray($user->fresh(['latestSubscription']));
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function setSubscription(string $userId, string $planId, bool $active): array

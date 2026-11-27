@@ -243,3 +243,25 @@ export interface UserPatch {
   businessName?: string
   businessType?: string
 }
+
+export interface AdminCreateUserPayload {
+  name: string
+  email: string
+  password: string
+  businessName: string
+  businessType?: string
+}
+
+export interface AdminCreatePaymentPayload {
+  userId: string
+  planId: string
+  amount?: number
+  currency?: string
+  method: string
+  reference: string
+  bank?: string
+  paidAt: string
+  status: 'approved' | 'pending'
+  note?: string
+  proofDataUrl?: string
+}

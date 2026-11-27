@@ -68,6 +68,7 @@ export const ADMIN_ENDPOINTS = {
     if (params.status && params.status !== 'all') query.set('status', params.status)
     return `/admin/payments?${query.toString()}`
   },
+  createPayment: '/admin/payments',
   reviewPayment: (paymentId: string) => `/admin/payments/${paymentId}/review`,
   users: '/admin/users',
   /** GET paginado y filtrado del directorio; la edición sigue en `updateUser`. */
@@ -84,6 +85,7 @@ export const ADMIN_ENDPOINTS = {
   },
   /** Lista ligera de comercios para los selectores de destinatarios. */
   userOptions: '/admin/users/options',
+  createUser: '/admin/users',
   updateUser: (userId: string) => `/admin/users/${userId}`,
   setSubscription: (userId: string) => `/admin/users/${userId}/subscription`,
   /** GET paginado y filtrado del historial de reportes. */

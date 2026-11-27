@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Admin\AdminCreatePaymentRequest;
 use App\Http\Requests\Api\V1\Admin\AdminReviewPaymentRequest;
 use App\Services\Admin\AdminPaymentService;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +18,11 @@ class AdminPaymentController extends Controller
     public function index(Request $request): JsonResponse
     {
         return response()->json($this->paymentService->list($request->query()));
+    }
+
+    public function store(AdminCreatePaymentRequest $request): JsonResponse
+    {
+        return response()->json($this->paymentService->create($request->validated()), 201);
     }
 
     public function review(AdminReviewPaymentRequest $request, string $payment): JsonResponse

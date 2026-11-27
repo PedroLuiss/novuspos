@@ -20,8 +20,10 @@ Panel de super administración para gestionar usuarios, pagos, reportes, notific
 | POST | `/api/v1/admin/login` | Login admin |
 | GET | `/api/v1/admin/overview` | KPIs y resumen |
 | GET | `/api/v1/admin/payments` | Pagos paginados + summary |
+| POST | `/api/v1/admin/payments` | Registrar pago manual para un usuario (puede activar suscripción) |
 | PATCH | `/api/v1/admin/payments/{payment}/review` | Aprobar/rechazar pago |
 | GET | `/api/v1/admin/users` | Usuarios paginados + summary |
+| POST | `/api/v1/admin/users` | Crear usuario cliente desde el panel admin |
 | GET | `/api/v1/admin/users/options` | Opciones `{id,businessName}` |
 | PATCH | `/api/v1/admin/users/{user}` | Actualizar usuario |
 | PATCH | `/api/v1/admin/users/{user}/subscription` | Asignar/activar suscripción |
@@ -37,17 +39,23 @@ Panel de super administración para gestionar usuarios, pagos, reportes, notific
 | GET | `/api/v1/admin/plans` | Listar planes (admin) |
 | PUT | `/api/v1/admin/plans` | Reemplazar catálogo planes |
 | PUT | `/api/v1/admin/payment-methods` | Reemplazar catálogo métodos pago |
+| GET | `/api/v1/admin/profile` | Perfil del super admin |
+| PUT | `/api/v1/admin/profile` | Actualizar perfil admin |
+| PUT | `/api/v1/admin/profile/password` | Cambiar contraseña admin (8-20, sin contraseña actual) |
 
 ## Shapes clave
 
 - **Overview**: `{totalUsers, unpaidUsers, pendingPayments, approvedPayments, revenueUsd, openReports, planSales:[{planName,count}], recentPayments: AdminPayment[]}`
 - **PaymentPage**: `{items,total,page,pageSize,summary:{pending,approved,rejected,total}}`
 - **AdminPayment**: `{id,userId,userName,planId,planName,method,reference,bank,paidAt,amount,currency,status(pending|approved|rejected),proofUrl,reviewNote?,createdAt}`
+- **CreatePayment payload**: `{userId,planId,amount?,currency?,method,reference,bank?,paidAt,status(approved|pending),note?,proofDataUrl?}`. Si `status=approved`, crea/actualiza suscripción activa.
 - **UserPage**: `{items,total,page,pageSize,summary:{active,pending,inactive,total}}`
 - **AdminUser**: `{id,name,email,businessName,businessType,planId,planName,subscriptionStatus,joinedAt,lastPaymentAt,openReports}`
+- **CreateUser payload**: `{name,email,password,businessName,businessType?}`. Crea usuario con rol `client`.
 - **ReportPage**: `{items,total,page,pageSize,summary:{total,open,resolved,web,desktop}}`
 - **NotificationPage/EmailPage**: `{items,total,page,pageSize}`
 - **AdminSettings**: `{companyName,contactEmail,phone,address,loginPath}`
+- **AdminProfile**: `{name,email}`; password: `{password,passwordConfirmation}` (8-20).
 
 ## Filtros/paginación
 

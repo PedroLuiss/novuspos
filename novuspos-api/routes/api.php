@@ -69,9 +69,11 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/overview', [AdminOverviewController::class, 'show']);
 
             Route::get('/payments', [AdminPaymentController::class, 'index']);
+            Route::post('/payments', [AdminPaymentController::class, 'store']);
             Route::patch('/payments/{payment}/review', [AdminPaymentController::class, 'review']);
 
             Route::get('/users', [AdminUserController::class, 'index']);
+            Route::post('/users', [AdminUserController::class, 'store']);
             Route::get('/users/options', [AdminUserController::class, 'options']);
             Route::patch('/users/{user}', [AdminUserController::class, 'update']);
             Route::patch('/users/{user}/subscription', [AdminUserController::class, 'setSubscription']);

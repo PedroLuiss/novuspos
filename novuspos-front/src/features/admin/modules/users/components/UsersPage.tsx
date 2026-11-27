@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { MS } from '@/shared/ui/MS'
 import { useAdminUsers } from '../hooks/useAdminUsers'
 import { formatAdminDate, statusLabels, subscriptionTone } from '@/features/admin/core/lib/adminFormatters'
-import { adminCompactButton, adminInput, adminSecondaryButton, adminTd, adminTh } from '@/features/admin/core/lib/adminStyles'
-import type { AdminUser, UserPageSize, UserPatch, UserStatusFilter } from '../types'
+import { adminCompactButton, adminInput, adminPrimaryButton, adminSecondaryButton, adminTd, adminTh } from '@/features/admin/core/lib/adminStyles'
+import type { AdminCreateUserPayload, AdminUser, UserPageSize, UserPatch, UserStatusFilter } from '../types'
 import { UsersSkeleton } from './UsersSkeleton'
 import { AdminAlert, AdminAvatar, AdminBadge, AdminCard, AdminPageHeader, AdminState } from '@/features/admin/core/ui/AdminUi'
+import { UserCreateModal } from './UserCreateModal'
 import { UserEditModal } from './UserEditModal'
 import { USER_PAGE_SIZES, USER_STATUS_OPTIONS, USER_SUMMARY_CARDS } from '../constants'
 
@@ -27,11 +28,14 @@ export function UsersPage() {
     setPageSize,
     setPage,
     resetFilters,
+    create,
     update,
     setSubscription,
   } = useAdminUsers()
   const [searchDraft, setSearchDraft] = useState(query.search)
   const [selected, setSelected] = useState<AdminUser | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [creatingBusy, setCreatingBusy] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
 
   useEffect(() => {
@@ -57,6 +61,11 @@ export function UsersPage() {
         eyebrow="Directorio de comercios"
         title="Usuarios"
         description={`${summary.total} comercios usando NovusPOS. Edita sus datos o activa y desactiva su suscripción.`}
+        actions={
+          <button type="button" onClick={() => setCreating(true)} className={adminPrimaryButton}>
+            <MS name="person_add" className="text-[18px]" /> Nuevo usuario
+          </button>
+        }
       />
 
       <div className="grid grid-cols-1 gap-space-sm sm:grid-cols-3">
@@ -190,6 +199,22 @@ export function UsersPage() {
           </div>
         </div>
       </AdminCard>
+
+      {creating && (
+        <UserCreateModal
+          busy={creatingBusy}
+          onClose={() => { if (!creatingBusy) setCreating(false) }}
+          onCreate={async (payload: AdminCreateUserPayload) => {
+            setCreatingBusy(true)
+            const ok = await create(payload)
+            setCreatingBusy(false)
+            if (ok) {
+              setCreating(false)
+              setNotice('Usuario creado correctamente. Ya puedes gestionar su suscripción y pagos.')
+            }
+          }}
+        />
+      )}
 
       {selected && (
         <UserEditModal

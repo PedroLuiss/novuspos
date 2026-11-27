@@ -4,10 +4,11 @@ import { paymentMethodLabel, paymentMethodLabels } from '@/shared/services/payme
 import { MS } from '@/shared/ui/MS'
 import { useAdminPayments } from '../hooks/useAdminPayments'
 import { formatAdminDate, formatUsd, paymentTone, statusLabels } from '@/features/admin/core/lib/adminFormatters'
-import { adminCompactButton, adminInput, adminSecondaryButton, adminTd, adminTh } from '@/features/admin/core/lib/adminStyles'
-import type { AdminPayment, PaymentPageSize } from '../types'
+import { adminCompactButton, adminInput, adminPrimaryButton, adminSecondaryButton, adminTd, adminTh } from '@/features/admin/core/lib/adminStyles'
+import type { AdminCreatePaymentPayload, AdminPayment, PaymentPageSize } from '../types'
 import { PaymentsSkeleton } from './PaymentsSkeleton'
 import { AdminAlert, AdminAvatar, AdminBadge, AdminCard, AdminFilterChip, AdminPageHeader, AdminState } from '@/features/admin/core/ui/AdminUi'
+import { PaymentCreateModal } from './PaymentCreateModal'
 import { PaymentReviewModal } from './PaymentReviewModal'
 import { PAYMENT_PAGE_SIZES, PAYMENT_STATUS_CHIPS, PAYMENT_SUMMARY_CARDS } from '../constants'
 
@@ -29,10 +30,14 @@ export function PaymentsPage() {
     setPageSize,
     setPage,
     resetFilters,
+    create,
     review,
   } = useAdminPayments()
   const [searchDraft, setSearchDraft] = useState(query.search)
   const [selected, setSelected] = useState<AdminPayment | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [creatingBusy, setCreatingBusy] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
   const { methods } = usePaymentMethods()
   const methodLabels = useMemo(() => paymentMethodLabels(methods), [methods])
 
@@ -60,9 +65,14 @@ export function PaymentsPage() {
         title="Pagos"
         description="Evalúa cada comprobante contra tu banco. Al aprobar, la suscripción del usuario queda activa."
         actions={
-          <a href="/administracion" className={adminSecondaryButton}>
-            <MS name="arrow_back" className="text-[18px]" /> Volver al resumen
-          </a>
+          <div className="flex flex-wrap items-center gap-space-xs">
+            <a href="/administracion" className={adminSecondaryButton}>
+              <MS name="arrow_back" className="text-[18px]" /> Volver al resumen
+            </a>
+            <button type="button" onClick={() => setCreating(true)} className={adminPrimaryButton}>
+              <MS name="add_card" className="text-[18px]" /> Registrar pago
+            </button>
+          </div>
         }
       />
 
@@ -81,6 +91,7 @@ export function PaymentsPage() {
       </div>
 
       {error && <AdminAlert>{error}</AdminAlert>}
+      {notice && <AdminAlert tone="success">{notice}</AdminAlert>}
 
       <AdminCard className="gap-space-sm" icon="filter_list" title="Filtrar pagos" description="Encuentra un cobro por usuario, referencia o banco">
         <div className="flex flex-col gap-space-sm lg:flex-row lg:items-center lg:justify-between">
@@ -198,6 +209,23 @@ export function PaymentsPage() {
           </div>
         </div>
       </AdminCard>
+
+      {creating && (
+        <PaymentCreateModal
+          busy={creatingBusy}
+          methods={methods}
+          onClose={() => { if (!creatingBusy) setCreating(false) }}
+          onCreate={async (payload: AdminCreatePaymentPayload) => {
+            setCreatingBusy(true)
+            const ok = await create(payload)
+            setCreatingBusy(false)
+            if (ok) {
+              setCreating(false)
+              setNotice(payload.status === 'approved' ? 'Pago registrado y suscripción activada.' : 'Pago registrado como pendiente.')
+            }
+          }}
+        />
+      )}
 
       {selected && (
         <PaymentReviewModal

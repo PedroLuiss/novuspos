@@ -189,4 +189,71 @@ class AdminPanelTest extends TestCase
         ])->assertUnprocessable()
             ->assertJsonValidationErrors(['password']);
     }
+
+    #[Test]
+    public function super_admin_can_create_user_and_manage_subscription(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        $response = $this->postJson('/api/v1/admin/users', [
+            'name' => 'Cliente Amigo',
+            'email' => 'amigo@novuspos.com',
+            'password' => 'Secreto123!',
+            'businessName' => 'Comercio Amigo',
+            'businessType' => 'Bodega',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('email', 'amigo@novuspos.com')
+            ->assertJsonPath('businessName', 'Comercio Amigo');
+
+        $userId = $response->json('id');
+        $this->assertDatabaseHas('users', ['email' => 'amigo@novuspos.com']);
+
+        $this->patchJson("/api/v1/admin/users/{$userId}/subscription", [
+            'planId' => 'novus-mensual',
+            'active' => true,
+        ])->assertOk()
+            ->assertJsonPath('subscriptionStatus', 'active')
+            ->assertJsonPath('planId', 'novus-mensual');
+    }
+
+    #[Test]
+    public function super_admin_can_register_payment_for_user(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        $user = User::factory()->create(['email' => 'cliente@novuspos.com']);
+        $user->assignRole('client');
+
+        $response = $this->postJson('/api/v1/admin/payments', [
+            'userId' => $user->id,
+            'planId' => 'novus-mensual',
+            'amount' => 4.99,
+            'currency' => 'USD',
+            'method' => 'transferencia',
+            'reference' => 'REF-ADMIN-001',
+            'bank' => 'Banesco',
+            'paidAt' => now()->toDateString(),
+            'status' => 'approved',
+            'note' => 'Pago registrado por admin',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('status', 'approved')
+            ->assertJsonPath('userId', (string) $user->id)
+            ->assertJsonPath('planId', 'novus-mensual');
+
+        $this->assertDatabaseHas('payments', [
+            'user_id' => $user->id,
+            'reference' => 'REF-ADMIN-001',
+            'status' => 'approved',
+        ]);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'user_id' => $user->id,
+            'plan_slug' => 'novus-mensual',
+            'status' => 'active',
+        ]);
+    }
 }

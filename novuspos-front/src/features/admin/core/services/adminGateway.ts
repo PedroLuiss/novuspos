@@ -2,6 +2,8 @@ import type { LandingConfig } from '@/shared/services/landing/types'
 import type { PlanOption } from '@/shared/services/plans/types'
 import type { PaymentMethodOption } from '@/shared/services/payment-methods/types'
 import type {
+  AdminCreatePaymentPayload,
+  AdminCreateUserPayload,
   AdminEmail,
   AdminNotification,
   AdminOverview,
@@ -31,8 +33,10 @@ export interface AdminGateway {
   getOverview(): Promise<AdminOverview>
   listPayments(query: PaymentQuery): Promise<PaymentPage>
   reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<AdminPayment>
+  createPayment(payload: AdminCreatePaymentPayload): Promise<AdminPayment>
   listUsers(query: UserQuery): Promise<UserPage>
   listUserOptions(): Promise<UserOption[]>
+  createUser(payload: AdminCreateUserPayload): Promise<AdminUser>
   updateUser(userId: string, patch: UserPatch): Promise<AdminUser>
   setSubscription(userId: string, planId: string, active: boolean): Promise<AdminUser>
   listReports(query: ReportQuery): Promise<ReportPage>

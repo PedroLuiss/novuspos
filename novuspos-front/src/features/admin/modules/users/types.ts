@@ -1,4 +1,5 @@
 export type {
+  AdminCreateUserPayload,
   AdminUser,
   UserPage,
   UserPageSize,

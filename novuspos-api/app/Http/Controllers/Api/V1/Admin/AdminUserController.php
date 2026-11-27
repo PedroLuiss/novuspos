@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Admin\AdminCreateUserRequest;
 use App\Http\Requests\Api\V1\Admin\AdminSetSubscriptionRequest;
 use App\Http\Requests\Api\V1\Admin\AdminUpdateUserRequest;
 use App\Services\Admin\AdminUserService;
@@ -23,6 +24,11 @@ class AdminUserController extends Controller
     public function options(): JsonResponse
     {
         return response()->json($this->userService->options());
+    }
+
+    public function store(AdminCreateUserRequest $request): JsonResponse
+    {
+        return response()->json($this->userService->create($request->validated()), 201);
     }
 
     public function update(AdminUpdateUserRequest $request, string $user): JsonResponse

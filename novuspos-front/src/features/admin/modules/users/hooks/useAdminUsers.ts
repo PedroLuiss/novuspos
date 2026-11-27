@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { adminService } from '@/features/admin/core/services/adminService'
-import type { UserPage, UserPageSize, UserPatch, UserQuery, UserStatusFilter } from '../types'
+import type { AdminCreateUserPayload, UserPage, UserPageSize, UserPatch, UserQuery, UserStatusFilter } from '../types'
 
 
 const DEFAULT_QUERY: UserQuery = { page: 1, pageSize: 20, search: '', status: 'all' }
@@ -65,6 +65,19 @@ export function useAdminUsers() {
     return load(query)
   }, [beginLoad, load, query])
 
+  const create = useCallback(async (payload: AdminCreateUserPayload) => {
+    setError(null)
+    try {
+      await adminService.createUser(payload)
+      beginLoad()
+      await load({ ...query, page: 1 })
+      return true
+    } catch {
+      setError('No pudimos crear el usuario. Verifica los datos e intenta de nuevo.')
+      return false
+    }
+  }, [beginLoad, load, query])
+
   const update = useCallback(async (userId: string, patch: UserPatch) => {
     setBusyId(userId)
     setError(null)
@@ -115,6 +128,7 @@ export function useAdminUsers() {
     setPage,
     resetFilters,
     refresh,
+    create,
     update,
     setSubscription,
   }

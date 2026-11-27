@@ -4,6 +4,8 @@ namespace App\Services\Admin;
 
 use App\Models\Payment;
 use App\Models\Plan;
+use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
@@ -74,6 +76,64 @@ class AdminPaymentService
                 'total' => $all,
             ],
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public function create(array $data): array
+    {
+        $user = User::query()->findOrFail($data['userId']);
+        if ($user->hasRole('super-admin')) {
+            throw ValidationException::withMessages(['userId' => ['No puedes registrar pagos para este usuario.']]);
+        }
+
+        $plan = Plan::query()->where('slug', $data['planId'])->first();
+        if (! $plan) {
+            throw ValidationException::withMessages(['planId' => ['El plan seleccionado no existe.']]);
+        }
+
+        $approved = ($data['status'] ?? 'pending') === 'approved';
+        $months = $plan->interval === 'year' ? 12 : 1;
+        $paidAt = now()->parse($data['paidAt']);
+        $start = $paidAt->copy();
+        $renewsAt = $start->copy()->addMonths($months);
+
+        $subscription = Subscription::query()->where('user_id', $user->id)->latest()->first();
+        $subscriptionPayload = [
+            'user_id' => $user->id,
+            'plan_slug' => $plan->slug,
+            'status' => $approved ? 'active' : 'pending_review',
+            'started_at' => $start->toDateString(),
+            'renews_at' => $approved ? $renewsAt->toDateString() : $start->toDateString(),
+            'amount' => $data['amount'] ?? $plan->price,
+            'currency' => $data['currency'] ?? $plan->currency,
+        ];
+
+        if ($subscription) {
+            $subscription->update($subscriptionPayload);
+        } else {
+            $subscription = Subscription::query()->create($subscriptionPayload);
+        }
+
+        $payment = Payment::query()->create([
+            'subscription_id' => $subscription->id,
+            'user_id' => $user->id,
+            'plan_slug' => $plan->slug,
+            'reference' => $data['reference'],
+            'method' => $data['method'],
+            'bank' => $data['bank'] ?? '',
+            'paid_at' => $paidAt->toDateString(),
+            'amount' => $data['amount'] ?? $plan->price,
+            'currency' => $data['currency'] ?? $plan->currency,
+            'status' => $approved ? 'approved' : 'pending_review',
+            'proof_name' => null,
+            'proof_data_url' => $data['proofDataUrl'] ?? null,
+            'review_note' => $data['note'] ?? null,
+        ]);
+
+        return $this->toArray($payment->fresh(['user', 'subscription']));
     }
 
     /**

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { adminService } from '@/features/admin/core/services/adminService'
-import type { PaymentPage, PaymentPageSize, PaymentQuery, PaymentStatusFilter } from '../types'
+import type { AdminCreatePaymentPayload, PaymentPage, PaymentPageSize, PaymentQuery, PaymentStatusFilter } from '../types'
 
 
 const DEFAULT_QUERY: PaymentQuery = { page: 1, pageSize: 20, search: '', status: 'pending' }
@@ -65,6 +65,19 @@ export function useAdminPayments() {
     return load(query)
   }, [beginLoad, load, query])
 
+  const create = useCallback(async (payload: AdminCreatePaymentPayload) => {
+    setError(null)
+    try {
+      await adminService.createPayment(payload)
+      beginLoad()
+      await load({ ...query, page: 1 })
+      return true
+    } catch {
+      setError('No pudimos registrar el pago. Verifica los datos e intenta de nuevo.')
+      return false
+    }
+  }, [beginLoad, load, query])
+
   const review = useCallback(async (paymentId: string, approved: boolean, note?: string) => {
     setBusyId(paymentId)
     setError(null)
@@ -99,6 +112,7 @@ export function useAdminPayments() {
     setPage,
     resetFilters,
     refresh,
+    create,
     review,
   }
 }

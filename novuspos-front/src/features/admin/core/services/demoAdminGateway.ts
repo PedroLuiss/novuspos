@@ -15,6 +15,8 @@ import {
   demoUsers,
 } from '../data/admin-data'
 import type {
+  AdminCreatePaymentPayload,
+  AdminCreateUserPayload,
   AdminEmail,
   AdminNotification,
   AdminOverview,
@@ -165,6 +167,49 @@ export const demoAdminGateway: AdminGateway = {
     }
   },
 
+  async createPayment(payload: AdminCreatePaymentPayload): Promise<AdminPayment> {
+    await wait()
+    const allUsers = users()
+    const user = allUsers.find((item) => item.id === payload.userId)
+    if (!user) throw new Error('No encontramos ese usuario.')
+
+    const planName = payload.planId === 'novus-anual' ? 'NovusPOS Anual' : 'NovusPOS Mensual'
+    const payment: AdminPayment = {
+      id: `p-${Date.now()}`,
+      userId: payload.userId,
+      userName: user.businessName || user.name,
+      planId: payload.planId,
+      planName,
+      method: payload.method,
+      reference: payload.reference,
+      bank: payload.bank ?? '',
+      paidAt: payload.paidAt,
+      amount: payload.amount ?? 0,
+      currency: payload.currency ?? 'USD',
+      status: payload.status,
+      proofUrl: payload.proofDataUrl ?? '',
+      reviewNote: payload.note,
+      createdAt: now(),
+    }
+
+    write('payments', [payment, ...payments()])
+
+    if (payload.status === 'approved') {
+      user.planId = payment.planId
+      user.planName = payment.planName
+      user.subscriptionStatus = 'active'
+      user.lastPaymentAt = payment.paidAt
+      write('users', allUsers)
+    } else {
+      user.planId = payment.planId
+      user.planName = payment.planName
+      user.subscriptionStatus = 'pending'
+      write('users', allUsers)
+    }
+
+    return payment
+  },
+
   async reviewPayment(paymentId, approved, note) {
     await wait()
     const all = payments()
@@ -211,6 +256,25 @@ export const demoAdminGateway: AdminGateway = {
   async listUserOptions(): Promise<UserOption[]> {
     await wait()
     return users().map(({ id, businessName }) => ({ id, businessName }))
+  },
+
+  async createUser(payload: AdminCreateUserPayload): Promise<AdminUser> {
+    await wait()
+    const user: AdminUser = {
+      id: `u-${Date.now()}`,
+      name: payload.name,
+      email: payload.email,
+      businessName: payload.businessName,
+      businessType: payload.businessType ?? '',
+      planId: '',
+      planName: 'Sin plan',
+      subscriptionStatus: 'cancelled',
+      joinedAt: now(),
+      lastPaymentAt: null,
+      openReports: 0,
+    }
+    write('users', [user, ...users()])
+    return user
   },
 
   async updateUser(userId, patch: UserPatch): Promise<AdminUser> {
