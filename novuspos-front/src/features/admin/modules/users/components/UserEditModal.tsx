@@ -24,8 +24,11 @@ export function UserEditModal({ user, busy, onClose, onSave, onSubscription }: P
   })
   const [planId, setPlanId] = useState(user.planId)
 
+  const hasSubscription = Boolean(user.planId)
+
   return (
     <AdminModal
+      size="xl"
       title="Editar usuario"
       subtitle={user.email}
       onClose={() => { if (!busy) onClose() }}
@@ -58,24 +61,26 @@ export function UserEditModal({ user, busy, onClose, onSave, onSubscription }: P
           <TextField id="admin-user-type" label="Tipo de comercio" icon="category" value={patch.businessType} onChange={(businessType) => setPatch({ ...patch, businessType })} />
         </div>
 
-        <div className="flex flex-col gap-space-sm rounded-xl border border-outline-variant/50 p-space-sm">
-          <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Suscripción</span>
-          <select value={planId} onChange={(event) => setPlanId(event.target.value)} aria-label="Plan del usuario" className={adminInput}>
-            <option value="novus-mensual">NovusPOS Mensual</option>
-            <option value="novus-anual">NovusPOS Anual</option>
-          </select>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
-            Cambiar el plan o el estado afecta al acceso del usuario en su próximo ingreso.
-          </p>
-          <div className="flex flex-wrap gap-space-xs">
-            <button type="button" disabled={busy} onClick={() => onSubscription(planId, true)} className={adminPrimaryButton}>
-              <MS name="check_circle" className="text-[18px]" /> Activar suscripción
-            </button>
-            <button type="button" disabled={busy} onClick={() => onSubscription(planId, false)} className={adminSecondaryButton}>
-              <MS name="block" className="text-[18px]" /> Desactivar suscripción
-            </button>
+        {hasSubscription && (
+          <div className="flex flex-col gap-space-sm rounded-xl border border-outline-variant/50 p-space-sm">
+            <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Suscripción</span>
+            <select value={planId} onChange={(event) => setPlanId(event.target.value)} aria-label="Plan del usuario" className={adminInput}>
+              <option value="novus-mensual">NovusPOS Mensual</option>
+              <option value="novus-anual">NovusPOS Anual</option>
+            </select>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Cambiar el plan o el estado afecta al acceso del usuario en su próximo ingreso.
+            </p>
+            <div className="flex flex-wrap gap-space-xs">
+              <button type="button" disabled={busy} onClick={() => onSubscription(planId, true)} className={adminPrimaryButton}>
+                <MS name="check_circle" className="text-[18px]" /> Activar suscripción
+              </button>
+              <button type="button" disabled={busy} onClick={() => onSubscription(planId, false)} className={adminSecondaryButton}>
+                <MS name="block" className="text-[18px]" /> Desactivar suscripción
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </form>
     </AdminModal>
   )
