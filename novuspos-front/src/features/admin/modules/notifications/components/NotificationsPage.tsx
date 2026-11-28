@@ -33,6 +33,7 @@ export function NotificationsPage() {
   const { options: users } = useAdminUserOptions()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [linkLabel, setLinkLabel] = useState('')
   const [link, setLink] = useState('')
   const [icon, setIcon] = useState('campaign')
   const [type, setType] = useState('info')
@@ -40,7 +41,7 @@ export function NotificationsPage() {
   const [notice, setNotice] = useState<string | null>(null)
 
   const reset = () => {
-    setTitle(''); setDescription(''); setLink(''); setIcon('campaign'); setType('info'); setAudience('all')
+    setTitle(''); setDescription(''); setLinkLabel(''); setLink(''); setIcon('campaign'); setType('info'); setAudience('all')
   }
   const audienceLabel = users.find((item) => item.id === audience)?.businessName ?? 'Todos los usuarios'
 
@@ -72,6 +73,7 @@ export function NotificationsPage() {
                 title: title.trim(),
                 description: description.trim(),
                 link: link.trim(),
+                linkLabel: linkLabel.trim(),
                 icon,
                 type: type as 'info' | 'success' | 'warning',
                 audience,
@@ -83,6 +85,7 @@ export function NotificationsPage() {
             <TextField id="admin-notice-title" label="Título" icon="title" value={title} onChange={setTitle} placeholder="Novedades de NovusPOS" required />
             <TextAreaField id="admin-notice-body" label="Descripción" icon="notes" rows={3} value={description} onChange={setDescription} placeholder="Cuéntales de qué se trata…" required />
             <div className="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+              <TextField id="admin-notice-link-label" label="Nombre del enlace (opcional)" icon="label" value={linkLabel} onChange={setLinkLabel} placeholder="Ver mi suscripción" />
               <TextField id="admin-notice-link" label="Enlace (opcional)" icon="link" value={link} onChange={setLink} placeholder="/panel/suscripcion" />
               <SelectField id="admin-notice-icon" label="Icono" icon="emoji_symbols" options={NOTIFICATION_ICON_OPTIONS} value={icon} onChange={setIcon} />
               <SelectField id="admin-notice-type" label="Tipo" icon="flag" options={NOTIFICATION_TYPE_OPTIONS} value={type} onChange={setType} />
@@ -114,7 +117,11 @@ export function NotificationsPage() {
               <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
                 {description || 'La descripción aparecerá aquí.'}
               </p>
-              {link && <span className="mt-1 block truncate font-label-sm text-label-sm text-primary">{link}</span>}
+              {link && (
+                <span className="mt-1 block truncate font-label-sm text-label-sm text-primary underline underline-offset-2">
+                  {linkLabel?.trim() || 'Abrir enlace'}
+                </span>
+              )}
               <span className="mt-space-xs block font-label-sm text-label-sm text-outline">Para: {audienceLabel}</span>
             </div>
           </div>

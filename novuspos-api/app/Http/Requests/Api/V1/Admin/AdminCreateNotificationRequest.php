@@ -20,6 +20,7 @@ class AdminCreateNotificationRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'link' => ['nullable', 'string', 'max:500'],
+            'linkLabel' => ['nullable', 'string', 'max:255'],
             'icon' => ['nullable', 'string', 'max:100'],
             'type' => ['required', 'string', 'in:info,success,warning'],
             'audience' => ['required', 'string', 'max:100'],

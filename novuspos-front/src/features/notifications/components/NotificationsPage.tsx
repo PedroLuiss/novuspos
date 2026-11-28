@@ -136,7 +136,7 @@ export function NotificationsPage() {
                   <div className="mt-space-xs flex flex-wrap items-center gap-space-sm font-label-sm text-label-sm text-outline">
                     <span>{formatDate(item.createdAt)}</span>
                     {item.link && (
-                      <a href={item.link} className="text-primary hover:underline">Abrir enlace</a>
+                      <a href={item.link} className="text-primary hover:underline">{item.linkLabel?.trim() || 'Abrir enlace'}</a>
                     )}
                   </div>
                 </div>

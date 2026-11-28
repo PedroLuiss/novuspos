@@ -5,6 +5,7 @@ export interface UserNotification {
   title: string
   description: string
   link: string
+  linkLabel: string
   icon: string
   type: UserNotificationType
   audience: string

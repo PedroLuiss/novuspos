@@ -61,6 +61,7 @@ class UserNotificationService
                     'title' => (string) $row->title,
                     'description' => (string) $row->description,
                     'link' => (string) ($row->link ?? ''),
+                    'linkLabel' => (string) ($row->link_label ?? ''),
                     'icon' => (string) ($row->icon ?? 'campaign'),
                     'type' => (string) $row->type,
                     'audience' => (string) $row->audience,

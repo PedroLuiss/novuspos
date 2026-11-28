@@ -177,6 +177,7 @@ export interface AdminNotification {
   title: string
   description: string
   link: string
+  linkLabel: string
   icon: string
   type: AdminNoticeType
   audience: 'all' | string

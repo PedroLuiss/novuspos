@@ -55,8 +55,8 @@ export const demoReports: AdminReport[] = [
 ]
 
 export const demoNotifications: AdminNotification[] = [
-  { id: 'n-1', title: 'Novedades de NovusPOS', description: 'Ya puedes imprimir tickets en 58 mm desde la configuración.', link: '/panel', icon: 'campaign', type: 'info', audience: 'all', audienceLabel: 'Todos los usuarios', createdAt: daysAgo(1) },
-  { id: 'n-2', title: 'Tu suscripción está por vencer', description: 'Renueva para seguir usando todas las funciones.', link: '/panel/suscripcion', icon: 'schedule', type: 'warning', audience: 'u-4', audienceLabel: 'Ana Rodríguez', createdAt: daysAgo(3) },
+  { id: 'n-1', title: 'Novedades de NovusPOS', description: 'Ya puedes imprimir tickets en 58 mm desde la configuración.', link: '/panel', linkLabel: 'Ir al panel', icon: 'campaign', type: 'info', audience: 'all', audienceLabel: 'Todos los usuarios', createdAt: daysAgo(1) },
+  { id: 'n-2', title: 'Tu suscripción está por vencer', description: 'Renueva para seguir usando todas las funciones.', link: '/panel/suscripcion', linkLabel: 'Ver suscripción', icon: 'schedule', type: 'warning', audience: 'u-4', audienceLabel: 'Ana Rodríguez', createdAt: daysAgo(3) },
 ]
 
 export const demoEmails: AdminEmail[] = [
