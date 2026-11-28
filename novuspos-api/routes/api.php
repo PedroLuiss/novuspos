@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\Billing\SubscriptionController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\ExchangeRate\ExchangeRateController;
 use App\Http\Controllers\Api\V1\LandingConfigController;
+use App\Http\Controllers\Api\V1\Panel\NotificationController as PanelNotificationController;
 use App\Http\Controllers\Api\V1\Support\SupportTicketController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,6 +52,9 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('/landing/download', [LandingConfigController::class, 'download']);
         Route::get('/panel/overview', [DashboardController::class, 'overview']);
+        Route::get('/panel/notifications', [PanelNotificationController::class, 'index']);
+        Route::get('/panel/notifications/unread-count', [PanelNotificationController::class, 'unreadCount']);
+        Route::post('/panel/notifications/mark-read', [PanelNotificationController::class, 'markRead']);
 
         Route::get('/billing/subscription', [SubscriptionController::class, 'show']);
         Route::get('/billing/payments', [PaymentController::class, 'index']);

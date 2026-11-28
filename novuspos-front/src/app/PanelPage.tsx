@@ -1,11 +1,12 @@
 import { BackupOverview } from '@/features/backups/components/BackupOverview'
 import { DashboardSection } from '@/features/dashboard/components/DashboardSection'
+import { NotificationsPage } from '@/features/notifications/components/NotificationsPage'
 import { PanelSidebar } from '@/features/panel/components/PanelSidebar'
 import { ProfileOverview } from '@/features/profile/components/ProfileOverview'
 import { SubscriptionOverview } from '@/features/subscription/components/SubscriptionOverview'
 import { SupportOverview } from '@/features/support/components/SupportOverview'
 
-export type PanelSection = 'general' | 'subscription' | 'backups' | 'support' | 'profile'
+export type PanelSection = 'general' | 'subscription' | 'backups' | 'support' | 'profile' | 'notifications'
 
 /** Panel de Control de Clientes: portada y tres módulos conectados a la API. */
 export function PanelPage({ section = 'general' }: { section?: PanelSection }) {
@@ -23,6 +24,8 @@ export function PanelPage({ section = 'general' }: { section?: PanelSection }) {
               <SupportOverview />
             ) : section === 'profile' ? (
               <ProfileOverview />
+            ) : section === 'notifications' ? (
+              <NotificationsPage />
             ) : (
               <DashboardSection />
             )}

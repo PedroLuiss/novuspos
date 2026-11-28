@@ -1,4 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react'
+import { NotificationBell } from '@/features/notifications/components/NotificationBell'
 import { panelNavItems } from '@/features/panel/data/panel-data'
 import { useAuth } from '@/shared/hooks/useAuth'
 import { navigate } from '@/shared/router/navigation'
@@ -89,9 +90,7 @@ export function PanelSidebar() {
           <span className="font-label-md text-label-md text-on-surface-variant font-semibold">Panel de Cliente NovusPOS</span>
         </div>
         <div className="flex items-center gap-space-md">
-          <button className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors">
-            <MS name="notifications" className="text-[20px]" />
-          </button>
+          <NotificationBell />
           <button className="w-9 h-9 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface-variant transition-colors">
             <MS name="sync" className="text-[20px]" />
           </button>

@@ -24,6 +24,21 @@ export const BILLING_ENDPOINTS = {
 /** Contrato de rutas del panel general. */
 export const PANEL_ENDPOINTS = {
   overview: '/panel/overview',
+  notifications: (params: {
+    page: number
+    pageSize: number
+    search?: string
+    type?: string
+    status?: string
+  }) => {
+    const query = new URLSearchParams({ page: String(params.page), pageSize: String(params.pageSize) })
+    if (params.search?.trim()) query.set('search', params.search.trim())
+    if (params.type && params.type !== 'all') query.set('type', params.type)
+    if (params.status && params.status !== 'all') query.set('status', params.status)
+    return `/panel/notifications?${query.toString()}`
+  },
+  unreadNotificationCount: '/panel/notifications/unread-count',
+  markNotificationsRead: '/panel/notifications/mark-read',
 } as const
 
 /** Contrato de la landing pública que promociona NovusPOS Desktop. */
