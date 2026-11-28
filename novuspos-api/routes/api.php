@@ -66,7 +66,6 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/billing/subscription', [SubscriptionController::class, 'show']);
         Route::get('/billing/payments', [PaymentController::class, 'index']);
         Route::post('/billing/payments', [PaymentController::class, 'store']);
-        Route::patch('/billing/payments/{payment}/review', [PaymentController::class, 'review']);
 
         Route::get('/backups/latest', [BackupController::class, 'latest']);
         Route::post('/backups', [BackupController::class, 'store']);

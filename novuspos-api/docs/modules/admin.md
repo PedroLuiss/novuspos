@@ -83,6 +83,6 @@ Panel de super administración para gestionar usuarios, pagos, reportes, notific
 
 ## Notas
 
-- `PATCH /billing/payments/{id}/review` existente sigue siendo owner-scoped para flujo cliente; admin usa `/admin/payments/{id}/review`.
+- La evaluación manual del comprobante es **solo del super admin** mediante `/admin/payments/{id}/review`. El endpoint del cliente para aprobar/rechazar sus propios pagos fue eliminado: el panel del usuario solo muestra el estado `pending_review` y la nota de revisión.
 - Las notificaciones creadas aquí llegan al panel del cliente en tiempo real; ver [modules/panel.md](panel.md) y la sección de broadcasting.
 - Status pago DB `pending_review` se expone como `pending` en admin.

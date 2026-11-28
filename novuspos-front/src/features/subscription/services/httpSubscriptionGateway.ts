@@ -1,7 +1,7 @@
 import { apiClient } from '@/shared/services/apiClient'
 import { BILLING_ENDPOINTS } from '@/shared/services/endpoints'
 import type { PaymentRecord, Plan, SubmitPaymentRequest, Subscription } from '../types'
-import type { BillingOverview, PaymentReviewResult, SubscriptionGateway } from './subscriptionGateway'
+import type { BillingOverview, SubscriptionGateway } from './subscriptionGateway'
 
 type UnknownRecord = Record<string, unknown>
 
@@ -51,9 +51,5 @@ export const httpSubscriptionGateway: SubscriptionGateway = {
 
   submitPayment(request: SubmitPaymentRequest): Promise<PaymentRecord> {
     return apiClient.post<PaymentRecord>(BILLING_ENDPOINTS.payments, request)
-  },
-
-  reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<PaymentReviewResult> {
-    return apiClient.patch<PaymentReviewResult>(BILLING_ENDPOINTS.reviewPayment(paymentId), { approved, note })
   },
 }

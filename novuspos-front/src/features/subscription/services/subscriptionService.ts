@@ -31,7 +31,4 @@ export const subscriptionService = {
     if (hasErrors(errors)) throw new ValidationError(toIssues(errors))
     return gateway.submitPayment(request)
   },
-
-  reviewPayment: (paymentId: string, approved: boolean, note?: string) =>
-    gateway.reviewPayment(paymentId, approved, note),
 }

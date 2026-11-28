@@ -13,7 +13,7 @@ import { SubscriptionSkeleton } from './SubscriptionSkeleton'
 
 /** Contenedor del módulo: obtiene datos y coordina el modal con el historial. */
 export function SubscriptionOverview() {
-  const { overview, isLoading, error, reviewingId, refresh, reviewPayment } = useSubscriptionOverview()
+  const { overview, isLoading, error, refresh } = useSubscriptionOverview()
   const { methods } = usePaymentMethods()
   const methodLabels = useMemo(() => paymentMethodLabels(methods), [methods])
   const [isPayOpen, setIsPayOpen] = useState(false)
@@ -26,8 +26,7 @@ export function SubscriptionOverview() {
   const isPendingReview = overview?.subscription.status === 'pending_review'
 
   const openPayment = (plan: Plan) => {
-    if (!overview) return
-    if (plan.id !== currentPlanId && !canSwitch) return
+    if (!overview || !canSwitch) return
     setSelectedPlan(plan)
     setIsPayOpen(true)
   }
@@ -92,6 +91,7 @@ export function SubscriptionOverview() {
           subscription={overview.subscription}
           plan={plan}
           isTrial={isTrial}
+          canPay={canSwitch}
           onPay={() => openPayment(plan)}
         />
       )}
@@ -100,8 +100,6 @@ export function SubscriptionOverview() {
         plans={overview.plans}
         subscription={overview.subscription}
         methodLabels={methodLabels}
-        reviewingId={reviewingId}
-        onReview={(id, approved) => void reviewPayment(id, approved)}
       />
 
       {isPayOpen && (selectedPlan ?? plan) && (

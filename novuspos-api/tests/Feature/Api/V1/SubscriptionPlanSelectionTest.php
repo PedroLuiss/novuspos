@@ -57,6 +57,25 @@ class SubscriptionPlanSelectionTest extends TestCase
             ->assertJsonValidationErrors(['planId']);
     }
 
+    public function test_user_cannot_review_their_own_payment(): void
+    {
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
+        $subscriptionId = $this->getJson('/api/v1/billing/subscription')->assertOk()->json('subscription.id');
+        $payment = $this->postJson('/api/v1/billing/payments', $this->paymentPayload($subscriptionId, 'novus-anual', '100007'))
+            ->assertCreated()
+            ->json('id');
+
+        $this->patchJson("/api/v1/billing/payments/{$payment}/review", ['approved' => true])
+            ->assertNotFound();
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment,
+            'status' => 'pending_review',
+        ]);
+    }
+
     public function test_after_approval_only_current_plan_can_be_renewed_until_expiry(): void
     {
         $user = User::factory()->create();
@@ -69,13 +88,22 @@ class SubscriptionPlanSelectionTest extends TestCase
             ->assertCreated()
             ->json('id');
 
-        $this->patchJson("/api/v1/billing/payments/{$payment}/review", ['approved' => true])
+        // Solo el super admin evalúa y aprueba el comprobante.
+        $admin = User::query()->where('email', 'admin@novuspos.com')->firstOrFail();
+        Sanctum::actingAs($admin);
+        $this->patchJson("/api/v1/admin/payments/{$payment}/review", ['approved' => true, 'note' => 'Transferencia verificada'])
+            ->assertOk()
+            ->assertJsonPath('status', 'approved');
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/billing/subscription')
             ->assertOk()
             ->assertJsonPath('subscription.planId', 'novus-anual')
             ->assertJsonPath('subscription.status', 'active')
             ->assertJsonPath('subscription.isTrial', false);
 
-        $this->postJson('/api/v1/billing/payments', $this->paymentPayload($subscriptionId, 'novus-mensual', '100005'))
+        // Ni siquiera el plan vigente se puede volver a pagar mientras siga activo.
+        $this->postJson('/api/v1/billing/payments', $this->paymentPayload($subscriptionId, 'novus-anual', '100005'))
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['planId']);
 

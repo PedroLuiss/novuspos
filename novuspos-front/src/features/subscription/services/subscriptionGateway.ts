@@ -6,14 +6,8 @@ export interface BillingOverview {
   payments: PaymentRecord[]
 }
 
-export interface PaymentReviewResult {
-  payment: PaymentRecord
-  subscription: Subscription
-}
-
-/** Contrato único para el modo demo y para la futura API. */
+/** Contrato único para el modo demo y para la API. La evaluación del pago es exclusiva del super admin. */
 export interface SubscriptionGateway {
   getOverview(): Promise<BillingOverview>
   submitPayment(request: SubmitPaymentRequest): Promise<PaymentRecord>
-  reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<PaymentReviewResult>
 }

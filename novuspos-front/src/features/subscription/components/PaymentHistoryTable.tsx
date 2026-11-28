@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { paymentMethodLabel } from '@/shared/services/payment-methods/paymentMethodLabels'
-import { IS_DEMO_AUTH } from '@/shared/lib/env'
 import { MS } from '@/shared/ui/MS'
 import { paymentStatusLabels } from '../data/subscription-data'
 import { formatDate, formatMoney } from '../lib/formatters'
@@ -13,8 +12,6 @@ interface Props {
   plans: Plan[]
   subscription: Subscription
   methodLabels: Record<string, string>
-  reviewingId: string | null
-  onReview: (paymentId: string, approved: boolean) => void
 }
 
 const STATUS_STYLE: Record<PaymentRecord['status'], string> = {
@@ -24,7 +21,7 @@ const STATUS_STYLE: Record<PaymentRecord['status'], string> = {
 }
 
 /** Historial de pagos: a qué suscripción corresponden y en qué estado están. */
-export function PaymentHistoryTable({ payments, plans, subscription, methodLabels, reviewingId, onReview }: Props) {
+export function PaymentHistoryTable({ payments, plans, subscription, methodLabels }: Props) {
   const [status, setStatus] = useState<PaymentFilter>('all')
   const [query, setQuery] = useState('')
   const visible = filterPayments(payments, status, query)
@@ -99,24 +96,9 @@ export function PaymentHistoryTable({ payments, plans, subscription, methodLabel
                       </span>
                     )}
                     {payment.status === 'pending_review' && (
-                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
-                        <button
-                          type="button"
-                          disabled={reviewingId === payment.id}
-                          onClick={() => onReview(payment.id, true)}
-                          className="font-label-sm text-label-sm text-secondary hover:underline font-semibold disabled:opacity-50"
-                        >
-                          {reviewingId === payment.id ? 'Actualizando…' : IS_DEMO_AUTH ? 'Simular aprobación' : 'Aprobar pago'}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={reviewingId === payment.id}
-                          onClick={() => onReview(payment.id, false)}
-                          className="font-label-sm text-label-sm text-error hover:underline font-semibold disabled:opacity-50"
-                        >
-                          Rechazar
-                        </button>
-                      </div>
+                      <span className="block font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[180px]">
+                        El equipo NovusPOS está verificando el comprobante.
+                      </span>
                     )}
                   </td>
                   <td className="py-space-md px-space-md text-right">

@@ -17,7 +17,6 @@ Gestiona el catálogo de planes, métodos de pago, suscripción actual del usuar
 | GET | `/api/v1/billing/subscription` | Sí | Overview: `{plans, subscription, payments}`. |
 | GET | `/api/v1/billing/payments` | Sí | Lista pagos del usuario. |
 | POST | `/api/v1/billing/payments` | Sí | Registra pago (queda `pending_review`). |
-| PATCH | `/api/v1/billing/payments/{payment}/review` | Sí | Aprueba/rechaza pago. |
 
 ## Contrato Front
 
@@ -53,13 +52,13 @@ Gestiona el catálogo de planes, métodos de pago, suscripción actual del usuar
 - Controllers: `Api/V1/Billing/PlanController`, `PaymentMethodController`, `SubscriptionController`, `PaymentController`
 - Services: `Services/Billing/PlanService`, `PaymentMethodService`, `SubscriptionService`
 - Repos: `PlanRepository`, `PaymentMethodRepository`, `SubscriptionRepository`, `PaymentRepository`
-- Requests: `StorePaymentRequest`, `ReviewPaymentRequest`
+- Requests: `StorePaymentRequest`. La evaluación del comprobante vive en `AdminReviewPaymentRequest` (`/admin/payments/{id}/review`).
 - Seeders: `PlanSeeder`, `PaymentMethodSeeder`
 - Tests: `tests/Feature/Api/V1/PanelEndpointsTest.php`, `tests/Feature/Api/V1/ProfileAndVerificationTest.php`, `tests/Feature/Api/V1/SubscriptionPlanSelectionTest.php`
 
 ## Reglas
 
-- **Selección de plan (valida backend):** durante la prueba de 30 días (`subscription.isTrial = true`, sin pagos aprobados) el usuario puede elegir y pagar cualquier plan, aunque no haya vencido. Con un pago aprobado activo, solo puede renovar el plan vigente; los demás quedan bloqueados hasta `renewsAt`. Al vencer (`expired`/`cancelled` o fecha pasada), vuelven a estar disponibles todos los planes. Mientras hay un pago en `pending_review`, solo se permite reportar otro pago del plan en revisión.
+- **Selección de plan (valida backend):** durante la prueba de 30 días (`subscription.isTrial = true`, sin pagos aprobados) el usuario puede elegir y pagar cualquier plan, aunque no haya vencido. Con un pago aprobado activo, **no puede reportar otro pago** (ni del plan vigente); el botón del panel se bloquea hasta `renewsAt`. Al vencer (`expired`/`cancelled` o fecha pasada), vuelven a estar disponibles todos los planes y se puede reportar un pago. Mientras hay un pago en `pending_review`, tampoco se aceptan nuevos reportes hasta que se evalúe.
 - Referencia + banco duplicados para el mismo usuario se rechazan.
-- Pago aprobado activa suscripción, actualiza plan/monto y recalcula `renewsAt` según intervalo.
+- El usuario solo **reporta** el pago (`POST /billing/payments`); aprobar o rechazar es exclusivo del super admin (`PATCH /admin/payments/{id}/review`). El pago aprobado activa la suscripción, actualiza plan/monto y recalcula `renewsAt` según intervalo.
 - **Verificación de correo para compra tras prueba:** al registrarse se crea una suscripción activa de 30 días (prueba). Durante la prueba no se exige correo verificado. Si la suscripción está vencida/expirada y el usuario intenta reportar un pago, el backend responde 422 exigiendo correo verificado.

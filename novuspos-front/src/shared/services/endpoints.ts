@@ -18,7 +18,6 @@ export const BILLING_ENDPOINTS = {
   payments: '/billing/payments',
   /** Cuentas y métodos que ve el usuario al pagar; el dueño los administra en `/admin/payment-methods`. */
   paymentMethods: '/billing/payment-methods',
-  reviewPayment: (paymentId: string) => `/billing/payments/${paymentId}/review`,
 } as const
 
 /** Contrato de rutas del panel general. */

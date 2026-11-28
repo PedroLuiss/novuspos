@@ -69,18 +69,15 @@ class SubscriptionService
             throw ValidationException::withMessages(['planId' => ['El plan seleccionado no existe.']]);
         }
 
-        $selectedPlanIsPending = $subscription->status === 'pending_review'
-            && $plan->slug !== $this->pendingPlanSlug($user);
-
-        if ($plan->slug !== $subscription->plan_slug && ! $this->isExpired($subscription) && ! $this->isTrial($user, $subscription)) {
+        if (! $this->isExpired($subscription) && ! $this->isTrial($user, $subscription)) {
             throw ValidationException::withMessages([
-                'planId' => ['Tu suscripción sigue activa. Podrás cambiar de plan cuando venza.'],
+                'planId' => ['Ya tienes una suscripción pagada y activa. Podrás reportar otro pago cuando venza.'],
             ]);
         }
 
-        if ($selectedPlanIsPending) {
+        if ($subscription->status === 'pending_review') {
             throw ValidationException::withMessages([
-                'planId' => ['Ya tienes un pago en revisión. Espera a que se evalúe antes de elegir otro plan.'],
+                'planId' => ['Ya tienes un pago en revisión. Espera a que se evalúe antes de reportar otro.'],
             ]);
         }
 
@@ -111,54 +108,6 @@ class SubscriptionService
         $this->subscriptionRepository->update($subscription, ['status' => 'pending_review']);
 
         return $this->paymentToArray($payment->fresh());
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function reviewPayment(User $user, int $paymentId, bool $approved, ?string $note = null): array
-    {
-        $payment = $this->paymentRepository->findForUser($user->id, $paymentId);
-
-        if (! $payment) {
-            throw ValidationException::withMessages(['payment' => ['No encontramos ese pago.']]);
-        }
-
-        $subscription = $this->ensureSubscription($user);
-        $this->paymentRepository->update($payment, [
-            'status' => $approved ? 'approved' : 'rejected',
-            'review_note' => $note,
-        ]);
-
-        if ($approved) {
-            $plan = $this->planRepository->findBySlug((string) ($payment->plan_slug ?? $subscription->plan_slug));
-            if ($plan) {
-                $start = $payment->paid_at?->copy() ?? now();
-                $renews = $start->copy();
-                if ($plan->interval === 'year') {
-                    $renews->addYear();
-                } else {
-                    $renews->addMonth();
-                }
-
-                $this->subscriptionRepository->update($subscription, [
-                    'plan_slug' => $plan->slug,
-                    'status' => 'active',
-                    'started_at' => $start->toDateString(),
-                    'renews_at' => $renews->toDateString(),
-                    'amount' => $plan->price,
-                    'currency' => $plan->currency,
-                ]);
-            }
-        }
-
-        $subscription = $subscription->fresh() ?? $subscription;
-        $payment = $payment->fresh() ?? $payment;
-
-        return [
-            'payment' => $this->paymentToArray($payment),
-            'subscription' => $this->subscriptionToArray($subscription),
-        ];
     }
 
     public function ensureSubscription(User $user): Subscription
@@ -201,13 +150,6 @@ class SubscriptionService
 
         return ! $this->paymentRepository->listForUser($user->id)
             ->contains(fn (Payment $payment): bool => $payment->status === 'approved');
-    }
-
-    private function pendingPlanSlug(User $user): ?string
-    {
-        return $this->paymentRepository->listForUser($user->id)
-            ->first(fn (Payment $payment): bool => $payment->status === 'pending_review')
-            ?->plan_slug;
     }
 
     /**

@@ -7,6 +7,8 @@ interface Props {
   subscription: Subscription
   plan: Plan
   isTrial?: boolean
+  /** Solo durante la prueba o con la suscripción vencida se puede reportar un pago. */
+  canPay: boolean
   onPay: () => void
 }
 
@@ -18,7 +20,7 @@ const STATUS_STYLE: Record<Subscription['status'], string> = {
 }
 
 /** Tarjeta principal: a qué plan está suscrito y en qué estado está el pago. */
-export function SubscriptionCard({ subscription, plan, isTrial = false, onPay }: Props) {
+export function SubscriptionCard({ subscription, plan, isTrial = false, canPay, onPay }: Props) {
   const pending = subscription.status === 'pending_review'
 
   return (
@@ -86,15 +88,31 @@ export function SubscriptionCard({ subscription, plan, isTrial = false, onPay }:
         <p className="font-body-sm text-body-sm text-on-surface-variant">
           {isTrial
             ? 'Puedes activar el plan que quieras desde ahora. Si no pagas, sigues usando el sistema hasta que termine la prueba.'
-            : 'Paga desde tu banco y reporta los datos aquí. Es rápido y sin plazos forzosos.'}
+            : canPay
+              ? 'Paga desde tu banco y reporta los datos aquí. Es rápido y sin plazos forzosos.'
+              : pending
+                ? 'Ya registramos tu comprobante. No hace falta reportar otro pago mientras lo evaluamos.'
+                : `Ya tienes una suscripción pagada y activa. Podrás reportar otro pago cuando venza el ${formatDate(subscription.renewsAt)}.`}
         </p>
         <button
           type="button"
           onClick={onPay}
-          className="px-space-lg py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 transition-colors shrink-0"
+          disabled={!canPay}
+          title={canPay ? undefined : 'Disponible cuando venza tu suscripción'}
+          className={`px-space-lg py-2.5 rounded-lg font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 transition-colors shrink-0 ${
+            canPay
+              ? 'bg-primary hover:bg-primary-container text-on-primary'
+              : 'bg-surface-container text-outline cursor-not-allowed'
+          }`}
         >
-          <MS name="payments" className="text-[18px]" />
-          {pending ? 'Reportar otro pago' : isTrial ? 'Elegir y pagar un plan' : 'Pagar suscripción'}
+          <MS name={canPay ? 'payments' : 'lock'} className="text-[18px]" />
+          {canPay
+            ? isTrial
+              ? 'Elegir y pagar un plan'
+              : 'Reportar pago'
+            : pending
+              ? 'Pago en revisión'
+              : 'Disponible al vencer'}
         </button>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { plansStore } from '@/shared/services/plans/plansStore'
 import { demoPayments, demoSubscription } from '../data/subscription-data'
 import { isSubscriptionExpired } from '../lib/subscriptionStatus'
 import type { PaymentRecord, SubmitPaymentRequest, Subscription } from '../types'
-import type { BillingOverview, PaymentReviewResult, SubscriptionGateway } from './subscriptionGateway'
+import type { BillingOverview, SubscriptionGateway } from './subscriptionGateway'
 
 const STORAGE_KEY = 'novuspos:demo-billing'
 const DEMO_DELAY_MS = 250
@@ -65,17 +65,16 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
 
     const trial = !isSubscriptionExpired(state.subscription)
       && !state.payments.some((payment) => payment.status === 'approved')
-    const pendingPlan = state.payments.find((payment) => payment.status === 'pending_review')?.planId
 
-    if (request.planId !== state.subscription.planId && !isSubscriptionExpired(state.subscription) && !trial) {
+    if (!isSubscriptionExpired(state.subscription) && !trial) {
       throw new ValidationError({
-        planId: ['Tu suscripción sigue activa. Podrás cambiar de plan cuando venza.'],
+        planId: ['Ya tienes una suscripción pagada y activa. Podrás reportar otro pago cuando venza.'],
       })
     }
 
-    if (state.subscription.status === 'pending_review' && request.planId !== pendingPlan) {
+    if (state.subscription.status === 'pending_review') {
       throw new ValidationError({
-        planId: ['Ya tienes un pago en revisión. Espera a que se evalúe antes de elegir otro plan.'],
+        planId: ['Ya tienes un pago en revisión. Espera a que se evalúe antes de reportar otro.'],
       })
     }
 
@@ -104,34 +103,4 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
     return payment
   },
 
-  async reviewPayment(paymentId: string, approved: boolean, note?: string): Promise<PaymentReviewResult> {
-    await wait()
-    const state = readState()
-    const payment = state.payments.find((item) => item.id === paymentId)
-    if (!payment) throw new Error('No encontramos ese pago.')
-
-    payment.status = approved ? 'approved' : 'rejected'
-    payment.reviewNote = note
-    if (approved) {
-      const catalog = plansStore.read()
-      const plan = catalog.find((item) => item.id === payment.planId) ?? catalog[0]
-      if (!plan) throw new Error('No hay suscripciones configuradas.')
-      const start = new Date(payment.paidAt)
-      if (Number.isNaN(start.getTime())) start.setTime(Date.now())
-      const renews = new Date(start)
-      if (plan.interval === 'year') renews.setFullYear(renews.getFullYear() + 1)
-      else renews.setMonth(renews.getMonth() + 1)
-      state.subscription = {
-        ...state.subscription,
-        planId: plan.id,
-        status: 'active',
-        startedAt: start.toISOString().slice(0, 10),
-        renewsAt: renews.toISOString().slice(0, 10),
-        amount: plan.price,
-        currency: plan.currency,
-      }
-    }
-    writeState(state)
-    return { payment: { ...payment }, subscription: { ...state.subscription } }
-  },
 }
