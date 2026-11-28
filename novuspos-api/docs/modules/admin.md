@@ -29,7 +29,7 @@ Panel de super administración para gestionar usuarios, pagos, reportes, notific
 | PATCH | `/api/v1/admin/users/{user}/subscription` | Asignar/activar suscripción |
 | GET | `/api/v1/admin/reports` | Reportes/tickets paginados (read-only) |
 | GET | `/api/v1/admin/notifications` | Notificaciones paginadas |
-| POST | `/api/v1/admin/notifications` | Crear notificación |
+| POST | `/api/v1/admin/notifications` | Crear notificación; emite `UserNotificationCreated` por WebSocket a los canales `private-notifications.all` o `private-notifications.{userId}` |
 | GET | `/api/v1/admin/emails` | Correos paginados |
 | POST | `/api/v1/admin/emails` | Crear correo |
 | GET | `/api/v1/admin/settings` | Obtener settings |
@@ -84,4 +84,5 @@ Panel de super administración para gestionar usuarios, pagos, reportes, notific
 ## Notas
 
 - `PATCH /billing/payments/{id}/review` existente sigue siendo owner-scoped para flujo cliente; admin usa `/admin/payments/{id}/review`.
+- Las notificaciones creadas aquí llegan al panel del cliente en tiempo real; ver [modules/panel.md](panel.md) y la sección de broadcasting.
 - Status pago DB `pending_review` se expone como `pending` en admin.

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\Events\UserNotificationCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Admin\AdminCreateNotificationRequest;
 use App\Services\Admin\AdminNotificationService;
@@ -21,6 +22,10 @@ class AdminNotificationController extends Controller
 
     public function store(AdminCreateNotificationRequest $request): JsonResponse
     {
-        return response()->json($this->notificationService->create($request->validated()), 201);
+        $notification = $this->notificationService->create($request->validated());
+
+        UserNotificationCreated::dispatch($notification);
+
+        return response()->json($notification, 201);
     }
 }

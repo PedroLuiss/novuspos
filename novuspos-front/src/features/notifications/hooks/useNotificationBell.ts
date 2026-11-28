@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { notificationService } from '../services/notificationService'
+import { useRealtimeNotifications } from './useRealtimeNotifications'
 import type { UserNotification } from '../types'
 
 const PAGE_SIZE = 20
-const POLL_MS = 15000
 
 export function useNotificationBell() {
   const [open, setOpen] = useState(false)
@@ -58,27 +58,15 @@ export function useNotificationBell() {
 
   useEffect(() => {
     void fetchUnreadCount()
-    const interval = window.setInterval(() => {
-      void fetchUnreadCount()
-      if (openRef.current) void loadPage(1, false)
-    }, POLL_MS)
+  }, [fetchUnreadCount])
 
-    const onFocus = () => {
-      void fetchUnreadCount()
-      if (openRef.current) void loadPage(1, false)
-    }
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') onFocus()
-    }
-
-    window.addEventListener('focus', onFocus)
-    document.addEventListener('visibilitychange', onVisibility)
-    return () => {
-      window.clearInterval(interval)
-      window.removeEventListener('focus', onFocus)
-      document.removeEventListener('visibilitychange', onVisibility)
-    }
+  // Las actualizaciones llegan por WebSocket (Reverb), no por sondeo periódico.
+  const onRealtimeNotification = useCallback(() => {
+    void fetchUnreadCount()
+    if (openRef.current) void loadPage(1, false)
   }, [fetchUnreadCount, loadPage])
+
+  useRealtimeNotifications(onRealtimeNotification)
 
   const markVisibleAsRead = useCallback(async () => {
     const unreadIds = itemsRef.current.filter((item) => !item.isRead).map((item) => item.id)

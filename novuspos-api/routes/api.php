@@ -23,10 +23,17 @@ use App\Http\Controllers\Api\V1\ExchangeRate\ExchangeRateController;
 use App\Http\Controllers\Api\V1\LandingConfigController;
 use App\Http\Controllers\Api\V1\Panel\NotificationController as PanelNotificationController;
 use App\Http\Controllers\Api\V1\Support\SupportTicketController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::get('/landing/config', [LandingConfigController::class, 'show']);
+
+    // Autorización de canales privados con token Sanctum (Bearer).
+    Route::post('/broadcasting/auth', function (Request $request) {
+        return Broadcast::auth($request);
+    })->middleware('auth:sanctum');
 
     Route::prefix('auth')->group(function (): void {
         Route::post('/login', [AuthController::class, 'login']);

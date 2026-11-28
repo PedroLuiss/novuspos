@@ -180,6 +180,10 @@ Todos los módulos del panel maestro muestran skeletons MD3 mientras cargan: res
 
 Las cuatro rutas del portal también tienen skeletons MD3: `DashboardSkeleton`, `SubscriptionSkeleton`, `BackupSkeleton` y `SupportSkeleton`. Los tres primeros reemplazan a los spinners de los hooks de panel, suscripción y respaldos. Soporte no carga datos al entrar: su skeleton aparece mientras se envía el reporte, sin temporizadores artificiales. Las primitivas compartidas están en `src/shared/ui/Skeleton.tsx`; `AdminSkeleton.tsx` solo las re-exporta para no tocar el panel maestro. En el modal de pago hay skeletons anidados para los métodos de cobro y la tasa del día, y el catálogo de planes admite `isLoading`. Ver skill §30 y contexto 09 §5.25.
 
+## Notificaciones en tiempo real del portal
+
+`src/features/notifications/` implementa la campana y el módulo `/panel/notificaciones`. No hay sondeo periódico: `src/features/notifications/services/realtimeNotifications.ts` abre una conexión Laravel Echo/Reverb a los canales privados `notifications.all` y `notifications.{userId}` usando el token Sanctum; el evento `notification.created` (emitido con `ShouldBroadcastNow`, sin worker de cola) recarga la campana y el listado. La API de Laravel debe tener `BROADCAST_CONNECTION=reverb` y el servidor `php artisan reverb:start` en ejecución. Configuración del cliente en `VITE_REVERB_*` (ver `.env.example`). El estado leído por usuario se guarda en `admin_notification_reads`; al cerrar la campana se marcan como leídas las visibles.
+
 ## Copy de la landing
 
 Todo el texto está escrito para quien va a usar el sistema: beneficios claros y positivos, sin detalles internos (SQLite, WAL, RS-232, SHA-256, `append-only`, etc.) ni frases como "pendiente de validación" o "aún no integrados". La veracidad funcional se mantiene: no se anuncia impresión térmica conectada ni rendimiento inventado. Si agregas texto, sigue el criterio de la skill §14 y del contexto 09 §5.7.
