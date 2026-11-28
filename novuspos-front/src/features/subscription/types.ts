@@ -17,6 +17,8 @@ export interface Subscription {
   renewsAt: string
   amount: number
   currency: string
+  /** Prueba gratuita de 30 días: aún no hay ningún pago aprobado. Lo envía la API. */
+  isTrial?: boolean
 }
 
 /** Clave del catálogo que configura el dueño; los iniciales son `mobile` y `transfer`. */

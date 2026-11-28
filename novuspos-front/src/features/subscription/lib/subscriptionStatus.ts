@@ -1,8 +1,9 @@
-import type { Subscription } from '../types'
+import type { PaymentRecord, Subscription } from '../types'
 
 /**
- * Solo se puede cambiar de plan cuando la suscripción actual ya venció.
- * El backend debe aplicar la misma regla; esto evita ofrecer una acción inválida.
+ * El periodo de prueba (30 días) permite elegir y pagar cualquier plan.
+ * Después del primer pago aprobado, solo se puede renovar el plan vigente
+ * hasta que venza; al vencerse vuelven a estar disponibles todos los planes.
  */
 export function isSubscriptionExpired(subscription: Subscription): boolean {
   if (subscription.status === 'expired' || subscription.status === 'cancelled') return true
@@ -14,6 +15,18 @@ export function isSubscriptionExpired(subscription: Subscription): boolean {
   return due.getTime() < today.getTime()
 }
 
+export function isTrialSubscription(subscription: Subscription): boolean {
+  return subscription.isTrial === true && !isSubscriptionExpired(subscription)
+}
+
+/** Planes seleccionables en el catálogo: prueba o vencimiento = todos; pago activo = solo el actual. */
 export function canSwitchPlan(subscription: Subscription): boolean {
-  return isSubscriptionExpired(subscription)
+  if (subscription.status === 'pending_review') return false
+  return isSubscriptionExpired(subscription) || isTrialSubscription(subscription)
+}
+
+/** Plan que debe aparecer seleccionado (el del pago en revisión, si lo hay). */
+export function selectedPlanId(subscription: Subscription, payments: PaymentRecord[] = []): string {
+  const pending = payments.find((payment) => payment.status === 'pending_review' && payment.planId)
+  return pending?.planId ?? subscription.planId
 }

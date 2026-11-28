@@ -69,9 +69,18 @@ class SubscriptionService
             throw ValidationException::withMessages(['planId' => ['El plan seleccionado no existe.']]);
         }
 
-        if ($plan->slug !== $subscription->plan_slug && ! $this->isExpired($subscription)) {
+        $selectedPlanIsPending = $subscription->status === 'pending_review'
+            && $plan->slug !== $this->pendingPlanSlug($user);
+
+        if ($plan->slug !== $subscription->plan_slug && ! $this->isExpired($subscription) && ! $this->isTrial($user, $subscription)) {
             throw ValidationException::withMessages([
                 'planId' => ['Tu suscripción sigue activa. Podrás cambiar de plan cuando venza.'],
+            ]);
+        }
+
+        if ($selectedPlanIsPending) {
+            throw ValidationException::withMessages([
+                'planId' => ['Ya tienes un pago en revisión. Espera a que se evalúe antes de elegir otro plan.'],
             ]);
         }
 
@@ -183,6 +192,24 @@ class SubscriptionService
         return $subscription->renews_at !== null && $subscription->renews_at->isPast();
     }
 
+    /** Prueba gratuita: aún no hay ningún pago aprobado para este usuario. */
+    private function isTrial(User $user, Subscription $subscription): bool
+    {
+        if ($this->isExpired($subscription)) {
+            return false;
+        }
+
+        return ! $this->paymentRepository->listForUser($user->id)
+            ->contains(fn (Payment $payment): bool => $payment->status === 'approved');
+    }
+
+    private function pendingPlanSlug(User $user): ?string
+    {
+        return $this->paymentRepository->listForUser($user->id)
+            ->first(fn (Payment $payment): bool => $payment->status === 'pending_review')
+            ?->plan_slug;
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -196,6 +223,8 @@ class SubscriptionService
             'renewsAt' => $subscription->renews_at?->toDateString(),
             'amount' => (float) $subscription->amount,
             'currency' => $subscription->currency,
+            'isTrial' => ! $this->paymentRepository->listForUser((int) $subscription->user_id)
+                ->contains(fn (Payment $payment): bool => $payment->status === 'approved'),
         ];
     }
 

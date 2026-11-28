@@ -6,6 +6,7 @@ import { MS } from '@/shared/ui/MS'
 interface Props {
   subscription: Subscription
   plan: Plan
+  isTrial?: boolean
   onPay: () => void
 }
 
@@ -17,7 +18,7 @@ const STATUS_STYLE: Record<Subscription['status'], string> = {
 }
 
 /** Tarjeta principal: a qué plan está suscrito y en qué estado está el pago. */
-export function SubscriptionCard({ subscription, plan, onPay }: Props) {
+export function SubscriptionCard({ subscription, plan, isTrial = false, onPay }: Props) {
   const pending = subscription.status === 'pending_review'
 
   return (
@@ -31,7 +32,7 @@ export function SubscriptionCard({ subscription, plan, onPay }: Props) {
           </div>
         </div>
         <span className={`self-start px-2.5 py-0.5 rounded-full font-label-sm text-label-sm font-bold ${STATUS_STYLE[subscription.status]}`}>
-          {statusLabels[subscription.status]}
+          {isTrial ? 'Prueba gratuita' : statusLabels[subscription.status]}
         </span>
       </div>
 
@@ -63,7 +64,11 @@ export function SubscriptionCard({ subscription, plan, onPay }: Props) {
             {formatDate(pending ? subscription.startedAt : subscription.renewsAt)}
           </span>
           <span className="font-body-sm text-body-sm text-on-surface-variant">
-            {pending ? 'Estamos revisando tu comprobante.' : 'Fecha de tu próxima renovación.'}
+            {pending
+              ? 'Estamos revisando tu comprobante.'
+              : isTrial
+                ? 'Termina tu prueba gratuita el:'
+                : 'Fecha de tu próxima renovación.'}
           </span>
         </div>
       </div>
@@ -79,7 +84,9 @@ export function SubscriptionCard({ subscription, plan, onPay }: Props) {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
         <p className="font-body-sm text-body-sm text-on-surface-variant">
-          Paga desde tu banco y reporta los datos aquí. Es rápido y sin plazos forzosos.
+          {isTrial
+            ? 'Puedes activar el plan que quieras desde ahora. Si no pagas, sigues usando el sistema hasta que termine la prueba.'
+            : 'Paga desde tu banco y reporta los datos aquí. Es rápido y sin plazos forzosos.'}
         </p>
         <button
           type="button"
@@ -87,7 +94,7 @@ export function SubscriptionCard({ subscription, plan, onPay }: Props) {
           className="px-space-lg py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 transition-colors shrink-0"
         >
           <MS name="payments" className="text-[18px]" />
-          {pending ? 'Reportar otro pago' : 'Pagar suscripción'}
+          {pending ? 'Reportar otro pago' : isTrial ? 'Elegir y pagar un plan' : 'Pagar suscripción'}
         </button>
       </div>
     </div>

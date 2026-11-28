@@ -63,9 +63,19 @@ export const demoSubscriptionGateway: SubscriptionGateway = {
       throw new ValidationError({ reference: ['Esa referencia ya fue registrada. Revisa tu comprobante.'] })
     }
 
-    if (request.planId !== state.subscription.planId && !isSubscriptionExpired(state.subscription)) {
+    const trial = !isSubscriptionExpired(state.subscription)
+      && !state.payments.some((payment) => payment.status === 'approved')
+    const pendingPlan = state.payments.find((payment) => payment.status === 'pending_review')?.planId
+
+    if (request.planId !== state.subscription.planId && !isSubscriptionExpired(state.subscription) && !trial) {
       throw new ValidationError({
         planId: ['Tu suscripción sigue activa. Podrás cambiar de plan cuando venza.'],
+      })
+    }
+
+    if (state.subscription.status === 'pending_review' && request.planId !== pendingPlan) {
+      throw new ValidationError({
+        planId: ['Ya tienes un pago en revisión. Espera a que se evalúe antes de elegir otro plan.'],
       })
     }
 
